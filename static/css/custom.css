@@ -1,0 +1,435 @@
+:root {
+  --color-primary: #1e3a8a;
+  --color-secondary: #f97316;
+  --color-accent: #fbbf24;
+  --color-neutral-dark: #1f2937;
+  --color-neutral-light: #f3f4f6;
+  --color-background: #ffffff;
+  --color-text: #111827;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: "Arial", sans-serif;
+}
+
+.navbar {
+  background-color: var(--color-primary) !important;
+}
+
+.navbar-light .navbar-brand,
+.navbar-light .nav-link {
+  color: var(--color-background) !important;
+}
+
+.navbar-light .nav-link:hover {
+  color: var(--color-accent) !important;
+}
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--color-primary);
+}
+
+.bg-light {
+  background-color: var(--color-neutral-light) !important;
+}
+
+footer {
+  background-color: var(--color-neutral-dark);
+  color: var(--color-background);
+}
+
+footer a {
+  color: var(--color-accent);
+}
+
+footer a:hover {
+  color: var(--color-secondary);
+}
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  .lead {
+    font-size: 1rem;
+  }
+}
+
+/* Ajustes para telas muito pequenas */
+@media (max-width: 576px) {
+  .container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+/* Melhorias na acessibilidade */
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn:focus {
+  box-shadow: 0 0 0 0.25rem rgba(var(--color-primary-rgb), 0.5);
+}
+
+/* Melhorias na tipografia */
+body {
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-bottom: 1rem;
+}
+
+/* Espaçamento consistente */
+section {
+  padding: 4rem 0;
+}
+
+@media (max-width: 768px) {
+  section {
+    padding: 2rem 0;
+  }
+}
+/* Estilos do Banner Principal */
+.hero-banner {
+  background-color: #f8f9fa;
+  padding: 5rem 0;
+  margin-bottom: 3rem;
+}
+
+.hero-banner h1 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.hero-banner p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.hero-banner .btn-primary {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+}
+
+.hero-banner img {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 991px) {
+  .hero-banner {
+    text-align: center;
+    padding: 3rem 0;
+  }
+
+  .hero-banner img {
+    margin-top: 2rem;
+  }
+}
+/* Estilos da seção Sobre Nós */
+.about-us {
+  background-color: var(--color-neutral-light);
+}
+
+.about-us h2 {
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+.about-us .lead {
+  color: var(--color-neutral-dark);
+}
+
+.about-us ul li {
+  margin-bottom: 0.5rem;
+}
+
+.about-us .fas {
+  color: var(--color-secondary);
+}
+
+.about-us img {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 991px) {
+  .about-us {
+    text-align: center;
+  }
+
+  .about-us ul {
+    display: inline-block;
+    text-align: left;
+  }
+}
+/* Estilos da seção de serviços */
+.services .card {
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.services .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.services .card-title {
+  color: var(--color-primary);
+}
+
+.services .fa-2x {
+  color: var(--color-secondary);
+}
+
+.services ul li {
+  margin-bottom: 0.5rem;
+}
+
+.services .btn-outline-primary {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.services .btn-outline-primary:hover {
+  background-color: var(--color-primary);
+  color: var(--color-background);
+}
+/* Estilos da galeria */
+.gallery-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.25rem;
+}
+
+.gallery-item img {
+  transition: transform 0.3s ease-in-out;
+}
+
+.gallery-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  padding: 1rem;
+  text-align: center;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.1);
+}
+
+.gallery-item:hover .gallery-overlay {
+  opacity: 1;
+}
+
+.gallery-overlay h3 {
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.gallery-overlay p {
+  color: #f8f9fa;
+  margin-bottom: 1rem;
+}
+
+.gallery-overlay .btn-outline-light:hover {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+}
+.benefits .benefit-item {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.benefits .benefit-item:hover {
+  transform: translateY(-5px);
+}
+
+.benefits .benefit-item i {
+  color: #007bff; /* Cor primária do Bootstrap, ajuste conforme necessário */
+}
+
+.benefits .benefit-item h3 {
+  margin-top: 15px;
+  font-size: 1.25rem;
+}
+
+.benefits .benefit-item p {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+/* Estilos para a seção de depoimentos */
+.testimonials {
+  background-color: var(--color-neutral-light);
+}
+
+.testimonial-carousel {
+  padding: 20px;
+}
+
+.testimonial-item {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 30px;
+  margin: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.testimonial-item:hover {
+  transform: translateY(-5px);
+}
+
+.testimonial-item blockquote {
+  font-style: italic;
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+
+.testimonial-item .author {
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+.testimonial-item .role {
+  color: var(--color-secondary);
+  font-size: 0.9rem;
+}
+
+/* Estilos para o carrossel de depoimentos (usando Slick Carousel) */
+.slick-prev,
+.slick-next {
+  font-size: 0;
+  line-height: 0;
+  position: absolute;
+  top: 50%;
+  display: block;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  transform: translate(0, -50%);
+  cursor: pointer;
+  color: transparent;
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
+.slick-prev:before,
+.slick-next:before {
+  font-family: "slick";
+  font-size: 20px;
+  line-height: 1;
+  opacity: 0.75;
+  color: var(--color-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.slick-prev {
+  left: -25px;
+}
+
+.slick-next {
+  right: -25px;
+}
+/* Estilos para a seção CTA de orçamentos */
+.cta-quote {
+  background-color: var(--color-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-quote::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(30deg);
+}
+
+.cta-quote h2 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cta-quote .lead {
+  font-size: 1.25rem;
+  opacity: 0.9;
+}
+
+.cta-quote .btn-light {
+  font-weight: bold;
+  padding: 12px 30px;
+  transition: all 0.3s ease;
+}
+
+.cta-quote .btn-light:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 991px) {
+  .cta-quote .text-lg-end {
+    text-align: center !important;
+    margin-top: 20px;
+  }
+}

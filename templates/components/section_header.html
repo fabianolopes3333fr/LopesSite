@@ -1,0 +1,10 @@
+{% comment %}
+Uso: {% include 'components/section_header.html' with title="Nossos Serviços" subtitle="Conheça nossa gama de serviços de pintura" %}
+{% endcomment %}
+
+<div class="text-center mb-5">
+    <h2 class="display-4">{{ title }}</h2>
+    {% if subtitle %}
+        <p class="lead text-muted">{{ subtitle }}</p>
+    {% endif %}
+</div>

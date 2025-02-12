@@ -1,0 +1,23 @@
+{% comment %}
+Uso: {% include 'components/service_item.html' with icon="fas fa-paint-roller" title="Pintura Residencial" description="Serviços de pintura para sua casa" %}
+{% endcomment %}
+
+<div class="card h-100 shadow-sm">
+    <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+            <i class="{{ icon }} fa-2x text-primary me-3"></i>
+            <h3 class="card-title h5 mb-0">{{ title }}</h3>
+        </div>
+        <p class="card-text">{{ description }}</p>
+        {% if features %}
+            <ul class="list-unstyled mt-3">
+                {% for feature in features|split:"|" %}
+                    <li><i class="fas fa-check text-success me-2"></i>{{ feature }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <div class="card-footer bg-transparent border-top-0">
+        <a href="#" class="btn btn-outline-primary btn-sm">En savoir plus</a>
+    </div>
+</div>

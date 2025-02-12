@@ -1,0 +1,5 @@
+{% comment %}
+Uso: {% include 'components/button.html' with text="Clique aqui" url="#" type="primary" %}
+{% endcomment %}
+
+<a href="{{ url }}" class="btn btn-{{ type|default:'primary' }}">{{ text }}</a>

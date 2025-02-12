@@ -1,0 +1,246 @@
+{% extends 'home/base_home.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Accueil - Lopes Peinture{% endblock %}
+
+{% block home_content %}
+    <!-- Banner Principal -->
+    <section class="hero-banner">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-3">Transformez votre espace avec Lopes Peinture</h1>
+                    <p class="lead mb-4">Des solutions de peinture professionnelles pour votre maison et votre entreprise</p>
+                    <a href="{% url 'contact' %}" class="btn btn-primary btn-lg">Demandez un devis gratuit</a>
+                </div>
+                <div class="col-lg-6">
+                    <img src="{% static 'images/banner-image.jpg' %}" alt="Lopes Peinture" class="img-fluid rounded shadow-lg">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção Sobre Nós -->
+    <section class="about-us py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <img src="{% static 'images/about-us.jpg' %}" alt="Équipe Lopes Peinture" class="img-fluid rounded shadow">
+                </div>
+                <div class="col-lg-6">
+                    <h2 class="mb-4">À propos de Lopes Peinture</h2>
+                    <p class="lead mb-4">Depuis plus de 20 ans, Lopes Peinture transforme les espaces de vie et de travail avec passion et expertise.</p>
+                    <p>Notre équipe de professionnels qualifiés s'engage à fournir des services de peinture de haute qualité, en utilisant les meilleures techniques et matériaux pour garantir des résultats durables et esthétiques.</p>
+                    <ul class="list-unstyled mb-4">
+                        <li><i class="fas fa-check text-primary me-2"></i> Expertise en peinture résidentielle et commerciale</li>
+                        <li><i class="fas fa-check text-primary me-2"></i> Utilisation de produits respectueux de l'environnement</li>
+                        <li><i class="fas fa-check text-primary me-2"></i> Satisfaction client garantie</li>
+                    </ul>
+                    <a href="{% url 'about' %}" class="btn btn-primary">En savoir plus sur nous</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="services py-5">
+        <div class="container">
+            {% include 'components/section_header.html' with title="Nos Services" subtitle="Découvrez notre gamme complète de services de peinture professionnelle" %}
+
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    {% include 'components/service_item.html' with 
+                        icon="fas fa-home" 
+                        title="Peinture Résidentielle" 
+                        description="Transformez votre espace de vie avec nos services de peinture intérieure et extérieure pour maisons et appartements." 
+                        features="Conseils personnalisés|Préparation minutieuse des surfaces|Finitions impeccables"
+                    %}
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    {% include 'components/service_item.html' with 
+                        icon="fas fa-building" 
+                        title="Peinture Commerciale" 
+                        description="Des solutions de peinture professionnelles pour bureaux, magasins, restaurants et autres espaces commerciaux." 
+                        features="Planification adaptée à vos horaires|Respect des normes de sécurité|Durabilité garantie"
+                    %}
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    {% include 'components/service_item.html' with 
+                        icon="fas fa-brush" 
+                        title="Peinture Décorative" 
+                        description="Ajoutez une touche unique à votre espace avec nos techniques de peinture décorative spécialisées." 
+                        features="Faux-finis|Effets texturés|Fresques murales"
+                    %}
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    {% include 'components/service_item.html' with 
+                        icon="fas fa-spray-can" 
+                        title="Revêtements Spéciaux" 
+                        description="Protection et esthétique optimales avec nos revêtements spéciaux pour différents types de surfaces." 
+                        features="Revêtements anti-corrosion|Peintures époxy|Finitions industrielles"
+                    %}
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    {% include 'components/service_item.html' with 
+                        icon="fas fa-recycle" 
+                        title="Peinture Écologique" 
+                        description="Des solutions de peinture respectueuses de l'environnement pour un habitat sain et durable." 
+                        features="Peintures à faible COV|Produits certifiés écologiques|Conseils pour un intérieur sain"
+                    %}
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    {% include 'components/service_item.html' with 
+                        icon="fas fa-tools" 
+                        title="Réparation et Préparation" 
+                        description="Services complets de réparation et de préparation des surfaces avant peinture." 
+                        features="Réparation de plâtre|Ponçage et lissage|Traitement anti-humidité"
+                    %}
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="{% url 'services' %}" class="btn btn-primary btn-lg">Voir tous nos services</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="benefits py-5">
+        <div class="container">
+            {% include 'components/section_header.html' with title="Pourquoi Choisir Lopes Peinture?" subtitle="Découvrez les avantages de travailler avec nous" %}
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="benefit-item text-center">
+                        <i class="fas fa-medal fa-3x text-primary mb-3"></i>
+                        <h3>Expertise Reconnue</h3>
+                        <p>Plus de 20 ans d'expérience dans le domaine de la peinture professionnelle.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="benefit-item text-center">
+                        <i class="fas fa-leaf fa-3x text-primary mb-3"></i>
+                        <h3>Produits Écologiques</h3>
+                        <p>Utilisation de peintures et matériaux respectueux de l'environnement.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="benefit-item text-center">
+                        <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                        <h3>Équipe Qualifiée</h3>
+                        <p>Des peintres professionnels formés aux dernières techniques du métier.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="benefit-item text-center">
+                        <i class="fas fa-clock fa-3x text-primary mb-3"></i>
+                        <h3>Respect des Délais</h3>
+                        <p>Nous nous engageons à terminer chaque projet dans les temps convenus.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="benefit-item text-center">
+                        <i class="fas fa-paint-brush fa-3x text-primary mb-3"></i>
+                        <h3>Finition Impeccable</h3>
+                        <p>Un souci du détail pour des résultats qui dépassent vos attentes.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="benefit-item text-center">
+                        <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                        <h3>Garantie de Satisfaction</h3>
+                        <p>Votre satisfaction est notre priorité, avec une garantie sur tous nos travaux.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="gallery py-5 bg-light">
+        <div class="container">
+            {% include 'components/section_header.html' with title="Nos Réalisations" subtitle="Découvrez quelques-uns de nos projets récents" %}
+
+            <div class="row g-4">
+                {% for project in recent_projects %}
+                    <div class="col-md-4">
+                        <div class="gallery-item">
+                            <img src="{{ project.image.url }}" alt="{{ project.title }}" class="img-fluid rounded">
+                            <div class="gallery-overlay">
+                                <h3>{{ project.title }}</h3>
+                                <p>{{ project.description|truncatewords:20 }}</p>
+                                <a href="{% url 'service_detail' project.service.id %}#project-{{ project.id }}" class="btn btn-outline-light">Voir plus</a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12 text-center">
+                        <p>Aucun projet récent à afficher pour le moment.</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="{% url 'services' %}" class="btn btn-primary btn-lg">Voir tous nos services et projets</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials py-5">
+        <div class="container">
+            {% include 'components/section_header.html' with title="Témoignages" subtitle="Ce que disent nos clients" %}
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="testimonial-carousel">
+                        <div class="testimonial-item">
+                            {% include 'components/testimonial.html' with quote="Excellent service, très professionnel ! L'équipe de Lopes Peinture a transformé notre maison en un véritable chef-d'œuvre." author="Marie Dupont" role="Propriétaire" %}
+                        </div>
+                        <div class="testimonial-item">
+                            {% include 'components/testimonial.html' with quote="Travail de qualité, je recommande vivement. Leur attention aux détails et leur expertise sont vraiment impressionnantes." author="Pierre Martin" role="Gérant d'entreprise" %}
+                        </div>
+                        <div class="testimonial-item">
+                            {% include 'components/testimonial.html' with quote="Rapide, efficace et abordable. Lopes Peinture a dépassé toutes mes attentes. Je les recommanderai à tous mes amis." author="Sophie Lefebvre" role="Décoratrice d'intérieur" %}
+                        </div>
+                        <div class="testimonial-item">
+                            {% include 'components/testimonial.html' with quote="Une équipe de professionnels passionnés. Ils ont su donner vie à notre vision avec brio." author="Jean Dubois" role="Architecte" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Seção CTA para Orçamentos -->
+    <section class="cta-quote py-5 bg-primary text-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8 mb-4 mb-lg-0">
+                    <h2 class="mb-3">Prêt à transformer votre espace ?</h2>
+                    <p class="lead mb-0">Obtenez un devis gratuit pour votre projet de peinture dès aujourd'hui !</p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <a href="{% url 'quotes:request_quote' %}" class="btn btn-light btn-lg">Demander un devis gratuit</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="projects">
+        <div class="container">
+            {% include 'components/section_header.html' with title="Derniers Projets" subtitle="Découvrez nos réalisations récentes" %}
+
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    {% include 'components/card.html' with title="Rénovation Appartement" content="Peinture complète d'un appartement de 3 pièces" image_url="{% static 'images/project1.jpg' %}" button_text="Voir plus" button_url="#" %}
+                </div>
+                <div class="col-md-4 mb-4">
+                    {% include 'components/card.html' with title="Peinture Extérieure" content="Rafraîchissement de la façade d'une maison" image_url="{% static 'images/project2.jpg' %}" button_text="Voir plus" button_url="#" %}
+                </div>
+                <div class="col-md-4 mb-4">
+                    {% include 'components/card.html' with title="Décoration Intérieure" content="Création d'une fresque murale pour un restaurant" image_url="{% static 'images/project3.jpg' %}" button_text="Voir plus" button_url="#" %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    
+{% endblock %}
