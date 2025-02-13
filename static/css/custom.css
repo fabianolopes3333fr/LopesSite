@@ -1,6 +1,8 @@
 :root {
-  --color-primary: #1e3a8a;
-  --color-secondary: #f97316;
+  --color-primary: #424e55;
+  --color-primary1: #1e3a8a;
+  --color-secondary: #5a8b27;
+  --color-secondary1: #f97316;
   --color-accent: #fbbf24;
   --color-neutral-dark: #1f2937;
   --color-neutral-light: #f3f4f6;
@@ -14,9 +16,9 @@ body {
   font-family: "Arial", sans-serif;
 }
 
-.navbar {
+/* .navbar {
   background-color: var(--color-primary) !important;
-}
+} */
 
 .navbar-light .navbar-brand,
 .navbar-light .nav-link {
@@ -27,12 +29,12 @@ body {
   color: var(--color-accent) !important;
 }
 .btn-primary {
-  background-color: var(--color-primary);
+  background-color: var(--color-secondary);
   border-color: var(--color-primary);
 }
 
 .btn-primary:hover {
-  background-color: var(--color-secondary);
+  background-color: var(--color-primary);
   border-color: var(--color-secondary);
 }
 
@@ -133,18 +135,26 @@ section {
 }
 /* Estilos do Banner Principal */
 .hero-banner {
-  background-color: #f8f9fa;
-  padding: 5rem 0;
+  background: url("../images/bg-home-desctop.webp") no-repeat center
+    center/cover;
+  padding: 11rem 0;
   margin-bottom: 3rem;
+  height: 80vh;
 }
 
 .hero-banner h1 {
-  color: #333;
+  color: var(--color-background);
   margin-bottom: 1rem;
 }
-
+.te {
+  color: var(--color-secondary);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
 .hero-banner p {
-  color: #666;
+  color: var(--color-background);
   margin-bottom: 2rem;
 }
 
@@ -161,7 +171,7 @@ section {
 @media (max-width: 991px) {
   .hero-banner {
     text-align: center;
-    padding: 3rem 0;
+    padding: 11rem 0;
   }
 
   .hero-banner img {
@@ -431,5 +441,39 @@ section {
   .cta-quote .text-lg-end {
     text-align: center !important;
     margin-top: 20px;
+  }
+}
+#main-header {
+  transition: background-color 0.3s ease;
+}
+
+#main-header.transparent {
+  background-color: transparent;
+}
+
+#main-header.scrolled {
+  background-color: #424e55;
+}
+
+.navbar-brand img {
+  transition: height 0.3s ease;
+}
+
+#main-header.scrolled .navbar-brand img {
+  height: 30px;
+}
+
+@media (max-width: 991px) {
+  .offcanvas {
+    background-color: #424e55;
+  }
+
+  .offcanvas-header,
+  .offcanvas-body {
+    color: white;
+  }
+
+  .navbar-nav .nav-link {
+    color: white !important;
   }
 }
