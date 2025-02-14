@@ -3,6 +3,9 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from .forms import CustomUserCreationForm
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView
+
 
 def register(request):
     if request.method == 'POST':
@@ -13,8 +16,9 @@ def register(request):
             messages.success(request, "Registration successful.")
             return redirect('home')
         messages.error(request, "Unsuccessful registration. Invalid information.")
-    form = CustomUserCreationForm()
-    return render(request, 'users/register.html', {'form': form})
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'registration/register.html', {'form': form})
 
 def user_login(request):
     if request.method == 'POST':
@@ -36,3 +40,9 @@ def user_login(request):
 
 def profile(request):
     return render(request, 'users/profile.html')
+
+
+class SignUpView(CreateView):
+    form_class = CustomUserCreationForm
+    success_url = reverse_lazy('login')
+    template_name = 'registration/register.html'

@@ -1,32 +1,62 @@
-<footer class="bg-light py-4 mt-auto">
+<footer class="py-5 bg-dark text-light mt-auto">
     <div class="container">
-        <div class="row">
-            <div class="col-md-4 mb-3 mb-md-0">
-                <h5>Lopes Peinture</h5>
-                <p class="mb-0">Votre partenaire de confiance pour tous vos projets de peinture.</p>
-            </div>
-            <div class="col-md-4 mb-3 mb-md-0">
-                <h5>Liens rapides</h5>
-                <ul class="list-unstyled">
-                    <li><a href="{% url 'home' %}">Accueil</a></li>
-                    <li><a href="{% url 'services' %}">Services</a></li>
-                    <li><a href="{% url 'projects' %}">Projets</a></li>
-                    <li><a href="{% url 'blog' %}">Blog</a></li>
-                    <li><a href="{% url 'contact' %}">Contact</a></li>
+        <div class="row gy-4">
+            <div class="col-12 col-md-6 col-lg-3">
+                <h5 class="text-uppercase mb-3">Lopes Peinture</h5>
+                <p class="mb-3">Votre partenaire de confiance pour tous vos projets de peinture depuis 2003.</p>
+                <ul class="list-inline  social-icons mb-0">
+                    <li class="list-inline-item me-3"><a target="_blank" href="https://www.facebook.com/lopespeinture.fr" aria-label="Facebook" class="text-text-primary "><i class=" fab fa-facebook-f fa-lg"></i></a></li>
+                    <li class="list-inline-item me-3"><a target="_blank" href="https://www.instagram.com/lopespeinture" aria-label="Instagram" class="text-text-primary"><i class="fab fa-instagram fa-lg"></i></a></li>
+                    <li class="list-inline-item me-3"><a target="_blank" href="https://x.com/LopesPeinture" aria-label="twitter" class="text-text-primary"><i class="fab fa-twitter fa-lg"></i></a></li>
+                    <li class="list-inline-item"><a target="_blank" href="https://fr.pinterest.com/LopesPeinture/" aria-label="Pinterest" class="text-text-primary"><i class="fab fa-pinterest-p fa-lg"></i></a></li>
                 </ul>
             </div>
-            <div class="col-md-4">
-                <h5>Contactez-nous</h5>
-                <p class="mb-0">
-                    <i class="fas fa-map-marker-alt"></i> 123 Rue de la Peinture, 75000 Paris<br>
-                    <i class="fas fa-phone"></i> +33 1 23 45 67 89<br>
-                    <i class="fas fa-envelope"></i> contact@lopespeinture.fr
-                </p>
+            <div class="col-6 col-md-6 col-lg-3">
+                <h5 class="text-uppercase mb-3">Liens rapides</h5>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><a href="{% url 'home' %}" class="text-light text-decoration-none">Accueil</a></li>
+                    <li class="mb-2"><a href="{% url 'services' %}" class="text-light text-decoration-none">Services</a></li>
+                    <li class="mb-2"><a href="{% url 'projects' %}" class="text-light text-decoration-none">Projets</a></li>
+                    <li class="mb-2"><a href="{% url 'blog' %}" class="text-light text-decoration-none">Blog</a></li>
+                    <li><a href="{% url 'contact' %}" class="text-light text-decoration-none">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md-6 col-lg-3">
+                <h5 class="text-uppercase mb-3">Nos services</h5>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><a href="#" class="text-light">Peinture résidentielle</a></li>
+                    <li class="mb-2"><a href="#" class="text-light">Peinture commerciale</a></li>
+                    <li class="mb-2"><a href="#" class="text-light">Peinture décorative</a></li>
+                    <li class="mb-2"><a href="#" class="text-light">Revêtements spéciaux</a></li>
+                    <li><a href="#" class="text-light">Peinture écologique</a></li>
+                </ul>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <h5 class="text-uppercase mb-3">Contactez-nous</h5>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> 261 Chemin de la castellane, 31790 Toulouse</li>
+                    <li class="mb-2"><i class="fas fa-phone me-2"></i> <a href="tel:+33634623320" class="text-light">+33 6 34 62 33 20</a></li>
+                    <li class="mb-2"><i class="fas fa-envelope me-2"></i> <a href="mailto:contact@lopespeinture.fr" class="text-light">contact@lopespeinture.fr</a></li>
+                    <li><i class="fas fa-clock me-2"></i> Lun-Ven: 8h-17h</li>
+                </ul>
             </div>
         </div>
-        <hr class="my-4">
-        <div class="text-center">
-            <p class="mb-0">&copy; 2023 Lopes Peinture. Tous droits réservés.</p>
+        <hr class="my-4 bg-light">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                <p class="mb-0">&copy; 2025 Lopes Peinture. Tous droits réservés.</p>
+            </div>
+            <div class="col-md-6 text-center text-md-end">
+                <ul class="list-inline mb-0">
+                    <li class="list-inline-item"><a href="#" class="text-light">Mentions légales</a></li>
+                    <li class="list-inline-item d-none d-sm-inline-block">|</li>
+                    <li class="list-inline-item"><a href="#" class="text-light">Politique de confidentialité</a></li>
+                    <li class="list-inline-item d-none d-sm-inline-block">|</li>
+                    <li class="list-inline-item"><a href="#" class="text-light">Plan du site</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </footer>
+
+

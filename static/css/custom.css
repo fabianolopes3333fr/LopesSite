@@ -14,12 +14,16 @@ body {
   background-color: var(--color-background);
   color: var(--color-text);
   font-family: "Arial", sans-serif;
+  overflow: hidden;
 }
 
 /* .navbar {
   background-color: var(--color-primary) !important;
 } */
 
+.nav-item > .t {
+  border-radius: 50%;
+}
 .navbar-light .navbar-brand,
 .navbar-light .nav-link {
   color: var(--color-background) !important;
@@ -62,7 +66,7 @@ h6 {
 }
 
 footer {
-  background-color: var(--color-neutral-dark);
+  background-color: var(--color-primary);
   color: var(--color-background);
 }
 
@@ -309,7 +313,7 @@ section {
 }
 
 .benefits .benefit-item i {
-  color: #007bff; /* Cor primária do Bootstrap, ajuste conforme necessário */
+  color: #5b8c28; /* Cor primária do Bootstrap, ajuste conforme necessário */
 }
 
 .benefits .benefit-item h3 {
@@ -418,7 +422,8 @@ section {
 .cta-quote h2 {
   font-size: 2.5rem;
   font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  color: var(--color-background);
+  text-shadow: 2px 2px 4px rgba(43, 233, 100, 0.1);
 }
 
 .cta-quote .lead {
@@ -462,7 +467,9 @@ section {
 #main-header.scrolled .navbar-brand img {
   height: 30px;
 }
-
+.tex {
+  color: var(--color-neutral-light);
+}
 @media (max-width: 991px) {
   .offcanvas {
     background-color: #424e55;
@@ -476,4 +483,110 @@ section {
   .navbar-nav .nav-link {
     color: white !important;
   }
+}
+
+/* Estilos para a seção de login  */
+
+.bg-brand {
+  background-color: var(
+    --color-primary
+  ); /* Cor da marca, ajuste conforme necessário */
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.logo {
+  max-width: 90%;
+  height: auto;
+}
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background-color: #f8f9fa;
+}
+
+.auth-form {
+  max-width: 400px;
+  margin: 0 auto;
+}
+.btn-login,
+.btn-register,
+.btn-reset {
+  background-color: #4e73df;
+  border-color: #4e73df;
+  font-weight: bold;
+  padding: 10px 20px;
+  transition: all 0.3s ease;
+}
+.btn-login:hover,
+.btn-reset:hover,
+.btn-register:hover {
+  background-color: #2e59d9;
+  border-color: #2e59d9;
+  transform: translateY(-2px);
+}
+.form-floating > label {
+  color: #6e707e;
+}
+.form-control:focus {
+  border-color: #4e73df;
+  box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+.auth-links a {
+  color: #4e73df;
+  transition: color 0.3s ease;
+}
+.auth-links a:hover {
+  color: #2e59d9;
+}
+
+.auth-form {
+  max-width: 400px;
+  margin: 0 auto;
+}
+.btn-reset {
+  background-color: #4e73df;
+  border-color: #4e73df;
+  font-weight: bold;
+  padding: 10px 20px;
+  transition: all 0.3s ease;
+}
+.btn-reset:hover {
+  background-color: #2e59d9;
+  border-color: #2e59d9;
+  transform: translateY(-2px);
+}
+.form-floating > label {
+  color: #6e707e;
+}
+.form-control:focus {
+  border-color: #4e73df;
+  box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+.auth-message {
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+}
+.success-icon {
+  color: #28a745;
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+.btn-login {
+  background-color: #4e73df;
+  border-color: #4e73df;
+  font-weight: bold;
+  padding: 10px 20px;
+  transition: all 0.3s ease;
+}
+.btn-login:hover {
+  background-color: #2e59d9;
+  border-color: #2e59d9;
+  transform: translateY(-2px);
 }

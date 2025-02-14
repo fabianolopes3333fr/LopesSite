@@ -1,0 +1,77 @@
+{% extends 'base/auth_base.html' %}
+{% load static %}
+
+{% block title %}Inscription - Lopes Peinture{% endblock %}
+
+{% block auth_content %}
+<div class="auth-form card p-4 shadow-lg">
+    <h2 class="text-center mb-4">Créer un compte</h2>
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="username" name="username" placeholder="Nom d'utilisateur" required>
+            <label for="username">Nom d'utilisateur</label>
+            <div class="invalid-feedback">
+                Veuillez choisir un nom d'utilisateur.
+            </div>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="email" class="form-control" id="email" name="email" placeholder="E-mail" required>
+            <label for="email">E-mail</label>
+            <div class="invalid-feedback">
+                Veuillez saisir une adresse e-mail valide.
+            </div>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="password1" name="password1" placeholder="Mot de passe" required>
+            <label for="password1">Mot de passe</label>
+            <div class="invalid-feedback">
+                Veuillez choisir un mot de passe.
+            </div>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirmez le mot de passe" required>
+            <label for="password2">Confirmez le mot de passe</label>
+            <div class="invalid-feedback">
+                Les mots de passe ne correspondent pas.
+            </div>
+        </div>
+        <div class="d-grid gap-2 mb-3">
+            <button type="submit" class="btn btn-primary btn-register">S'inscrire</button>
+        </div>
+    </form>
+    <div class="text-center auth-links">
+        <p>Vous avez déjà un compte ? <a href="{% url 'login' %}" class="text-decoration-none">Connectez-vous ici</a></p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Validation du formulaire
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    // Vérification supplémentaire pour les mots de passe correspondants
+                    var password1 = document.getElementById('password1')
+                    var password2 = document.getElementById('password2')
+                    if (password1.value !== password2.value) {
+                        password2.setCustomValidity('Les mots de passe ne correspondent pas.')
+                    } else {
+                        password2.setCustomValidity('')
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
+{% endblock %}

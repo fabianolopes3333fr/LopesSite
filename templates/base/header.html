@@ -1,59 +1,117 @@
-
-
 {% load static %}
 
 <header id="main-header" class="fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar navbar-expand-lg navbar-light ">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
                 <img src="{% static 'images/logo-175x50.svg' %}" alt="Lopes Peinture" height="40">
             </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            
+            <!-- Botão de toggle para o menu mobile -->
+            <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="offcanvas offcanvas-end" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+            <!-- Menu para desktop -->
+            <div class="collapse navbar-collapse d-none d-lg-flex" id="desktopMenu">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">Accueil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'services' %}">Peintures</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'projects' %}">Nos Couleurs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'blog' %}">Inspiration et Conseils</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'contact' %}">Contact</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'profile' %}"><i class="fas fa-user me-2"></i>Profil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Déconnexion</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item ms-4">
+                            <a class="nav-link btn btn-primary rounded p-2" href="{% url 'login' %}" title="Connexion">
+                                <i class="fas fa-sign-in-alt"></i> Connexion
+                            </a>
+                        </li>
+                        
+                    {% endif %}
+                </ul>
+            </div>
+
+            <!-- Menu para mobile -->
+            <div class="offcanvas offcanvas-end d-lg-none" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
                 <div class="offcanvas-header">
-                    <h5 class="offcanvas-title" id="sidebarMenuLabel">Menu</h5>
+                    <h5 class="offcanvas-title tex" id="mobileMenuLabel">Menu</h5>
                     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
+                <form class="d-flex mx-3 my-3" method="GET" >
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Rechercher..." aria-label="Rechercher" name="q">
+                        <button class="btn btn-outline-primary" type="submit"><i class="fas fa-search"></i></button>
+                    </div>
+                </form>
                 <div class="offcanvas-body">
-                    <ul class="navbar-nav ms-auto">
+                    <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'home' %}">Accueil</a>
+                            <a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home me-2"></i>Accueil</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'services' %}">Services</a>
+                            <a class="nav-link" href="{% url 'services' %}"><i class="fas fa-paint-roller me-2"></i>Peintures</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'projects' %}">Projets</a>
+                            <a class="nav-link" href="{% url 'projects' %}"><i class="fas fa-palette me-2"></i>Nos Couleurs</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'blog' %}">Blog</a>
+                            <a class="nav-link" href="{% url 'blog' %}"><i class="fas fa-lightbulb me-2"></i>Inspiration et Conseils</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'contact' %}">Contact</a>
+                            <a class="nav-link" href="{% url 'contact' %}"><i class="fas fa-envelope me-2"></i>Contact</a>
                         </li>
-                        {% if user.is_authenticated %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'profile' %}">Profil</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'logout' %}">Déconnexion</a>
-                            </li>
-                        {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'login' %}">Connexion</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'register' %}">Inscription</a>
-                            </li>
-                        {% endif %}
                     </ul>
+                    <hr>
+                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Liens rapides</span>
+                    </h6>
+                    <ul class="nav flex-column mb-2">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#"><i class="fas fa-file-invoice me-2"></i>Demander un devis</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#"><i class="fas fa-calendar-alt me-2"></i>Prendre rendez-vous</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#"><i class="fas fa-question-circle me-2"></i>FAQ</a>
+                        </li>
+                    </ul>
+                    <hr>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'profile' %}" class="btn btn-outline-primary btn-sm me-2 mb-2 w-100">
+                            <i class="fas fa-user me-2"></i>Profil
+                        </a>
+                        <a href="{% url 'logout' %}" class="btn btn-outline-primary btn-sm me-2 mb-2 w-100">
+                            <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-primary btn-sm me-2 mb-2 w-100">
+                            <i class="fas fa-sign-in-alt me-2"></i>Connexion
+                        </a>
+                        <a href="{% url 'register' %}" class="btn btn-outline-light btn-sm me-2 mb-2 w-100">
+                            <i class="fas fa-user-plus me-2"></i>Inscription
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </nav>
 </header>
-
