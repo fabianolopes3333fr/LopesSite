@@ -1,0 +1,40 @@
+{% extends 'base/base_pages.html' %}
+{% load i18n %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <article>
+        <h1 class="mb-4">{{ post.title }}</h1>
+        <p class="text-muted">{% trans "Publié le" %} {{ post.created_at|date:"d F Y" }} {% trans "par" %} {{ post.author }}</p>
+        <div class="mt-4">
+            {{ post.content|linebreaks }}
+        </div>
+    </article>
+    <a href="{% url 'blog_list' %}" class="btn btn-secondary mt-4">{% trans "Retour au blog" %}</a>
+    <section id="comments" class="mt-5">
+        <h3>{% trans "Commentaires" %} ({{ post.post_comments.count }})</h3>
+        {% for comment in post.post_comments.all %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ comment.author }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ comment.created_at|date:"d F Y H:i" }}</h6>
+                    <p class="card-text">{{ comment.content }}</p>
+                </div>
+            </div>
+        {% empty %}
+            <p>{% trans "Aucun commentaire pour le moment." %}</p>
+        {% endfor %}
+    </section>
+
+    <section id="add-comment" class="mt-5">
+        <h4>{% trans "Ajouter un commentaire" %}</h4>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">{% trans "Envoyer" %}</button>
+        </form>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base/base_pages.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Articles avec le tag" %} {{ tag.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">{% trans "Articles avec le tag" %}: {{ tag.name }}</h1>
+    {% for post in posts %}
+        <article class="mb-4">
+            <h2><a href="{% url 'blog:blog_detail' post.slug %}">{{ post.title }}</a></h2>
+            <p class="text-muted">{% trans "Publié le" %} {{ post.created_at|date:"d F Y" }} {% trans "par" %} {{ post.author }}</p>
+            <p>{{ post.content|truncatewords:50 }}</p>
+            <a href="{% url 'blog:blog_detail' post.slug %}" class="btn btn-primary">{% trans "Lire plus" %}</a>
+        </article>
+    {% empty %}
+        <p>{% trans "Aucun article avec ce tag." %}</p>
+    {% endfor %}
+
+    {% include 'components/pagination.html' %}
+</div>
+{% endblock %}

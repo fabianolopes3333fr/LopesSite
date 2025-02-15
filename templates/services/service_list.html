@@ -1,0 +1,81 @@
+{% extends 'base/base_services.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Nos Services - Lopes Peinture{% endblock %}
+
+{% block content %}
+<section class="services-list mt-5">
+    <div class="container">
+        <h1 class="text-center mb-5">{% trans "Nos Services" %}</h1>
+
+        <form method="get" class="mb-4">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    {{ form.category }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.search }}
+                </div>
+                <div class="col-md-2 mb-3">
+                    <button type="submit" class="btn btn-primary w-100">{% trans "Filtrer" %}</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="row">
+            {% for service in services %}
+            <div class="col-md-4 mb-4">
+                <div class="service-item text-center">
+                    <i class="{{ service.icon }} service-icon"></i>
+                    <h3>{{ service.title }}</h3>
+                    <p>{{ service.description|truncatewords:20 }}</p>
+                    <a href="{% url 'service_detail' service.id %}" class="btn btn-primary">{% trans "En savoir plus" %}</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <p class="text-center">{% trans "Aucun service trouvé." %}</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if is_paginated %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">{% trans "Précédent" %}</a></li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if page_obj.number == num %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">{% trans "Suivant" %}</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</section>
+
+
+<!-- Nova seção para a galeria de projetos -->
+<section class="project-gallery mt-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Projets Liés</h2>
+        <div class="gallery-grid">
+            {% for project in service.projects.all %}
+                <div class="gallery-item">
+                    <img src="{{ project.image.url }}" alt="{{ project.title }}">
+                    <div class="gallery-overlay">
+                        <h4>{{ project.title }}</h4>
+                        <p>{{ project.description|truncatewords:20 }}</p>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-center">Aucun projet lié à ce service pour le moment.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

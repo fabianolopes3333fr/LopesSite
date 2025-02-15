@@ -1,0 +1,121 @@
+{% extends 'base/base_pages.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans "Blog - Inspiration et Conseils" %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/blog.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row">
+        <div class="col-lg-8 pt-5">
+            <h1 class="mb-4 border-bottom pb-3">{% trans "Blog - Inspiration et Conseils" %}</h1>
+
+            {% for post in posts %}
+                <article class="card mb-4 shadow-sm">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            {% if post.image %}
+                                <img src="{{ post.image.url }}" class="img-fluid rounded-start h-100 object-fit-cover" alt="{{ post.title }}">
+                            {% else %}
+                                <img src="{% static 'images/default_blog_image.jpg' %}" class="img-fluid rounded-start h-100 object-fit-cover" alt="Default Image">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h2 class="card-title h4"><a href="{% url 'blog_detail' post.slug %}" class="text-decoration-none text-dark">{{ post.title }}</a></h2>
+                                <p class="card-text text-muted small">
+                                    <i class="fas fa-calendar-alt me-2"></i>{% trans "Publié le" %} {{ post.created_at|date:"d F Y" }}
+                                    <i class="fas fa-user ms-3 me-2"></i>{% trans "par" %} {{ post.author }}
+                                </p>
+                                <p class="card-text">{{ post.content|truncatewords:30 }}</p>
+                                <a href="{% url 'blog_detail' post.slug %}" class="btn btn-outline-primary btn-sm">{% trans "Lire la suite" %} <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>{% trans "Aucun article disponible pour le moment." %}
+                </div>
+            {% endfor %}
+
+            {% if is_paginated %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4 mt-5 pt-5 mt-lg-0">
+            <!-- Formulário de busca -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h3 class="card-title h5 mb-3">{% trans "Rechercher" %}</h3>
+                    <form action="{% url 'search' %}" method="get">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="{% trans 'Rechercher des articles...' %}" name="q" aria-label="Search">
+                            <button class="btn btn-outline-primary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h3 class="card-title h5 mb-3">{% trans "Catégories" %}</h3>
+                    <ul class="list-group list-group-flush">
+                        {% for category in categories %}
+                            <li class="list-group-item">
+                                <a href="{% url 'category_posts' category.slug %}" class="text-decoration-none text-dark">
+                                    <i class="fas fa-folder me-2 text-primary"></i>{{ category.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title h5 mb-3">{% trans "Tags" %}</h3>
+                    <div class="tag-cloud">
+                        {% for tag in tags %}
+                            <a href="{% url 'tag_posts' tag.slug %}" class="btn btn-outline-primary btn-sm m-1">{{ tag.name }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

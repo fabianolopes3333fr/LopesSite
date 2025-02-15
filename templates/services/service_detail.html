@@ -1,0 +1,38 @@
+{% extends 'base/base_services.html' %}
+{% load static %}
+
+{% block title %}{{ service.title }} - Lopes Peinture{% endblock %}
+
+{% block content %}
+<section class="service-detail mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <h1 class="text-center mb-4">{{ service.title }}</h1>
+                <div class="service-icon text-center mb-4">
+                    <i class="{{ service.icon }} fa-4x"></i>
+                </div>
+                <div class="service-description">
+                    {{ service.description|linebreaks }}
+                </div>
+                {% if service.image %}
+                    <img src="{{ service.image.url }}" alt="{{ service.title }}" class="img-fluid mt-4 mb-4">
+                {% endif %}
+                <div class="service-features mt-4">
+                    <h3>Caractéristiques du service:</h3>
+                    <ul>
+                        {% for feature in service.features.all %}
+                            <li>{{ feature.description }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="text-center mt-5">
+                    <a href="{% url 'contact' %}" class="btn btn-primary">Demander un devis</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}

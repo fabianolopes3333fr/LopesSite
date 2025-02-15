@@ -13,9 +13,11 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ('title', 'content')
     prepopulated_fields = {'slug': ('title',)}
     date_hierarchy = 'created_at'
-
+    filter_horizontal = ('categories',)
+    autocomplete_fields = ['tags']
+    
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'post', 'created_at')
+    list_display = ('author', 'post', 'created_at')  # Mudamos 'name' para 'author'
     list_filter = ('created_at',)
-    search_fields = ('name', 'email', 'content')
+    search_fields = ('author', 'email', 'content')

@@ -1,0 +1,30 @@
+#header-pages {
+  transition: background-color 0.3s ease;
+}
+
+#header-pages {
+  background-color: var(--color-primary);
+}
+
+#header-pages.scrolled {
+  background-color: var(--color-primary);
+}
+
+#header-pages.scrolled .navbar-brand img {
+  height: 30px;
+}
+
+@media (max-width: 991px) {
+  .offcanvas {
+    background-color: var(--color-primary);
+  }
+
+  .offcanvas-header,
+  .offcanvas-body {
+    color: white;
+  }
+
+  .navbar-nav .nav-link {
+    color: white !important;
+  }
+}

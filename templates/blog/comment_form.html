@@ -1,0 +1,19 @@
+{% load i18n %}
+
+<form method="post" action="{% url 'blog:add_comment' post.slug %}" class="mt-4">
+    {% csrf_token %}
+    <h4>{% trans "Ajouter un commentaire" %}</h4>
+    <div class="mb-3">
+        <label for="author" class="form-label">{% trans "Nom" %}</label>
+        <input type="text" class="form-control" id="author" name="author" required>
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">{% trans "Email" %}</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+    </div>
+    <div class="mb-3">
+        <label for="content" class="form-label">{% trans "Commentaire" %}</label>
+        <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">{% trans "Envoyer" %}</button>
+</form>

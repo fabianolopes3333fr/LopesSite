@@ -19,3 +19,25 @@ class ProjectFilterForm(forms.Form):
         widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         label=_("Date de fin")
     )
+    
+    
+class ServiceFilterForm(forms.Form):
+    CATEGORY_CHOICES = [
+        ('', _('Toutes les catégories')),
+        ('residential', _('Résidentiel')),
+        ('commercial', _('Commercial')),
+        ('industrial', _('Industriel')),
+        ('exterior', _('Extérieur')),
+        ('interior', _('Intérieur')),
+    ]
+
+    category = forms.ChoiceField(
+        choices=CATEGORY_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    search = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('Rechercher un service')})
+    )
+
