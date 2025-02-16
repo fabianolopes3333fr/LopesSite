@@ -1,0 +1,167 @@
+{% extends 'base/base_pages.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Notre Collection de Peintures{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="{% trans "Découvrez notre sélection de peintures de haute qualité" %}">
+    <meta name="keywords" content="{% trans "Peintures, collection, haute qualité" %}">
+    
+{% endblock %}
+{% block extra_css %}
+
+{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<section class="shop-header">
+    <div class="container text-center">
+        <h1 class="display-4 mb-3 align-items-center">{% trans "Notre Collection de Peintures" %}</h1>
+        <p class="lead text-muted">{% trans "Découvrez notre sélection de peintures de haute qualité" %}</p>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row g-4">
+        <!-- Sidebar Filters -->
+        <div class="col-lg-3">
+            <div class="filter-card">
+                <div class="card-body">
+                    <!-- Categories -->
+                    <div class="filter-section">
+                        <h5 class="filter-title">{% trans "Catégories" %}</h5>
+                        {% for category in categories %}
+                        <a href="?category={{ category.slug }}" class="category-link">
+                            {{ category.name }}
+                            <span class="badge bg-light text-dark ms-auto">
+                                {{ category.paint_set.count }}
+                            </span>
+                        </a>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Filters -->
+                    <form method="get">
+                        <div class="filter-section">
+                            <h5 class="filter-title">{% trans "Finition" %}</h5>
+                            {% for finish in paint_finishes %}
+                            <div class="custom-checkbox form-check">
+                                <input type="checkbox" 
+                                       name="finish" 
+                                       value="{{ finish.0 }}"
+                                       class="form-check-input"
+                                       id="finish-{{ finish.0 }}">
+                                <label class="form-check-label" for="finish-{{ finish.0 }}">
+                                    {{ finish.1 }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="filter-section">
+                            <h5 class="filter-title">{% trans "Prix" %}</h5>
+                            <div class="price-inputs">
+                                <input type="number" 
+                                       name="price_min" 
+                                       class="form-control"
+                                       placeholder="Min €">
+                                <input type="number" 
+                                       name="price_max" 
+                                       class="form-control"
+                                       placeholder="Max €">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-filter w-100">
+                            {% trans "Appliquer les filtres" %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <!-- Sort Bar -->
+            <div class="sort-bar d-flex justify-content-between align-items-center">
+                <div>
+                    {% with paints.count as total_paints %}
+                    <p class="mb-0 fw-medium">
+                        {{ total_paints }} {% trans "produits trouvés" %}
+                    </p>
+                    {% endwith %}
+                </div>
+                <div class="d-flex align-items-center">
+                    <label class="me-2">{% trans "Trier par" %}:</label>
+                    <select class="form-select" style="width: auto;">
+                        <option value="name">{% trans "Nom" %}</option>
+                        <option value="price_asc">{% trans "Prix croissant" %}</option>
+                        <option value="price_desc">{% trans "Prix décroissant" %}</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="row g-4">
+                {% for paint in paints %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="product-card card h-100">
+                        {% if paint.image %}
+                        <div class="overflow-hidden">
+                            <img src="{{ paint.image.url }}" 
+                                 class="card-img-top" 
+                                 alt="{{ paint.name }}">
+                        </div>
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <span class="product-category">{{ paint.category.name }}</span>
+                            <h5 class="product-title">{{ paint.name }}</h5>
+                            <p class="card-text flex-grow-1">
+                                {{ paint.description|truncatewords:20 }}
+                            </p>
+                            <div class="product-price">
+                                {{ paint.base_price }} €
+                            </div>
+                            <a href="{% url 'paint_detail' paint.slug %}" 
+                               class="btn btn-primary btn-lg rounded-pill">
+                                {% trans "Voir détails" %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav class="mt-5" aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,6 @@
 from django.urls import path
-from . import views
+from .views import ColorCatalogView
 
 urlpatterns = [
-    path('', views.color_list, name='color_list'),
+    path('catalog/', ColorCatalogView.as_view(), name='color_catalog'),
 ]

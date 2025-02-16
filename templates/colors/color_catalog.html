@@ -1,0 +1,205 @@
+{% extends 'base/base_pages.html' %}
+{% load static %}
+
+{% block title %}Catalogue de Couleurs{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Découvrez notre catalogue de couleurs pour votre site web.">
+    <meta name="keywords" content="couleurs, catalogue, site web">
+    <meta name="author" content="Lopes Peinture">
+    <meta property="og:title" content="Catalogue de Couleurs">
+    <meta property="og:description" content="Découvrez notre catalogue de couleurs pour votre site web.">
+    <meta property="og:image" content="{% static 'img/logo.png' %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Catalogue de Couleurs">
+    <meta name="twitter:description" content="Découvrez notre catalogue de couleurs pour votre site web.">
+    <meta name="twitter:image" content="{% static 'img/logo.png' %}">
+    <meta name="twitter:url" content="{{ request.build_absolute_uri }}">
+{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<section class="color-header">
+    <div class="container">
+        <h1 class="display-4 mb-3">Notre Palette de Couleurs</h1>
+        <p class="lead text-muted">Découvrez notre sélection exclusive de teintes pour tous vos projets</p>
+    </div>
+</section>
+
+<div class="container">
+    <!-- Search Form -->
+    <form method="get" class="search-form">
+        <div class="row g-3">
+            <div class="col-md-4">
+                {{ form.color_type.label_tag }}
+                {{ form.color_type }}
+            </div>
+            <div class="col-md-6">
+                {{ form.search.label_tag }}
+                {{ form.search }}
+            </div>
+            <div class="col-md-2">
+                <label class="d-none d-md-block">&nbsp;</label>
+                <button type="submit" class="btn btn-primary w-100 h-100">
+                    <i class="fas fa-search me-2"></i>Filtrer
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Colors Grid -->
+    <div class="row g-4">
+        {% for color in colors %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="color-card" data-bs-toggle="modal" data-bs-target="#colorModal{{ color.id }}">
+                <div class="color-sample" style="background-color: {{ color.hex_code }}">
+                    <span class="color-type-badge">{{ color.get_color_type_display }}</span>
+                </div>
+                <div class="color-info">
+                    <h3 class="color-name">{{ color.name }}</h3>
+                    <div class="color-code">
+                        {{ color.hex_code }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Color Detail Modal -->
+        <div class="modal fade color-detail-modal" id="colorModal{{ color.id }}" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title h4">{{ color.name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="color-detail-sample" style="background-color: {{ color.hex_code }}"></div>
+                        <p class="lead">{{ color.description }}</p>
+                        
+                        <div class="color-specs">
+                            <div class="color-spec-item">
+                                <span>Code HEX</span>
+                                <strong>{{ color.hex_code }}</strong>
+                            </div>
+                            <div class="color-spec-item">
+                                <span>Code RGB</span>
+                                <strong>{{ color.rgb_code }}</strong>
+                            </div>
+                            <div class="color-spec-item">
+                                <span>Type</span>
+                                <strong>{{ color.get_color_type_display }}</strong>
+                            </div>
+                            <div class="color-spec-item">
+                                <span>Réflectance Lumineuse</span>
+                                <strong>{{ color.light_reflectance_value|default_if_none:"N/A" }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2"></i>Aucune couleur trouvée.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    <!-- Color Combinations -->
+    <section class="mt-5 pt-5">
+        <h2 class="h3 mb-4">Combinaisons de Couleurs Suggérées</h2>
+        <div class="row g-4">
+            {% for combination in combinations %}
+            <div class="col-md-6 col-lg-4">
+                <div class="combination-card">
+                    <div class="combination-samples">
+                        {% for color in combination.colors.all %}
+                        <div class="combination-sample" style="background-color: {{ color.hex_code }}"></div>
+                        {% endfor %}
+                    </div>
+                    <div class="combination-info">
+                        <h3 class="h5 mb-2">{{ combination.name }}</h3>
+                        <p class="text-muted mb-0">{{ combination.description }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Inicialização dos tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+
+    // Preview de cor ao hover
+    document.querySelectorAll('.color-sample').forEach(sample => {
+        sample.addEventListener('mouseover', function() {
+            const color = this.style.backgroundColor;
+            document.body.style.transition = 'background-color 0.3s ease';
+            document.body.style.backgroundColor = color;
+        });
+        
+        sample.addEventListener('mouseout', function() {
+            document.body.style.backgroundColor = '';
+        });
+    });
+
+    // Copiar código de cor ao clicar
+    document.querySelectorAll('.color-code').forEach(code => {
+        code.addEventListener('click', function(e) {
+            e.stopPropagation();
+            navigator.clipboard.writeText(this.textContent.trim())
+                .then(() => {
+                    const originalText = this.textContent;
+                    this.textContent = 'Copié!';
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                    }, 1000);
+                });
+        });
+    });
+</script>
+{% endblock %}

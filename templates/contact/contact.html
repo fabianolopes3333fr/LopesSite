@@ -1,0 +1,217 @@
+{% extends 'base/base_pages.html' %}
+{% load static %}
+
+{% block title %}Contact{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Contactez-nous pour toute demande de devis ou d'information.">
+    <meta name="keywords" content="contact, devis, information">
+    <meta property="og:title" content="Contact">
+    <meta property="og:description" content="Contactez-nous pour toute demande de devis ou d'information.">
+    <meta property="og:image" content="{% static 'img/logo.png' %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ company_info.name }}">
+{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<section class="contact-header">
+    <div class="container">
+        <h1 class="display-4 mb-3">Contactez-nous</h1>
+        <p class="lead text-muted">Nous sommes là pour répondre à toutes vos questions</p>
+    </div>
+</section>
+
+<div class="container mb-5">
+    {% if messages %}
+    <div class="success-message">
+        {% for message in messages %}
+        <i class="fas fa-check-circle me-2"></i>{{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row g-4 ">
+        <!-- Contact Form -->
+        <div class="col-lg-6">
+            <div class="contact-card">
+                <form method="post" class="contact-form">
+                    {% csrf_token %}
+                    <h3 class="mb-4">Envoyez-nous un message</h3>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.name.id_for_label }}" class="form-label">Nom</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="invalid-feedback">{{ form.name.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback">{{ form.email.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3 d-flex flex-column">
+                        <label for="{{ form.phone.id_for_label }}" class="form-label">Téléphone</label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}
+                            <div class="invalid-feedback">{{ form.phone.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.subject.id_for_label }}" class="form-label">Sujet</label>
+                        {{ form.subject }}
+                        {% if form.subject.errors %}
+                            <div class="invalid-feedback">{{ form.subject.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.message.id_for_label }}" class="form-label">Message</label>
+                        {{ form.message }}
+                        {% if form.message.errors %}
+                            <div class="invalid-feedback">{{ form.message.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-submit">
+                        <i class="fas fa-paper-plane me-2"></i>Envoyer le message
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="col-lg-6">
+            <div class="contact-card info-card">
+                <h3 class="mb-4">Nos coordonnées</h3>
+                
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="info-content">
+                        <strong class="d-block mb-1">{{ company_info.name }}</strong>
+                        <span class="text-muted">Entreprise de peinture professionnelle</span>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="info-content">
+                        {{ company_info.address }}<br>
+                        {{ company_info.postal_code }} {{ company_info.city }}
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="info-content">
+                        <a href="tel:{{ company_info.phone }}">{{ company_info.phone }}</a>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="info-content">
+                        <a href="mailto:{{ company_info.email }}">{{ company_info.email }}</a>
+                    </div>
+                </div>
+
+                <div class="hours-card">
+                    <h4 class="hours-title">
+                        <i class="fas fa-clock hours-icon"></i>
+                        Horaires d'ouverture
+                    </h4>
+                    {{ company_info.opening_hours|linebreaks }}
+                </div>
+
+                <div class="mt-4">
+                    <h4 class="mb-3">Suivez-nous</h4>
+                    <div class="social-icons">
+                        <a href="https://www.facebook.com/lopespeinture.fr" target="_blank" class="social-icon" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://www.instagram.com/lopespeinture" target="_blank" class="social-icon" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://x.com/LopesPeinture" target="_blank" class="social-icon" aria-label="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://fr.pinterest.com/LopesPeinture/" target="_blank" class="social-icon" aria-label="Pinterest">
+                            <i class="fab fa-pinterest-p"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mapa
+        var map = L.map('map').setView([{{ company_info.latitude|default:"0" }}, {{ company_info.longitude|default:"0" }}], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        var marker = L.marker([{{ company_info.latitude|default:"0" }}, {{ company_info.longitude|default:"0" }}]).addTo(map);
+        marker.bindPopup('{{ company_info.name|default:"Notre emplacement" }}').openPopup();
+
+        // Telefone Internacional
+        var phoneInput = document.querySelector("#{{ form.phone.id_for_label }}");
+        if (phoneInput) {
+            window.intlTelInput(phoneInput, {
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                preferredCountries: ['fr'],
+                initialCountry: 'fr',
+                separateDialCode: true,
+                formatOnDisplay: true
+            });
+        }
+
+        // Animação suave para mensagens de sucesso
+        const successMessage = document.querySelector('.success-message');
+        if (successMessage) {
+            successMessage.style.opacity = '0';
+            successMessage.style.transition = 'opacity 0.3s ease';
+            
+            setTimeout(() => {
+                successMessage.style.opacity = '1';
+            }, 100);
+
+            setTimeout(() => {
+                successMessage.style.opacity = '0';
+                setTimeout(() => {
+                    successMessage.remove();
+                }, 300);
+            }, 5000);
+        }
+    });
+</script>
+{% endblock %}

@@ -8,15 +8,15 @@ class ColorFilterForm(forms.Form):
         ('cool', _('Couleurs froides')),
         ('neutral', _('Couleurs neutres')),
     ]
-    
+
     color_type = forms.ChoiceField(
         choices=CHOICES,
         required=False,
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        label=_("Type de couleur")
+        label=_('Type de couleur'),
+        widget=forms.Select(attrs={'class': 'form-select'})
     )
     search = forms.CharField(
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('Rechercher une couleur')}),
-        label=_("Recherche")
+        label=_('Rechercher'),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('Nom ou code de la couleur')})
     )

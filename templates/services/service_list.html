@@ -1,8 +1,16 @@
-{% extends 'base/base_services.html' %}
+{% extends 'base/base_pages.html' %}
 {% load static %}
 {% load i18n %}
+{% block meta %}
+    <meta name="description" content="{% trans "Nos services en coloris, couleurs, et couleurs de texte pour votre site web." %}">
+    <meta name="keywords" content="{% trans "services web, coloris, couleurs, texte" %}">
+    <meta name="author" content="{{ site_author }}">
+    <meta property="og:title" content="{% trans "Nos Services" %}">
+    <meta property="og:description" content="{% trans "Nos services en coloris, couleurs, et couleurs de texte pour votre site web." %}">
+    <meta property="og:image" content="{{ site_logo }}">
 
-{% block title %}Nos Services - Lopes Peinture{% endblock %}
+{% endblock %}
+{% block title %}Nos Services{% endblock %}
 
 {% block content %}
 <section class="services-list mt-5">

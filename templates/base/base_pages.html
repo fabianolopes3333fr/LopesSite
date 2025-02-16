@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="fr">
     <head>
-
+        <title>Lopes Peinture - {% block title %}{% endblock %}</title>
         {% include "components/head.html" %}
         {% block extra_css %}
         
@@ -14,7 +14,7 @@
 <body class="d-flex flex-column min-vh-100">
     {% include 'components/header_page.html' %}
 
-    <main class="flex-grow-1">
+    <main class="flex-grow-1 mt-5">
         {% block content %}{% endblock %}
     </main>
 

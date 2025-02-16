@@ -3,8 +3,8 @@ from .models import Color, ColorCombination
 
 @admin.register(Color)
 class ColorAdmin(admin.ModelAdmin):
-    list_display = ('name', 'hex_code')
-    search_fields = ('name', 'hex_code')
+    list_display = ('name', 'hex_code', 'rgb_code')
+    search_fields = ('name', 'hex_code', 'rgb_code', 'category')
 
 @admin.register(ColorCombination)
 class ColorCombinationAdmin(admin.ModelAdmin):

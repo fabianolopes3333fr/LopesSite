@@ -15,9 +15,10 @@
                 <h5 class="text-uppercase mb-3">Liens rapides</h5>
                 <ul class="list-unstyled mb-0">
                     <li class="mb-2"><a href="{% url 'home' %}" class="text-light text-decoration-none">Accueil</a></li>
-                    <li class="mb-2"><a href="{% url 'services' %}" class="text-light text-decoration-none">Services</a></li>
-                    <li class="mb-2"><a href="{% url 'projects' %}" class="text-light text-decoration-none">Projets</a></li>
-                    <li class="mb-2"><a href="{% url 'blog_list' %}" class="text-light text-decoration-none">Blog</a></li>
+                    <li class="mb-2"><a href="{% url 'paint_catalog' %}" class="text-light text-decoration-none">Peintures</a></li>
+                    <li class="mb-2"><a href="{% url 'color_catalog' %}" class="text-light text-decoration-none">Nos Couleurs</a></li>
+                    <li class="mb-2"><a href="{% url 'blog_list' %}" class="text-light text-decoration-none"
+Inspiration et Conseils</a></li>
                     <li><a href="{% url 'contact' %}" class="text-light text-decoration-none">Contact</a></li>
                 </ul>
             </div>
@@ -34,10 +35,11 @@
             <div class="col-12 col-md-6 col-lg-3">
                 <h5 class="text-uppercase mb-3">Contactez-nous</h5>
                 <ul class="list-unstyled mb-0">
-                    <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> 261 Chemin de la castellane, 31790 Toulouse</li>
-                    <li class="mb-2"><i class="fas fa-phone me-2"></i> <a href="tel:+33634623320" class="text-light">+33 6 34 62 33 20</a></li>
-                    <li class="mb-2"><i class="fas fa-envelope me-2"></i> <a href="mailto:contact@lopespeinture.fr" class="text-light">contact@lopespeinture.fr</a></li>
-                    <li><i class="fas fa-clock me-2"></i> Lun-Ven: 8h-17h</li>
+                    <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> {{ company_info.address }}</li>
+                    <li class="mb-2"> {{ company_info.postal_code }} - {{ company_info.city }} </li>
+                    <li class="mb-2"><i class="fas fa-phone me-2"></i> <a href="tel:{{ company_info.phone }}" class="text-light">{{ company_info.phone }}</a></li>
+                    <li class="mb-2"><i class="fas fa-envelope me-2"></i> <a href="mailto:{{ company_info.email }}" class="text-light">{{ company_info.email }}</a></li>
+                    <li><i class="fas fa-clock me-2"></i> {{ company_info.opening_hours|linebreaks }}</li>
                 </ul>
             </div>
         </div>

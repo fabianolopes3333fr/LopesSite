@@ -22,3 +22,129 @@
 .badge {
   font-weight: normal;
 }
+.blog-hero {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 4rem 0;
+  margin-bottom: 3rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.blog-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: none;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.blog-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.blog-card img {
+  height: 300px;
+  object-fit: cover;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+}
+
+.blog-card .card-body {
+  padding: 2rem;
+}
+
+.blog-meta {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.blog-meta-item {
+  display: flex;
+  align-items: center;
+  margin-right: 1.5rem;
+}
+
+.category-card {
+  transition: all 0.3s ease;
+  border: none;
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.category-card:hover {
+  background: #f8f9fa;
+}
+
+.category-link {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #343a40;
+  text-decoration: none;
+}
+
+.category-link:hover {
+  color: #0d6efd;
+}
+
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  background: #f8f9fa;
+  color: #343a40;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.tag-badge:hover {
+  background: #0d6efd;
+  color: #fff;
+}
+
+.search-form {
+  position: relative;
+}
+
+.search-input {
+  border-radius: 2rem;
+  padding-left: 1.5rem;
+  padding-right: 3.5rem;
+  height: 3rem;
+}
+
+.search-button {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  border-radius: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination {
+  gap: 0.5rem;
+}
+
+.pagination .page-link {
+  border-radius: 0.5rem;
+  border: none;
+  padding: 0.75rem 1rem;
+  color: #343a40;
+}
+
+.pagination .page-item.active .page-link {
+  background: #0d6efd;
+  color: #fff;
+}

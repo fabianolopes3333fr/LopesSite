@@ -1,10 +1,26 @@
-{% extends 'base/base_home.html' %}
+{% extends 'base/base.html' %}
 {% load static %}
 {% comment %} {% load custom_filters %} {% endcomment %}
 
-{% block title %}Accueil - Lopes Peinture{% endblock %}
+{% block title %}Accueil{% endblock %}
+{% block meta %}
+    <meta name="description" content="Lopes Peinture est une entreprise spécialisée dans la vente de peintures professionnelles. Nous proposons des solutions de peinture adaptées à votre budget et à votre style.">
+    <meta name="keywords" content="peinture, vente, lopes peinture, peintures professionnelles, vente en ligne">
 
-{% block home_content %}
+    {% comment %} <meta property="og:title" content="{% trans "Accueil" %}"> {% endcomment %}
+    {% comment %} <meta property="og:description" content="{% trans "Nos services en coloris, couleurs, et couleurs de texte pour votre site web." %}"> {% endcomment %}
+    <meta property="og:image" content="{{ site_logo }}">
+{% endblock %}
+
+{% block extra_js %}
+
+
+{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+{% block content %}
     <!-- Banner Principal -->
     <section class="hero-banner">
         <div class="container">
@@ -387,7 +403,34 @@
             </div>
         </div>
     </section>
+    <script>
+    // Animações ao scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            const animateOnScroll = function() {
+                const elements = document.querySelectorAll('.service-card, .benefit-item, .gallery-item, .testimonial-item');
+                
+                elements.forEach(element => {
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const screenPosition = window.innerHeight;
+                    
+                    if(elementPosition < screenPosition) {
+                        element.style.opacity = '1';
+                        element.style.transform = 'translateY(0)';
+                    }
+                });
+            };
 
+            window.addEventListener('scroll', animateOnScroll);
+            animateOnScroll();
+        });
+
+        // Inicialização dos elementos com opacidade 0
+        document.querySelectorAll('.service-card, .benefit-item, .gallery-item, .testimonial-item').forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(50px)';
+            element.style.transition = 'all 0.5s ease';
+        });
+</script>
 
     
 {% endblock %}
