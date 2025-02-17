@@ -22,11 +22,11 @@
 {% endblock %}
 {% block content %}
     <!-- Banner Principal -->
-    <section class="hero-banner">
+    <section class="hero-banner ">
         <div class="container">
             <div class="row align-items-center ">
-                <div class="col-lg-6">
-                    <h1 class="display-4 fw-bold mb-3">Transformez votre espace avec <span class="te">Lopes Peinture</span></h1>
+                <div class="col-lg-6 z-1">
+                    <h1 class="display-4 fw-bold mb-3 ">Transformez votre espace avec <span class="te">Lopes Peinture</span></h1>
                     <p class="lead mb-4">Des solutions de peinture professionnelles pour votre maison et votre entreprise</p>
                     <a href="{% url 'contact' %}" class="btn btn-primary btn-lg">Demandez un devis gratuit</a>
                 </div>
@@ -260,9 +260,11 @@
     </section>
 
 
-    <section class="faq py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-5">Foire Aux Questions</h2>
+
+    <section class="faq-section py-5 bg-light">
+        <div class="container faq-container">
+            {% include 'components/section_header.html' with title="Foire Aux Questions" subtitle="" %}
+            
             <div class="accordion" id="faqAccordion">
                 <div class="accordion-item">
                     <h3 class="accordion-header " id="headingOne">
@@ -270,7 +272,7 @@
                             Quels types de peintures utilisez-vous ?
                         </button>
                     </h3>
-                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                    <div id="collapseOne" class="accordion-collapse collapse " aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
                         <div class="accordion-body">
                             Nous utilisons une large gamme de peintures de haute qualité, y compris des options écologiques à faible COV. Nos experts sélectionnent la meilleure peinture en fonction de vos besoins spécifiques et de l'environnement de votre projet.
                         </div>
@@ -387,22 +389,61 @@
         </div>
     {% comment %} container {% endcomment %}
     </section>
-    <section class="newsletter py-5">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-8 text-center">
-                    <h2 class="mb-4">Restez informé</h2>
-                    <p class="mb-4">Inscrivez-vous à notre newsletter pour recevoir nos dernières offres, conseils de peinture et inspirations de design.</p>
-                    <form class="newsletter-form">
-                        <div class="input-group mb-3">
-                            <input type="email" class="form-control" placeholder="Votre adresse e-mail" aria-label="Votre adresse e-mail" required>
-                            <button class="btn btn-primary" type="submit">S'inscrire</button>
-                        </div>
-                    </form>
+    
+
+    <section class="newsletter-section">
+        <div class="container newsletter-container">
+            <div class="newsletter-content">
+                <h2 class="newsletter-title">Restez informé de nos actualités</h2>
+                <p class="newsletter-description">
+                    Inscrivez-vous à notre newsletter pour recevoir en exclusivité nos dernières offres, 
+                    conseils de peinture boîte mail.
+                </p>
+            
+            <form class="newsletter-form" id="newsletterForm">
+                <div class="newsletter-input-group">
+                    <div class="form-floating">
+                        <input 
+                            type="text" 
+                            class="newsletter-input" 
+                            id="name" 
+                            placeholder="Votre nom"
+                            required
+                        >
+                    </div>
+                    <div class="form-floating">
+                        <input 
+                            type="email" 
+                            class="newsletter-input" 
+                            id="email" 
+                            placeholder="Votre adresse e-mail"
+                            required
+                        >
+                    </div>
+                    <button type="submit" class="newsletter-button">
+                        <i class="fas fa-paper-plane me-2"></i>S'inscrire
+                    </button>
+                </div>
+            </form>
+
+            <div class="newsletter-features">
+                <div class="feature-item">
+                    <i class="fas fa-lock"></i>
+                    <span>100% Sécurisé</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>Envois hebdomadaires</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-times-circle"></i>
+                    <span>Désinscription facile</span>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
+
     <script>
     // Animações ao scroll
         document.addEventListener('DOMContentLoaded', function() {
@@ -431,6 +472,6 @@
             element.style.transition = 'all 0.5s ease';
         });
 </script>
-
+     <script src="{% static 'js/index.js' %}"></script> 
     
 {% endblock %}

@@ -8,4 +8,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='home'), name='logout'),
     path('profile/', views.profile, name='profile'),
     
+    # section for newsletter signup
+    path('newsletter/signup/', views.newsletter_signup, name='newsletter_signup'),
+    
 ]

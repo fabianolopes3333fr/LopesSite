@@ -5,6 +5,9 @@ from django.contrib import messages
 from .forms import CustomUserCreationForm
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
+from django.http import JsonResponse
+from core.services import NewsletterService
+from .models import NewsletterSubscription
 
 
 def register(request):
@@ -46,3 +49,45 @@ class SignUpView(CreateView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('login')
     template_name = 'registration/register.html'
+
+
+
+# newsletter signup view
+
+def newsletter_signup(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+
+        try:
+            # Verifica se já existe
+            if NewsletterSubscription.objects.filter(email=email).exists():
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Cet email est déjà inscrit.'
+                })
+
+            # Salva no banco
+            subscription = NewsletterSubscription.objects.create(
+                name=name,
+                email=email
+            )
+
+            # Envia email de boas-vindas
+            NewsletterService.send_welcome_email(name, email)
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Inscription réussie!'
+            })
+
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Une erreur est survenue.'
+            })
+
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Méthode non autorisée'
+    })
