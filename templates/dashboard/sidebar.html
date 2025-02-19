@@ -1,0 +1,38 @@
+<!-- templates/dashboard/includes/sidebar.html -->
+<div class="flex flex-col h-0 flex-1">
+    <div class="flex items-center h-16 flex-shrink-0 px-4 bg-primary">
+        <img class="h-8 w-auto" src="{{ STATIC_URL }}img/logo.png" alt="Logo">
+        <span class="ml-2 text-white text-lg font-semibold">Service de Peinture</span>
+    </div>
+    <div class="flex-1 flex flex-col overflow-y-auto">
+        <nav class="flex-1 px-2 py-4 space-y-1">
+            <a href="{% url 'home' %}" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md {% if request.resolver_match.url_name == 'home' %}bg-accent text-white{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %}">
+                <svg class="mr-3 h-6 w-6 {% if request.resolver_match.url_name == 'home' %}text-white{% else %}text-gray-400 group-hover:text-gray-300{% endif %}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                Tableau de bord
+            </a>
+
+            <a href="{% url 'projects' %}" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md {% if request.resolver_match.url_name == 'projects' %}bg-accent text-white{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %}">
+                <svg class="mr-3 h-6 w-6 {% if request.resolver_match.url_name == 'projects' %}text-white{% else %}text-gray-400 group-hover:text-gray-300{% endif %}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                Projets
+            </a>
+
+            <a href="{% url 'paint_catalog' %}" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md {% if request.resolver_match.url_name == 'quotes' %}bg-accent text-white{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %}">
+                <svg class="mr-3 h-6 w-6 {% if request.resolver_match.url_name == 'quotes' %}text-white{% else %}text-gray-400 group-hover:text-gray-300{% endif %}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                Devis
+            </a>
+
+            <a href="{% url 'paint_catalog' %}" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md {% if request.resolver_match.url_name == 'clients' %}bg-accent text-white{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %}">
+                <svg class="mr-3 h-6 w-6 {% if request.resolver_match.url_name == 'clients' %}text-white{% else %}text-gray-400 group-hover:text-gray-300{% endif %}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                Clients
+            </a>
+        </nav>
+    </div>
+</div>

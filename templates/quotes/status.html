@@ -1,0 +1,32 @@
+{% extends 'base/base_pages.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Statut du devis" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">{% trans "Statut du devis" %} #{{ quote.id }}</h1>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">{% trans "Détails du devis" %}</h5>
+            <p><strong>{% trans "Nom" %}:</strong> {{ quote.name }}</p>
+            <p><strong>{% trans "Email" %}:</strong> {{ quote.email }}</p>
+            <p><strong>{% trans "Type de service" %}:</strong> {{ quote.get_service_type_display }}</p>
+            <p><strong>{% trans "Statut actuel" %}:</strong> {{ quote.get_status_display }}</p>
+        </div>
+    </div>
+
+    <h2 class="mb-3">{% trans "Mises à jour du statut" %}</h2>
+    {% for update in updates %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ update.get_status_display }}</h5>
+            <p class="card-text">{{ update.comment }}</p>
+            <p class="card-text"><small class="text-muted">{{ update.created_at|date:"d/m/Y H:i" }}</small></p>
+        </div>
+    </div>
+    {% empty %}
+    <p>{% trans "Aucune mise à jour de statut pour le moment." %}</p>
+    {% endfor %}
+</div>
+{% endblock %}

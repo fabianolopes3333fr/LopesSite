@@ -1,0 +1,32 @@
+{% extends 'base/base_pages.html' %}
+
+{% block content %}
+<div class="confirmation-page py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="card shadow-lg">
+                    <div class="card-body p-5">
+                        <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                        <h1 class="mb-4">Demande Envoyée!</h1>
+                        <p class="lead">
+                            Merci {{ quote.name }}, nous avons bien reçu votre demande de devis.
+                        </p>
+                        <p>
+                            Votre numéro de référence est: <strong>#{{ quote.id }}</strong>
+                        </p>
+                        <p class="mb-4">
+                            Nous vous contacterons dans les plus brefs délais pour discuter 
+                            de votre projet en détail.
+                        </p>
+                        <a href="{% url 'quote_status' quote.id %}" 
+                           class="btn btn-primary">
+                            Suivre l'état de ma demande
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

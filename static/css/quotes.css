@@ -144,3 +144,105 @@
   background: #0d6efd;
   color: #fff;
 }
+
+/* devis */
+
+/* Estilos para o sistema de orçamentos */
+.quote-request-page {
+  background: var(--color-neutral-light);
+  min-height: 100vh;
+  padding: 4rem 0;
+}
+
+.quote-form .form-control,
+.quote-form .form-select {
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.quote-form .form-control:focus,
+.quote-form .form-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(66, 78, 85, 0.1);
+}
+
+.quote-form label {
+  font-weight: 500;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.quote-form .btn-primary {
+  background: var(--color-primary);
+  border: none;
+  padding: 1rem 2rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.quote-form .btn-primary:hover {
+  background: var(--color-primary1);
+  transform: translateY(-2px);
+}
+
+.status-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+.status-badge.pending {
+  background: var(--color-accent);
+  color: var(--color-neutral-dark);
+}
+
+.status-badge.in_review {
+  background: var(--color-secondary1);
+  color: white;
+}
+
+.status-badge.approved {
+  background: var(--color-secondary);
+  color: white;
+}
+
+.status-badge.rejected {
+  background: #ef4444;
+  color: white;
+}
+
+.timeline {
+  position: relative;
+  padding: 2rem 0;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: var(--color-neutral-light);
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 2rem;
+  margin-bottom: 2rem;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-primary);
+}

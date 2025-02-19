@@ -2,6 +2,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from apps.users.models import CustomUser
 from django.utils.text import slugify
+from django.contrib.auth import get_user_model
+
 
 
 class Supplier(models.Model):
@@ -150,22 +152,98 @@ class OrderItem(models.Model):
 
 
 class Quote(models.Model):
+    
+    STATUS_CHOICES = [
+        ('pending', _('En attente')),
+        ('in_review', _('En cours de révision')),
+        ('approved', _('Approuvé')),
+        ('rejected', _('Rejeté')),
+        ('canceled', _('Annulé'))
+    ]
+
+    SERVICE_TYPES = [
+        ('interior', _('Peinture Intérieure')),
+        ('exterior', _('Peinture Extérieure')),
+        ('commercial', _('Peinture Commerciale')),
+        ('industrial', _('Peinture Industrielle')),
+        ('decorative', _('Peinture Décorative'))
+    ]
+
+    
+    # Informações Básicas
     name = models.CharField(_("Nom"), max_length=100)
     email = models.EmailField(_("Email"))
     phone = models.CharField(_("Téléphone"), max_length=20)
-    service = models.CharField(_("Service demandé"), max_length=200)
-    area = models.DecimalField(_("Surface (m²)"), max_digits=10, decimal_places=2)
-    details = models.TextField(_("Détails supplémentaires"))
+    address = models.TextField(_('Adresse'), null=True, blank=True)
+    postal_code = models.CharField(_('Code Postal'), max_length=10, null=True, blank=True)
+    city = models.CharField(_('Ville'), max_length=100, null=True, blank=True)
+    
+    
+    # Detalhes do Projeto
+    service_type = models.CharField(
+        _('Type de Service'), 
+        max_length=200,
+        choices=SERVICE_TYPES, 
+        default='interior'
+    )
+    area_size  = models.DecimalField(
+        _("Surface (m²)"), 
+        max_digits=10, 
+        decimal_places=2
+    )
+    project_description = models.TextField(_('Description du projet'), null=True, blank=True)
+    preferred_date = models.DateField(_('Date préférée'), null=True, blank=True)
+    budget_range = models.CharField(_('Budget estimé'), max_length=50, null=True, blank=True)
+    
+    
+    # Campos de Sistema
+    status = models.CharField(
+        _("Statut"), 
+        max_length=20, 
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+    
     created_at = models.DateTimeField(_("Date de création"), auto_now_add=True)
-    status = models.CharField(_("Statut"), max_length=20, choices=[
-        ('pending', _('En attente')),
-        ('processed', _('Traité')),
-        ('completed', _('Terminé')),
-    ], default='pending')
+    updated_at = models.DateTimeField(auto_now=True)
+    estimated_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+    admin_notes = models.TextField(blank=True)
+    
+    reference_photos = models.ManyToManyField(
+        'QuotePhoto',
+        blank=True,
+        related_name='quotes'
+    )
+    
+    def __str__(self):
+        return f"Devis #{self.id} - {self.name}"
+        
 
     class Meta:
         verbose_name = _("Devis")
         verbose_name_plural = _("Devis")
 
-    def __str__(self):
-        return f"Devis de {self.name} pour {self.service}"
+class QuotePhoto(models.Model):
+    image = models.ImageField(upload_to='quotes/photos/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    caption = models.CharField(max_length=200, blank=True)
+
+class QuoteStatusUpdate(models.Model):
+    quote = models.ForeignKey(
+        Quote,
+        on_delete=models.CASCADE,
+        related_name='status_updates'
+    )
+    status = models.CharField(max_length=20, choices=Quote.STATUS_CHOICES)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True
+    )

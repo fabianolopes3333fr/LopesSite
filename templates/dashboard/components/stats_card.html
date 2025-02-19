@@ -1,0 +1,23 @@
+{% load humanize %}
+
+<div class="stats-card bg-white rounded-lg shadow-sm p-6">
+    <div class="flex items-start justify-between">
+        <div>
+            <p class="text-sm font-medium text-gray-600">{{ title }}</p>
+            <p class="mt-2 text-3xl font-bold text-gray-900">{{ value|intcomma }}</p>
+        </div>
+        <div class="p-3 bg-{{ color }}-100 rounded-lg">
+            {{ icon|safe }}
+        </div>
+    </div>
+    <div class="mt-4">
+        <div class="flex items-center">
+            <span class="text-{{ trend_color }}-500 text-sm font-medium">
+                {{ trend_value }}%
+            </span>
+            <span class="ml-2 text-sm text-gray-600">
+                vs mois dernier
+            </span>
+        </div>
+    </div>
+</div>

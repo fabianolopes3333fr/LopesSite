@@ -50,6 +50,7 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django.contrib.humanize',
     
     
 ]
@@ -80,6 +81,7 @@ PROJECT_APPS = [ # são os apps que criamos no projeto
     'apps.contact',
     'apps.quotes',
     'apps.users',
+    'apps.dashboard',
     # 'apps.testimonials',
 ]
 
@@ -192,9 +194,14 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.CustomUser'
 
+SITE_URL = os.getenv('SITE_URL')
+
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'home'
+
+# Tamanho máximo de upload
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880

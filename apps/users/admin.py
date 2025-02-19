@@ -7,15 +7,21 @@ class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = CustomUser
-    list_display = ('email', 'username', 'first_name', 'last_name', 'is_staff', 'is_contractor')
+    list_display = ('email', 'first_name', 'last_name', 'is_staff', 'is_contractor')
     list_filter = ('is_staff', 'is_contractor')
-    fieldsets = UserAdmin.fieldsets + (
-        (None, {'fields': ('phone_number', 'address', 'is_contractor', 'company_name')}),
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        ('Personal info', {'fields': ('first_name', 'last_name')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        ('Contractor info', {'fields': ('is_contractor', 'company_name')}),
     )
-    add_fieldsets = UserAdmin.add_fieldsets + (
-        (None, {'fields': ('email', 'phone_number', 'address', 'is_contractor', 'company_name')}),
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'first_name', 'last_name', 'password1', 'password2', 'is_staff', 'is_active')}),
     )
-    search_fields = ('email', 'username', 'first_name', 'last_name')
+    search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
 
 

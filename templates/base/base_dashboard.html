@@ -1,0 +1,51 @@
+<!-- templates/dashboard/base.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - {% block title %}{% endblock %} </title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#424e55',
+                        secondary: '#5a666e',
+                        accent: '#68a138',
+                        'accent-dark': '#5a8b27',
+                        'light-bg': '#e7ecee',
+                        'lighter-bg': '#f8f9fa',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    {% block extra_css %}
+        
+        
+    {% endblock  %}
+</head>
+<body class="bg-lighter-bg">
+    {% block content %}
+    
+    
+    {% endblock %}
+   
+
+    {% block extra_js %}
+    
+    {% endblock %}
+</body>
+</html>

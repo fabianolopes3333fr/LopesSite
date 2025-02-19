@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            background: #f8f9fa;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Confirmation de Demande de Devis</h1>
+        </div>
+        
+        <div class="content">
+            <p>Bonjour {{ name }},</p>
+            
+             <p>Nous avons bien reçu votre demande de devis (Référence #{{ quote_id }}).</p>
+            
+            <p>Détails de votre demande:</p>
+            <ul>
+                <li>Service: {{ quote.get_service_type_display }}</li>
+                <li>Surface: {{ quote.area_size }} m²</li>
+                <li>Date souhaitée: {{ quote.preferred_date|date:"d/m/Y" }}</li>
+            </ul>
+            
+            <p>Notre équipe va étudier votre demande et vous contactera dans les plus brefs délais.</p>
+            
+            <p>Vous pouvez suivre l'état de votre demande en cliquant sur le lien ci-dessous:</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{ status_url }}" 
+                   style="background: #424e55; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px;">
+                    Suivre ma demande
+                </a>
+            </div>
+            
+            <p>Si vous avez des questions, n'hésitez pas à nous contacter.</p>
+            
+            <p>Cordialement,<br>
+            L'équipe Lopes Peinture</p>
+        </div>
+        
+        <div class="footer">
+            <p>Ce message a été envoyé automatiquement, merci de ne pas y répondre.</p>
+        </div>
+    </div>
+</body>
+</html>
