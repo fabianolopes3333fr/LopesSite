@@ -1,77 +1,141 @@
 {% extends 'base/auth_base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Inscription{% endblock %}
+{% block title %}{% trans "Inscription" %}{% endblock %}
 
 {% block auth_content %}
 <div class="auth-form card p-4 shadow-lg">
-    <h2 class="text-center mb-4">Créer un compte</h2>
+    <h2 class="text-center mb-4">{% trans "Créer un compte" %}</h2>
+
+    {% if messages %}
+    <div class="messages mb-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <form method="post" class="needs-validation" novalidate>
         {% csrf_token %}
+
+        <!-- Prénom -->
         <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="username" name="username" placeholder="Nom d'utilisateur" required>
-            <label for="username">Nom d'utilisateur</label>
+            <input type="text" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" id="{{ form.first_name.id_for_label }}" name="{{ form.first_name.html_name }}" placeholder="{% trans 'Prénom' %}" required value="{{ form.first_name.value|default:'' }}">
+            <label for="{{ form.first_name.id_for_label }}">{% trans "Prénom" %}</label>
+            {% if form.first_name.errors %}
             <div class="invalid-feedback">
-                Veuillez choisir un nom d'utilisateur.
+                {{ form.first_name.errors|join:", " }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Nom -->
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" id="{{ form.last_name.id_for_label }}" name="{{ form.last_name.html_name }}" placeholder="{% trans 'Nom' %}" required value="{{ form.last_name.value|default:'' }}">
+            <label for="{{ form.last_name.id_for_label }}">{% trans "Nom" %}</label>
+            {% if form.last_name.errors %}
+            <div class="invalid-feedback">
+                {{ form.last_name.errors|join:", " }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Email -->
+        <div class="form-floating mb-3">
+            <input type="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" id="{{ form.email.id_for_label }}" name="{{ form.email.html_name }}" placeholder="{% trans 'E-mail' %}" required value="{{ form.email.value|default:'' }}">
+            <label for="{{ form.email.id_for_label }}">{% trans "E-mail" %}</label>
+            {% if form.email.errors %}
+            <div class="invalid-feedback">
+                {{ form.email.errors|join:", " }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control {% if form.password1.errors %}is-invalid{% endif %}" id="{{ form.password1.id_for_label }}" name="{{ form.password1.html_name }}" placeholder="{% trans 'Mot de passe' %}" required>
+            <label for="{{ form.password1.id_for_label }}">{% trans "Mot de passe" %}</label>
+            {% if form.password1.errors %}
+            <div class="invalid-feedback">
+                {{ form.password1.errors|join:", " }}
+            </div>
+            {% endif %}
+            <div class="form-text">
+                {% trans "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un caractère spécial." %}
             </div>
         </div>
+
+        <!-- Confirmer le mot de passe -->
         <div class="form-floating mb-3">
-            <input type="email" class="form-control" id="email" name="email" placeholder="E-mail" required>
-            <label for="email">E-mail</label>
+            <input type="password" class="form-control {% if form.password2.errors %}is-invalid{% endif %}" id="{{ form.password2.id_for_label }}" name="{{ form.password2.html_name }}" placeholder="{% trans 'Confirmer le mot de passe' %}" required>
+            <label for="{{ form.password2.id_for_label }}">{% trans "Confirmer le mot de passe" %}</label>
+            {% if form.password2.errors %}
             <div class="invalid-feedback">
-                Veuillez saisir une adresse e-mail valide.
+                {{ form.password2.errors|join:", " }}
             </div>
+            {% endif %}
         </div>
-        <div class="form-floating mb-3">
-            <input type="password" class="form-control" id="password1" name="password1" placeholder="Mot de passe" required>
-            <label for="password1">Mot de passe</label>
-            <div class="invalid-feedback">
-                Veuillez choisir un mot de passe.
-            </div>
-        </div>
-        <div class="form-floating mb-3">
-            <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirmez le mot de passe" required>
-            <label for="password2">Confirmez le mot de passe</label>
-            <div class="invalid-feedback">
-                Les mots de passe ne correspondent pas.
-            </div>
-        </div>
+
         <div class="d-grid gap-2 mb-3">
-            <button type="submit" class="btn btn-primary btn-register">S'inscrire</button>
+            <button type="submit" class="btn btn-primary btn-register">
+                {% trans "S'inscrire" %}
+            </button>
         </div>
     </form>
+
     <div class="text-center auth-links">
-        <p>Vous avez déjà un compte ? <a href="{% url 'login' %}" class="text-decoration-none">Connectez-vous ici</a></p>
+        <p>
+            {% trans "Vous avez déjà un compte ?" %}
+            <a href="{% url 'login' %}" class="text-decoration-none">
+                {% trans "Connectez-vous ici" %}
+            </a>
+        </p>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Validation du formulaire
-    (function () {
-        'use strict'
-        var forms = document.querySelectorAll('.needs-validation')
-        Array.prototype.slice.call(forms)
-            .forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault()
-                        event.stopPropagation()
-                    }
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('.needs-validation');
+        const password1 = document.getElementById('{{ form.password1.id_for_label }}');
+        const password2 = document.getElementById('{{ form.password2.id_for_label }}');
 
-                    // Vérification supplémentaire pour les mots de passe correspondants
-                    var password1 = document.getElementById('password1')
-                    var password2 = document.getElementById('password2')
-                    if (password1.value !== password2.value) {
-                        password2.setCustomValidity('Les mots de passe ne correspondent pas.')
-                    } else {
-                        password2.setCustomValidity('')
-                    }
+        form.addEventListener('submit', function (event) {
+            let isValid = true;
 
-                    form.classList.add('was-validated')
-                }, false)
-            })
-    })()
+            // Validação de senha correspondente
+            if (password1.value !== password2.value) {
+                password2.setCustomValidity('{% trans "Les mots de passe ne correspondent pas." %}');
+                isValid = false;
+            } else {
+                password2.setCustomValidity('');
+            }
+
+            // Validação de força da senha
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+            if (!passwordRegex.test(password1.value)) {
+                password1.setCustomValidity('{% trans "Le mot de passe ne respecte pas les critères de sécurité." %}');
+                isValid = false;
+            } else {
+                password1.setCustomValidity('');
+            }
+
+            if (!form.checkValidity() || !isValid) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            form.classList.add('was-validated');
+        });
+
+        // Limpa as validações customizadas quando o usuário digita
+        password1.addEventListener('input', () => password1.setCustomValidity(''));
+        password2.addEventListener('input', () => password2.setCustomValidity(''));
+    });
 </script>
 {% endblock %}

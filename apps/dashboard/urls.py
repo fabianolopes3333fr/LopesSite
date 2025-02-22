@@ -2,7 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.DashboardView.as_view, name='painel'),
+    # urls.py
+    path('', views.dashboard, name='dashboard'),
+    path('dashboard/user/', views.user_dashboard, name='user_dashboard'),
     
     
 ]

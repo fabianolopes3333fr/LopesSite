@@ -1,0 +1,64 @@
+.nav-tabs .nav-link.active {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: var(--accent-dark);
+}
+
+.badge {
+    padding: 0.5em 0.75em;
+}
+
+.list-group-item {
+    padding: 1rem;
+}
+
+.form-switch .form-check-input:checked {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.content-wrapper {
+    
+    position: relative;
+    width: calc(100% - 250px);
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+.content-container {
+    max-width: 1400px;
+    /* Limita a largura máxima */
+    margin: 0 auto;
+    /* Centraliza o conteúdo */
+    padding: 20px;
+    /* Espaçamento interno */
+}
+
+/* Estiliza a barra de scroll */
+.content-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.content-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.content-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.content-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Ajustes para responsividade */
+@media (max-width: 768px) {
+    .content-wrapper {
+        width: 100%;
+        margin-left: 0;
+    }
+}

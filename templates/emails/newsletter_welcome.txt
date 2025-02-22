@@ -1,0 +1,22 @@
+<!-- templates/emails/newsletter_welcome.txt -->
+Bienvenue {{ name }} !
+
+Nous sommes ravis de vous compter parmi nos abonnés newsletter.
+
+En tant qu'abonné, vous recevrez régulièrement :
+- Nos dernières actualités
+- Des conseils de décoration
+- Des offres exclusives
+- Des inspirations pour vos projets
+
+Restez à l'écoute, notre prochaine newsletter arrivera bientôt !
+
+---
+
+Pour vous désabonner de notre newsletter, visitez :
+{{ unsubscribe_url }}
+
+Service de Peinture
+Protection de vos données personnelles
+
+Cet e-mail a été envoyé automatiquement. Merci de ne pas y répondre.

@@ -18,11 +18,9 @@ section {
 
 /* Hero Banner */
 .hero-banner {
-  background: linear-gradient(
-    135deg,
-    var(--primary-dark) 100%,
-    var(--primary-color) 0%
-  );
+  background: linear-gradient(135deg,
+      var(--primary-dark) 100%,
+      var(--primary-color) 0%);
   min-height: 80vh;
   padding: 8rem 0;
   color: white;
@@ -250,11 +248,9 @@ section {
 
 /* CTA Section */
 .cta-quote {
-  background: linear-gradient(
-    135deg,
-    var(--color-primary1) 0%,
-    var(--color-primary1) 100%
-  );
+  background: linear-gradient(135deg,
+      var(--color-primary1) 0%,
+      var(--color-primary1) 100%);
   padding: 5rem 0;
 }
 
@@ -292,11 +288,9 @@ section {
 
 /* Newsletter Section */
 .newsletter {
-  background: linear-gradient(
-    135deg,
-    var(--primary-dark) 0%,
-    var(--primary-color) 100%
-  );
+  background: linear-gradient(135deg,
+      var(--primary-dark) 0%,
+      var(--primary-color) 100%);
   padding: 5rem 0;
   color: white;
 }
@@ -402,8 +396,8 @@ section {
 }
 
 .newsletter-input {
-  height: 45px;
-  border-radius: 10px;
+  height: 40px;
+  border-radius: 7px;
   border: 1px solid #dddddd;
   background: rgba(255, 255, 255);
   color: rgb(51, 51, 51);
@@ -477,6 +471,40 @@ section {
   }
 }
 
+.newsletter-section {
+  background-color: var(--light-bg);
+  padding: 4rem 0;
+}
+
+.newsletter-input-group {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.newsletter-features {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .newsletter-features {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+}
 /* section FAQ */
 
 .faq-section {
@@ -493,11 +521,9 @@ section {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    135deg,
-    rgba(90, 139, 39, 0.05) 0%,
-    rgba(66, 78, 85, 0.05) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(90, 139, 39, 0.05) 0%,
+      rgba(66, 78, 85, 0.05) 100%);
   z-index: 1;
 }
 

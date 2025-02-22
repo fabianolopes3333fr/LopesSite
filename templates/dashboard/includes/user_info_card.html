@@ -1,0 +1,25 @@
+<!-- templates/dashboard/includes/user_info_card.html -->
+{% load i18n %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">{% trans "Informations personnelles" %}</h5>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <label class="small text-muted">{% trans "E-mail" %}</label>
+            <div>{{ user.email }}</div>
+        </div>
+        <div class="mb-3">
+            <label class="small text-muted">{% trans "Téléphone" %}</label>
+            <div>{{ profile.phone_number|default:_("Non défini") }}</div>
+        </div>
+        <div class="mb-3">
+            <label class="small text-muted">{% trans "Adresse" %}</label>
+            <div>{{ profile.address|default:_("Non définie") }}</div>
+            <div>{{ profile.postal_code }} {{ profile.city }}</div>
+        </div>
+        <a href="{% url 'profile' %}" class="btn btn-primary">
+            {% trans "Modifier le profil" %}
+        </a>
+    </div>
+</div>

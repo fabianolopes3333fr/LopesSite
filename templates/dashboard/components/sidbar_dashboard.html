@@ -1,0 +1,67 @@
+{% load static %}
+{% load i18n %}
+<div class="sidebar  shadow-sm" style="width: 250px; height: 100vh; position: fixed; left: 0; top: 0;">
+    <!-- Logo -->
+    <div class="p-3 ">
+        <h5 class="mb-0">Service de Peinture</h5>
+    </div>
+
+    <!-- Menu -->
+    <div class="p-3">
+        <div class="user-info text-center mb-4">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 64px; height: 64px;">
+                <span class="fs-4">{{ user.first_name|first }}{{ user.last_name|first }}</span>
+            </div>
+            <h6 class="mb-1">{{ user.get_full_name }}</h6>
+            <small class="text-muted">{{ user.email }}</small>
+        </div>
+        <nav class="nav flex-column ">
+            
+        
+                
+                    <a class="nav-link active py-2 ps-3 rounded" href="{% url 'dashboard' %}">
+                        <i class="fas fa-home me-2"></i> Tableau de bord
+                    </a>
+                
+                
+                    <a class="nav-link py-2 ps-3 rounded" href="{% url 'profile' %}">
+                        <i class="fas fa-user me-2"></i> Mon Profil
+                    </a>
+                
+                
+                    <a class="nav-link py-2 ps-3 rounded" href="#">
+                        <i class="fas fa-paint-roller me-2"></i> Mes Projets
+                    </a>
+                
+                
+                    <a class="nav-link py-2 ps-3 rounded" href="#">
+                        <i class="fas fa-file-invoice me-2"></i> Devis
+                    </a>
+                
+                
+                    <a class="nav-link py-2 ps-3 rounded" href="#">
+                        <i class="fas fa-calendar me-2"></i> Rendez-vous
+                    </a>
+                
+                
+                    <a class="nav-link py-2 ps-3 rounded" href="#">
+                        <i class="fas fa-bell me-2"></i> Notifications
+                    </a>
+                
+
+            
+
+        </nav>
+
+        <hr class="my-4">
+
+        <nav class="nav flex-column">
+            <a class="nav-link py-2 ps-3 rounded" href="{% url 'password_change' %}">
+                <i class="fas fa-lock me-2"></i> Sécurité
+            </a>
+            <a class="nav-link py-2 ps-3 rounded" href="{% url 'logout' %}">
+                <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
+            </a>
+        </nav>
+    </div>
+</div>

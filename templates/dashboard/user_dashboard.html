@@ -1,0 +1,73 @@
+{% extends 'base/base_dashboard.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Tableau de bord" %}{% endblock %}
+
+{% block extra_css %}
+    
+{% endblock %}
+
+{% block extra_js %}
+    
+{% endblock %}
+
+<!-- Page Content -->
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="bg-white shadow-sm rounded-lg p-4 mb-4">
+        <div class="d-flex align-items-center">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                {{ user.get_initials }}
+            </div>
+            <div class="ms-3">
+                <h1 class="h3 mb-1">{{ user.get_full_name }}</h1>
+                <p class="text-muted mb-0">{{ user.email }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-4 mb-4">
+            {% include 'dashboard/includes/user_info_card.html' %}
+            {% include 'dashboard/includes/security_card.html' %}
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Nav Tabs -->
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#overview" data-bs-toggle="tab">
+                                {% trans "Vue d'ensemble" %}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#security" data-bs-toggle="tab">
+                                {% trans "Sécurité" %}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#notifications" data-bs-toggle="tab">
+                                {% trans "Notifications" %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        {% include 'dashboard/includes/overview_tab.html' %}
+                        {% include 'dashboard/includes/security_tab.html' %}
+                        {% include 'dashboard/includes/notifications_tab.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

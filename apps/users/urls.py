@@ -5,7 +5,9 @@ from . import views
 urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.user_login, name='login'),
-    path('logout/', LogoutView.as_view, name='logout'),
+    path('logout/', views.logout_view, name='logout'),
+    # urls.py
+    path('two-factor-auth/', views.two_factor_auth, name='two_factor_auth'),
     path('profile/', views.profile, name='profile'),
     
     # section for newsletter signup

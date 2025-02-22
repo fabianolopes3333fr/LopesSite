@@ -1,0 +1,39 @@
+<!-- templates/dashboard/includes/security_card.html -->
+{% load i18n %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">{% trans "Sécurité" %}</h5>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div>{% trans "Vérification email" %}</div>
+                    <small class="text-muted">{% trans "Statut de vérification" %}</small>
+                </div>
+                <span class="badge {% if user.email_verified %}bg-success{% else %}bg-warning{% endif %}">
+                    {% if user.email_verified %}
+                    {% trans "Vérifié" %}
+                    {% else %}
+                    {% trans "Non vérifié" %}
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div>{% trans "Double authentification" %}</div>
+                    <small class="text-muted">{% trans "Sécurité renforcée" %}</small>
+                </div>
+                <span class="badge {% if user.two_factor_enabled %}bg-success{% else %}bg-secondary{% endif %}">
+                    {% if user.two_factor_enabled %}
+                    {% trans "Activé" %}
+                    {% else %}
+                    {% trans "Désactivé" %}
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,9 +1,14 @@
 # services.py
 from django.core.mail import send_mail
 from django.conf import settings 
+from django.utils.translation import gettext as _
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from apps.users.models import NewsletterSubscription
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+
 
 class NewsletterService:
     @staticmethod
@@ -52,7 +57,7 @@ class QuoteEmailService:
             'status_url': f"{settings.SITE_URL}/quotes/status/{quote.id}/"
         }
         
-        html_message = render_to_string('quotes/email/confirmation.html', context)
+        html_message = render_to_string('email/confirmation.html', context)
         plain_message = strip_tags(html_message)
         
         send_mail(
@@ -84,3 +89,47 @@ class QuoteEmailService:
             [quote.email],
             html_message=html_message
         )
+        
+
+    
+@staticmethod
+def send_verification_email(request, user):
+    token = default_token_generator.make_token(user)
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    verification_url = request.build_absolute_uri(f'/verify-email/{uid}/{token}/')
+
+    subject = 'Vérifiez votre adresse e-mail'
+    message = render_to_string('email/verification_email.html', {
+        'user': user,
+        'verification_url': verification_url,
+    })
+
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email],
+        fail_silently=False,
+        html_message=message,
+    )
+@staticmethod
+def send_password_reset_email(request, user):
+    token = default_token_generator.make_token(user)
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    reset_url = request.build_absolute_uri(f'/reset-password/{uid}/{token}/')
+
+    subject = 'Réinitialisation de votre mot de passe'
+    message = render_to_string('email/password_reset_email.html', {
+        'user': user,
+        'reset_url': reset_url,
+    })
+
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email],
+        fail_silently=False,
+        html_message=message,
+    )
+        

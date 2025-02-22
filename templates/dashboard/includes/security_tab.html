@@ -1,0 +1,45 @@
+<!-- templates/dashboard/includes/security_tab.html -->
+{% load i18n %}
+<div class="tab-pane fade" id="security">
+    <div class="list-group">
+        {% if user.two_factor_enabled %}
+        <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-1">Authentification à deux facteurs</h6>
+                    <p class="mb-0 small text-muted">
+                        Activé et configuré
+                    </p>
+                </div>
+                <span class="badge bg-success">Actif</span>
+            </div>
+        </div>
+        {% else %}
+        <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-1">Authentification à deux facteurs</h6>
+                    <p class="mb-0 small text-muted">
+                        Ajoutez une couche de sécurité supplémentaire
+                    </p>
+                </div>
+                <span class="badge bg-warning">Non configuré</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-1">Changer le mot de passe</h6>
+                    <p class="mb-0 small text-muted">
+                        Mettez à jour votre mot de passe régulièrement
+                    </p>
+                </div>
+                <a href="{% url 'password_change' %}" class="btn btn-outline-primary btn-sm">
+                    Modifier
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

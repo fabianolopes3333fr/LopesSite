@@ -1,0 +1,111 @@
+{% extends 'base/auth_base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Authentification à deux facteurs" %}{% endblock %}
+
+{% block auth_content %}
+<div class="auth-form card p-4 shadow-lg">
+    <h2 class="text-center mb-4">{% trans "Vérification en deux étapes" %}</h2>
+
+    {% if messages %}
+    <div class="messages mb-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="text-center mb-4">
+        <p>{% trans "Veuillez entrer le code à 6 chiffres généré par votre application d'authentification." %}</p>
+    </div>
+
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <div class="form-floating mb-4">
+            <input type="text" class="form-control {% if form.token.errors %}is-invalid{% endif %}" id="{{ form.token.id_for_label }}" name="{{ form.token.html_name }}" placeholder="{% trans 'Code à 6 chiffres' %}" maxlength="6" pattern="\d{6}" inputmode="numeric" autocomplete="one-time-code" required>
+            <label for="{{ form.token.id_for_label }}">{% trans "Code de vérification" %}</label>
+            {% if form.token.errors %}
+            <div class="invalid-feedback">
+                {{ form.token.errors|join:", " }}
+            </div>
+            {% endif %}
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+            {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg">
+                {% trans "Vérifier" %}
+            </button>
+        </div>
+    </form>
+
+    <div class="text-center mt-4">
+        <p class="text-muted">
+            {% trans "Vous n'avez pas reçu le code ?" %}
+            <a href="{% url 'contact' %}" class="text-decoration-none">
+                {% trans "Contactez le support" %}
+            </a>
+        </p>
+    </div>
+</div>
+
+<div class="text-center mt-3">
+    <p>
+        {% trans "Besoin d'aide ?" %}
+        <a href="{% url 'contact' %}" class="text-decoration-none">
+            {% trans "Contactez-nous" %}
+        </a>
+    </p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('.needs-validation');
+        const tokenInput = document.getElementById('{{ form.token.id_for_label }}');
+
+        // Permitir apenas números
+        tokenInput.addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^\d]/g, '');
+        });
+
+        form.addEventListener('submit', function (event) {
+            let isValid = true;
+
+            // Validação do código
+            if (!tokenInput.value) {
+                tokenInput.setCustomValidity('{% trans "Veuillez entrer le code de vérification." %}');
+                isValid = false;
+            } else if (tokenInput.value.length !== 6) {
+                tokenInput.setCustomValidity('{% trans "Le code doit contenir 6 chiffres." %}');
+                isValid = false;
+            } else {
+                tokenInput.setCustomValidity('');
+            }
+
+            if (!form.checkValidity() || !isValid) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            form.classList.add('was-validated');
+        });
+
+        // Reset da validação personalizada
+        tokenInput.addEventListener('input', () => tokenInput.setCustomValidity(''));
+    });
+</script>
+{% endblock %}

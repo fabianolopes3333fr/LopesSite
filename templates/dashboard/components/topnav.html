@@ -1,0 +1,39 @@
+{% load static %}
+{% load i18n %}
+
+<div class="d-flex justify-content-between align-items-center  py-4 px-6">
+    <div>
+        <h4 class="text-2xl font-semibold text-gray-800">Tableau de bord</h4>
+    </div>
+    <div class="d-flex align-items-center mr-4">
+        <div class="dropdown me-3">
+            <button class="btn btn-light position-relative" type="button" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-bell"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    3
+                </span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                <li><a class="dropdown-item" href="#">Nouveau devis reçu</a></li>
+                <li><a class="dropdown-item" href="#">Rendez-vous confirmé</a></li>
+                <li><a class="dropdown-item" href="#">Projet mis à jour</a></li>
+            </ul>
+        </div>
+        <div class="dropdown">
+            <button class="btn d-flex align-items-center" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                    <span>{{ user.first_name|first }}</span>
+                </div>
+                <span>{{ user.first_name }}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                <li><a class="dropdown-item" href="{% url 'profile' %}">Mon profil</a></li>
+                <li><a class="dropdown-item" href="{% url 'password_change' %}">Paramètres</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="{% url 'logout' %}">Déconnexion</a></li>
+            </ul>
+        </div>
+    </div>
+</div>

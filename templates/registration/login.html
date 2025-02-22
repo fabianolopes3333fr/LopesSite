@@ -1,55 +1,128 @@
 {% extends 'base/auth_base.html' %}
 {% load static %}
-{% block title %}Connexion{% endblock %}
-{% block auth_content %}
+{% load i18n %}
 
+{% block title %}{% trans "Connexion" %}{% endblock %}
+
+{% block auth_content %}
 <div class="auth-form card p-4 shadow-lg">
-    <h2 class="text-center mb-4">Bienvenue !</h2>
+    <h2 class="text-center mb-4">{% trans "Bienvenue !" %}</h2>
+
+    {% if messages %}
+    <div class="messages mb-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <form method="post" class="needs-validation" novalidate>
         {% csrf_token %}
+
+        <!-- Email -->
         <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="username" name="username" placeholder="Nom d'utilisateur" required>
-            <label for="username">Nom d'utilisateur</label>
+            <input type="email" class="form-control {% if form.username.errors %}is-invalid{% endif %}" id="{{ form.username.id_for_label }}" name="{{ form.username.html_name }}" placeholder="{% trans 'E-mail' %}" required value="{{ form.username.value|default:'' }}" autocomplete="email">
+            <label for="{{ form.username.id_for_label }}">{% trans "E-mail" %}</label>
+            {% if form.username.errors %}
             <div class="invalid-feedback">
-                Veuillez saisir votre nom d'utilisateur.
+                {{ form.username.errors|join:", " }}
             </div>
+            {% endif %}
         </div>
+
+        <!-- Mot de passe -->
         <div class="form-floating mb-3">
-            <input type="password" class="form-control" id="password" name="password" placeholder="Mot de passe" required>
-            <label for="password">Mot de passe</label>
+            <input type="password" class="form-control {% if form.password.errors %}is-invalid{% endif %}" id="{{ form.password.id_for_label }}" name="{{ form.password.html_name }}" placeholder="{% trans 'Mot de passe' %}" required autocomplete="current-password">
+            <label for="{{ form.password.id_for_label }}">{% trans "Mot de passe" %}</label>
+            {% if form.password.errors %}
             <div class="invalid-feedback">
-                Veuillez saisir votre mot de passe.
+                {{ form.password.errors|join:", " }}
             </div>
+            {% endif %}
         </div>
+
+        <!-- Se souvenir de moi -->
         <div class="form-check mb-3">
-            <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">
-            <label class="form-check-label" for="remember-me">Se souvenir de moi</label>
+            <input type="checkbox" class="form-check-input" id="remember" name="remember" {% if form.remember.value %}checked{% endif %}>
+            <label class="form-check-label" for="remember">
+                {% trans "Se souvenir de moi" %}
+            </label>
         </div>
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+            {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
+
         <div class="d-grid gap-2 mb-3">
-            <button type="submit" class="btn btn-primary btn-login">Se connecter</button>
+            <button type="submit" class="btn btn-primary btn-login">
+                {% trans "Se connecter" %}
+            </button>
         </div>
     </form>
+
     <div class="text-center auth-links">
-        <p><a href="{% url 'password_reset' %}" class="text-decoration-none">Mot de passe oublié ?</a></p>
-        <p>Vous n'avez pas de compte ? <a href="{% url 'register' %}" class="text-decoration-none">Inscrivez-vous ici</a></p>
+        <p>
+            <a href="{% url 'password_reset' %}" class="text-decoration-none">
+                {% trans "Mot de passe oublié ?" %}
+            </a>
+        </p>
+        <p>
+            {% trans "Vous n'avez pas de compte ?" %}
+            <a href="{% url 'register' %}" class="text-decoration-none">
+                {% trans "Inscrivez-vous ici" %}
+            </a>
+        </p>
     </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <script>
-    // Form validation
-    (function () {
-        'use strict'
-        var forms = document.querySelectorAll('.needs-validation')
-        Array.prototype.slice.call(forms)
-            .forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault()
-                        event.stopPropagation()
-                    }
-                    form.classList.add('was-validated')
-                }, false)
-            })
-    })()
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('.needs-validation');
+        const emailInput = document.getElementById('{{ form.username.id_for_label }}');
+        const passwordInput = document.getElementById('{{ form.password.id_for_label }}');
+
+        form.addEventListener('submit', function (event) {
+            let isValid = true;
+
+            // Validation email
+            if (!emailInput.value) {
+                emailInput.setCustomValidity('{% trans "Veuillez saisir votre adresse e-mail." %}');
+                isValid = false;
+            } else if (!emailInput.checkValidity()) {
+                emailInput.setCustomValidity('{% trans "Veuillez saisir une adresse e-mail valide." %}');
+                isValid = false;
+            } else {
+                emailInput.setCustomValidity('');
+            }
+
+            // Validation mot de passe
+            if (!passwordInput.value) {
+                passwordInput.setCustomValidity('{% trans "Veuillez saisir votre mot de passe." %}');
+                isValid = false;
+            } else {
+                passwordInput.setCustomValidity('');
+            }
+
+            if (!form.checkValidity() || !isValid) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            form.classList.add('was-validated');
+        });
+
+        // Reset des validations personnalisées
+        emailInput.addEventListener('input', () => emailInput.setCustomValidity(''));
+        passwordInput.addEventListener('input', () => passwordInput.setCustomValidity(''));
+    });
 </script>
 {% endblock %}

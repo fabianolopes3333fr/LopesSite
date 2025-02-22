@@ -1,0 +1,134 @@
+{% extends 'base/auth_base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Mon Profil" %}{% endblock %}
+
+{% block auth_content %}
+<div class="profile-form card p-4 shadow-lg">
+    <h2 class="text-center mb-4">{% trans "Mon Profil" %}</h2>
+
+    {% if messages %}
+    <div class="messages mb-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <div class="row">
+            <!-- Informações básicas -->
+            <div class="col-md-6">
+                <h3 class="h5 mb-3">{% trans "Informations personnelles" %}</h3>
+
+                <!-- Email -->
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control {% if user_form.email.errors %}is-invalid{% endif %}" id="{{ user_form.email.id_for_label }}" name="{{ user_form.email.html_name }}" value="{{ user_form.email.value|default:'' }}" placeholder="{% trans 'E-mail' %}" required>
+                    <label for="{{ user_form.email.id_for_label }}">{% trans "E-mail" %}</label>
+                    {% if user_form.email.errors %}
+                    <div class="invalid-feedback">
+                        {{ user_form.email.errors|join:", " }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Prénom -->
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control {% if user_form.first_name.errors %}is-invalid{% endif %}" id="{{ user_form.first_name.id_for_label }}" name="{{ user_form.first_name.html_name }}" value="{{ user_form.first_name.value|default:'' }}" placeholder="{% trans 'Prénom' %}" required>
+                    <label for="{{ user_form.first_name.id_for_label }}">{% trans "Prénom" %}</label>
+                    {% if user_form.first_name.errors %}
+                    <div class="invalid-feedback">
+                        {{ user_form.first_name.errors|join:", " }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Nom -->
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control {% if user_form.last_name.errors %}is-invalid{% endif %}" id="{{ user_form.last_name.id_for_label }}" name="{{ user_form.last_name.html_name }}" value="{{ user_form.last_name.value|default:'' }}" placeholder="{% trans 'Nom' %}" required>
+                    <label for="{{ user_form.last_name.id_for_label }}">{% trans "Nom" %}</label>
+                    {% if user_form.last_name.errors %}
+                    <div class="invalid-feedback">
+                        {{ user_form.last_name.errors|join:", " }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Informações de contato -->
+            <div class="col-md-6">
+                <h3 class="h5 mb-3">{% trans "Coordonnées" %}</h3>
+
+                <!-- Téléphone -->
+                <div class="form-floating mb-3">
+                    <input type="tel" class="form-control {% if profile_form.phone_number.errors %}is-invalid{% endif %}" id="{{ profile_form.phone_number.id_for_label }}" name="{{ profile_form.phone_number.html_name }}" value="{{ profile_form.phone_number.value|default:'' }}" placeholder="{% trans 'Téléphone' %}">
+                    <label for="{{ profile_form.phone_number.id_for_label }}">{% trans "Téléphone" %}</label>
+                    {% if profile_form.phone_number.errors %}
+                    <div class="invalid-feedback">
+                        {{ profile_form.phone_number.errors|join:", " }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Adresse -->
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control {% if profile_form.address.errors %}is-invalid{% endif %}" id="{{ profile_form.address.id_for_label }}" name="{{ profile_form.address.html_name }}" value="{{ profile_form.address.value|default:'' }}" placeholder="{% trans 'Adresse' %}">
+                    <label for="{{ profile_form.address.id_for_label }}">{% trans "Adresse" %}</label>
+                    {% if profile_form.address.errors %}
+                    <div class="invalid-feedback">
+                        {{ profile_form.address.errors|join:", " }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Code postal -->
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control {% if profile_form.postal_code.errors %}is-invalid{% endif %}" id="{{ profile_form.postal_code.id_for_label }}" name="{{ profile_form.postal_code.html_name }}" value="{{ profile_form.postal_code.value|default:'' }}" placeholder="{% trans 'Code postal' %}">
+                    <label for="{{ profile_form.postal_code.id_for_label }}">{% trans "Code postal" %}</label>
+                    {% if profile_form.postal_code.errors %}
+                    <div class="invalid-feedback">
+                        {{ profile_form.postal_code.errors|join:", " }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Ville -->
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control {% if profile_form.city.errors %}is-invalid{% endif %}" id="{{ profile_form.city.id_for_label }}" name="{{ profile_form.city.html_name }}" value="{{ profile_form.city.value|default:'' }}" placeholder="{% trans 'Ville' %}">
+                    <label for="{{ profile_form.city.id_for_label }}">{% trans "Ville" %}</label>
+                    {% if profile_form.city.errors %}
+                    <div class="invalid-feedback">
+                        {{ profile_form.city.errors|join:", " }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2 mt-3">
+            <button type="submit" class="btn btn-primary">
+                {% trans "Mettre à jour" %}
+            </button>
+        </div>
+    </form>
+
+    <div class="mt-4 pt-3 border-top">
+        <h3 class="h5">{% trans "Sécurité" %}</h3>
+        <div class="d-grid gap-2">
+            <a href="{% url 'password_change' %}" class="btn btn-outline-primary">
+                {% trans "Changer le mot de passe" %}
+            </a>
+            {% if not user.email_verified %}
+            <a href="{% url 'verify_email' %}" class="btn btn-outline-warning">
+                {% trans "Vérifier l'adresse e-mail" %}
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
