@@ -1,0 +1,203 @@
+{% extends 'base/base_pages.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .card-title {
+        color: #4a90e2;
+        font-weight: 600;
+    }
+
+    .form-section {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-section h4 {
+        color: #4a90e2;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+
+    .btn-primary-quote {
+        background-color: #4a90e2;
+        border-color: #4a90e2;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+    }
+
+    .btn-primary-quote:hover {
+        background-color: #3a7bc8;
+        border-color: #3a7bc8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4">Demande de devis</h2>
+
+                    {% if messages %}
+                    <div class="messages mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        {% if user_form %}
+                        <div class="form-section">
+                            <h4>Vos informations</h4>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ user_form.first_name.id_for_label }}" class="form-label">Prénom</label>
+                                    {{ user_form.first_name }}
+                                    <div class="invalid-feedback">{{ user_form.first_name.errors|join:", " }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Nom</label>
+                                    {{ user_form.last_name }}
+                                    <div class="invalid-feedback">{{ user_form.last_name.errors|join:", " }}</div>
+                                </div>
+                                <div class="col-12">
+                                    <label for="{{ user_form.email.id_for_label }}" class="form-label">E-mail</label>
+                                    {{ user_form.email }}
+                                    <div class="invalid-feedback">{{ user_form.email.errors|join:", " }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ user_form.password1.id_for_label }}" class="form-label">Mot de passe</label>
+                                    {{ user_form.password1 }}
+                                    <div class="form-text">Minimum 8 caractères, avec majuscules, minuscules et chiffres</div>
+                                    <div class="invalid-feedback">{{ user_form.password1.errors|join:", " }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ user_form.password2.id_for_label }}" class="form-label">Confirmez le mot de passe</label>
+                                    {{ user_form.password2 }}
+                                    <div class="invalid-feedback">{{ user_form.password2.errors|join:", " }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="form-section">
+                            <h4>Détails du projet</h4>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ quote_form.project_type.id_for_label }}" class="form-label">Type de projet*</label>
+                                    {{ quote_form.project_type }}
+                                    <div class="invalid-feedback">{{ quote_form.project_type.errors|join:", " }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ quote_form.area_size.id_for_label }}" class="form-label">Surface (m²)*</label>
+                                    {{ quote_form.area_size }}
+                                    <div class="form-text">Indiquez la surface approximative en mètres carrés</div>
+                                    <div class="invalid-feedback">{{ quote_form.area_size.errors|join:", " }}</div>
+                                </div>
+                                <div class="col-12">
+                                    <label for="{{ quote_form.description.id_for_label }}" class="form-label">Description du projet*</label>
+                                    {{ quote_form.description }}
+                                    <div class="form-text">Décrivez votre projet en détail (type de surface, état actuel, finition souhaitée...)</div>
+                                    <div class="invalid-feedback">{{ quote_form.description.errors|join:", " }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ quote_form.desired_start_date.id_for_label }}" class="form-label">Date souhaitée de début</label>
+                                    {{ quote_form.desired_start_date }}
+                                    <div class="form-text">Date approximative de début des travaux</div>
+                                    <div class="invalid-feedback">{{ quote_form.desired_start_date.errors|join:", " }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4>Coordonnées</h4>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="{{ quote_form.address.id_for_label }}" class="form-label">Adresse complète*</label>
+                                    {{ quote_form.address }}
+                                    <div class="form-text">Numéro et nom de rue</div>
+                                    <div class="invalid-feedback">{{ quote_form.address.errors|join:", " }}</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="{{ quote_form.postal_code.id_for_label }}" class="form-label">Code postal*</label>
+                                    {{ quote_form.postal_code }}
+                                    <div class="invalid-feedback">{{ quote_form.postal_code.errors|join:", " }}</div>
+                                </div>
+                                <div class="col-md-8">
+                                    <label for="{{ quote_form.city.id_for_label }}" class="form-label">Ville*</label>
+                                    {{ quote_form.city }}
+                                    <div class="invalid-feedback">{{ quote_form.city.errors|join:", " }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ quote_form.phone_number.id_for_label }}" class="form-label">Téléphone*</label>
+                                    {{ quote_form.phone_number }}
+                                    <div class="form-text">Format: 06XXXXXXXX ou +33XXXXXXXXX</div>
+                                    <div class="invalid-feedback">{{ quote_form.phone_number.errors|join:", " }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ quote_form.contact_preference.id_for_label }}" class="form-label">Comment souhaitez-vous être contacté?*</label>
+                                    {{ quote_form.contact_preference }}
+                                    <div class="invalid-feedback">{{ quote_form.contact_preference.errors|join:", " }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mb-4" role="alert">
+                            <small>Les champs marqués d'un astérisque (*) sont obligatoires</small>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary-quote btn-lg ">
+                                Envoyer la demande de devis
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        flatpickr("#{{ quote_form.desired_start_date.id_for_label }}", {
+            dateFormat: "d/m/Y",
+            minDate: "today",
+        });
+
+        // Form validation
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,12 +1,223 @@
-{% extends 'home/base.html' %}
+{% extends 'base/base_pages.html' %}
+{% load static %}
 
 {% block title %}À propos - Lopes Peinture{% endblock %}
 
 {% block content %}
-<section class="about-page py-5">
+<!-- Hero Section -->
+<section class="hero-section bg-light py-5">
     <div class="container">
-        <h1>À propos de Lopes Peinture</h1>
-        <!-- Adicione o conteúdo da página "About" aqui -->
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 mb-4">Bienvenue chez Lopes Peinture</h1>
+                <p class="lead text-muted">Plus de 10 ans d'expertise dans la rénovation et l'embellissement de vos espaces intérieurs et extérieurs.</p>
+            </div>
+            <div class="col-lg-6">
+                <img src="{% static 'img/about/hero-image.jpg' %}" alt="Lopes Peinture Team" class="img-fluid rounded shadow">
+            </div>
+        </div>
     </div>
 </section>
+
+<!-- Notre Histoire -->
+<section class="our-story py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="mb-4">Notre Histoire</h2>
+                <p class="text-muted">Fondée en 2014, Lopes Peinture est née d'une passion pour l'artisanat et d'un désir de créer des espaces de vie exceptionnels. Notre entreprise familiale a grandi avec une vision claire : offrir un service de qualité supérieure tout en maintenant des relations personnalisées avec nos clients.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Nos Valeurs -->
+<section class="our-values bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Nos Valeurs</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-4">
+                            <i class="fas fa-medal fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="h5 mb-3">Excellence</h3>
+                        <p class="text-muted mb-0">Nous nous engageons à fournir un travail de la plus haute qualité, en utilisant les meilleurs matériaux et techniques.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-4">
+                            <i class="fas fa-handshake fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="h5 mb-3">Confiance</h3>
+                        <p class="text-muted mb-0">La transparence et l'honnêteté sont au cœur de chaque projet que nous entreprenons.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-4">
+                            <i class="fas fa-heart fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="h5 mb-3">Passion</h3>
+                        <p class="text-muted mb-0">Notre amour du métier se reflète dans chaque coup de pinceau et chaque détail de finition.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Notre Équipe -->
+<section class="our-team py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Notre Équipe</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card team-card border-0 shadow-sm">
+                    <img src="{% static 'imgages/about/team-1.jpg' %}" class="card-img-top" alt="Team Member">
+                    <div class="card-body text-center p-4">
+                        <h3 class="h5 mb-2">Fabiano Lopes</h3>
+                        <p class="text-muted mb-3">Fondateur & Directeur</p>
+                        <p class="small text-muted">Plus de 15 ans d'expérience dans le secteur de la peinture et de la rénovation.</p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-4">
+                <div class="card team-card border-0 shadow-sm">
+                    <img src="{% static 'imgages/about/team-1.jpg' %}" class="card-img-top" alt="Team Member">
+                    <div class="card-body text-center p-4">
+                        <h3 class="h5 mb-2">Fradique Trajano</h3>
+                        <p class="text-muted mb-3">Directeur</p>
+                        <p class="small text-muted">Plus de 25 ans d'expérience dans le secteur de la peinture et de la rénovation.</p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-4">
+                <div class="card team-card border-0 shadow-sm">
+                    <img src="{% static 'imgages/about/team-1.jpg' %}" class="card-img-top" alt="Team Member">
+                    <div class="card-body text-center p-4">
+                        <h3 class="h5 mb-2">Fabiano Lopes</h3>
+                        <p class="text-muted mb-3">Fondateur & Directeur</p>
+                        <p class="small text-muted">Plus de 15 ans d'expérience dans le secteur de la peinture et de la rénovation.</p>
+                    </div>
+                </div>
+
+            </div>
+            <!-- Adicione mais membros da equipe conforme necessário -->
+        </div>
+    </div>
+</section>
+
+<!-- Nos Services -->
+<section class="our-services bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Nos Services</h2>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card">
+                    <img src="{% static 'imgages/services/interior.jpg' %}" alt="Peinture Intérieure" class="img-fluid rounded mb-3">
+                    <h3 class="h5 mb-3">Peinture Intérieure</h3>
+                    <p class="text-muted">Transformation complète de vos espaces intérieurs avec des finitions impeccables.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card">
+                    <img src="{% static 'imgages/services/exterior.jpg' %}" alt="Peinture Extérieure" class="img-fluid rounded mb-3">
+                    <h3 class="h5 mb-3">Peinture Extérieure</h3>
+                    <p class="text-muted">Protection et embellissement de vos façades avec des produits durables.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card">
+                    <img src="{% static 'imgages/services/decoration.jpg' %}" alt="Décoration" class="img-fluid rounded mb-3">
+                    <h3 class="h5 mb-3">Décoration</h3>
+                    <p class="text-muted">Conseils et solutions personnalisés pour un intérieur qui vous ressemble.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Chiffres Clés -->
+<section class="key-numbers py-5">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-3">
+                <div class="number-card">
+                    <h3 class="display-4 mb-2">15+</h3>
+                    <p class="text-muted mb-0">Années d'expérience</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="number-card">
+                    <h3 class="display-4 mb-2">500+</h3>
+                    <p class="text-muted mb-0">Projets réalisés</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="number-card">
+                    <h3 class="display-4 mb-2">98%</h3>
+                    <p class="text-muted mb-0">Clients satisfaits</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="number-card">
+                    <h3 class="display-4 mb-2">12</h3>
+                    <p class="text-muted mb-0">Experts qualifiés</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta bg-primary text-white py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Prêt à transformer votre espace?</h2>
+        <p class="lead mb-4">Contactez-nous pour un devis gratuit et personnalisé</p>
+        <a href="{% url 'create_quote' %}" class="btn btn-light btn-lg">Demander un devis</a>
+    </div>
+</section>
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7)),
+        url('{% static "imgages/about/hero-bg.jpg" %}') center/cover;
+    }
+
+    .team-card:hover {
+        transform: translateY(-5px);
+        transition: transform 0.3s ease;
+    }
+
+    .service-card:hover {
+        transform: translateY(-5px);
+        transition: transform 0.3s ease;
+    }
+
+    .number-card {
+        padding: 2rem;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .cta {
+        background: linear-gradient(45deg, var(--bs-primary), var(--bs-primary-dark));
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+{% endblock %}
 {% endblock %}

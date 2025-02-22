@@ -1,0 +1,68 @@
+{% load static %}
+{% load i18n %}
+
+
+
+<section class="newsletter-section">
+    <div class="container newsletter-container">
+        <div class="newsletter-content">
+            <h2 class="newsletter-title">{% trans "Restez informé de nos actualités" %}</h2>
+            <p class="newsletter-description">
+                {% trans "Inscrivez-vous à notre newsletter pour recevoir en exclusivité nos dernières offres, conseils de peinture dans votre boîte mail." %}
+            </p>
+
+            <form class="newsletter-form" id="newsletterForm" method="POST" data-action="{% url 'newsletter_signup' %}">
+                {% csrf_token %}
+
+                <div class="newsletter-input-group">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control newsletter-input" id="name" name="name" placeholder="{% trans 'Votre nom' %}" minlength="2" maxlength="100" required aria-label="{% trans 'Votre nom' %}">
+                        <label for="name">{% trans "Votre nom" %}</label>
+                        <div class="invalid-feedback">
+                            {% trans "Veuillez entrer votre nom" %}
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-3 ">
+                        <input type="email" class="form-control newsletter-input" id="email" name="email" placeholder="{% trans 'Votre adresse e-mail' %}" required aria-label="{% trans 'Votre adresse e-mail' %}">
+                        <label for="email">{% trans "Votre adresse e-mail" %}</label>
+                        <div class="invalid-feedback">
+                            {% trans "Veuillez entrer une adresse e-mail valide" %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary newsletter-button" id="newsletterSubmit">
+                        <svg class="icon me-2" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        {% trans "S'inscrire" %}
+                    </button>
+                </div>
+
+                <!-- Alert para feedback -->
+                <div class="alert d-none mt-3" role="alert" id="newsletterAlert"></div>
+            </form>
+
+            <div class="newsletter-features">
+                <div class="feature-item" aria-label="{% trans 'Sécurité garantie' %}">
+                    <svg class="icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span>{% trans "100% Sécurisé" %}</span>
+                </div>
+                <div class="feature-item" aria-label="{% trans 'Fréquence des envois' %}">
+                    <svg class="icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span>{% trans "Envois hebdomadaires" %}</span>
+                </div>
+                <div class="feature-item" aria-label="{% trans 'Option de désinscription' %}">
+                    <svg class="icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{% trans "Désinscription facile" %}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,24 @@
+{% load static %}
+{% load i18n %}
+
+<!-- Seção Sobre Nós -->
+<section class="about-us py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <img src="{% static 'images/about-us.webp' %}" alt="Équipe Lopes Peinture" class="img-fluid rounded ">
+            </div>
+            <div class="col-lg-6">
+                <h2 class="mb-4">À propos de Lopes Peinture</h2>
+                <p class="lead mb-4">Depuis plus de 10 ans, Lopes Peinture transforme les espaces de vie et de travail avec passion et expertise.</p>
+                <p>Notre équipe de professionnels qualifiés s'engage à fournir des services de peinture de haute qualité, en utilisant les meilleures techniques et matériaux pour garantir des résultats durables et esthétiques.</p>
+                <ul class="list-unstyled mb-4">
+                    <li><i class="fas fa-check text-primary me-2"></i> Expertise en peinture résidentielle et commerciale</li>
+                    <li><i class="fas fa-check text-primary me-2"></i> Utilisation de produits respectueux de l'environnement</li>
+                    <li><i class="fas fa-check text-primary me-2"></i> Satisfaction client garantie</li>
+                </ul>
+                <a href="{% url 'about' %}" class="btn btn-primary">En savoir plus sur nous</a>
+            </div>
+        </div>
+    </div>
+</section>

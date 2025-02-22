@@ -3,7 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from apps.users.models import CustomUser
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
-
+from typing import List, Tuple
+from django.utils import timezone
 
 
 class Supplier(models.Model):
@@ -153,7 +154,7 @@ class OrderItem(models.Model):
 
 class Quote(models.Model):
     
-    STATUS_CHOICES = [
+    STATUS_CHOICES: List[Tuple[str, str]] = [
         ('pending', _('En attente')),
         ('in_review', _('En cours de révision')),
         ('approved', _('Approuvé')),
@@ -161,41 +162,64 @@ class Quote(models.Model):
         ('canceled', _('Annulé'))
     ]
 
-    SERVICE_TYPES = [
+    TYPE_CHOICES: List[Tuple[str, str]] = [
         ('interior', _('Peinture Intérieure')),
         ('exterior', _('Peinture Extérieure')),
         ('commercial', _('Peinture Commerciale')),
         ('industrial', _('Peinture Industrielle')),
-        ('decorative', _('Peinture Décorative'))
+        ('decorative', _('Peinture Décorative')),
+        ('floor', _('Parquet Flottant')),
+        ('wallpaper', _('Papier Peint')),
+        ('glass', _('Toile de Verre'))
     ]
-
     
-    # Informações Básicas
-    name = models.CharField(_("Nom"), max_length=100)
-    email = models.EmailField(_("Email"))
-    phone = models.CharField(_("Téléphone"), max_length=20)
-    address = models.TextField(_('Adresse'), null=True, blank=True)
-    postal_code = models.CharField(_('Code Postal'), max_length=10, null=True, blank=True)
-    city = models.CharField(_('Ville'), max_length=100, null=True, blank=True)
-    
-    
-    # Detalhes do Projeto
-    service_type = models.CharField(
-        _('Type de Service'), 
-        max_length=200,
-        choices=SERVICE_TYPES, 
+    CONTACT_PREFERENCES: List[Tuple[str, str]] = [
+        ('email', 'Email'),
+        ('phone', _('Téléphone')),
+        ('both', _('Les deux'))
+    ]
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(
+        CustomUser, 
+        on_delete=models.CASCADE,
+        related_name='quotes',
+        null=True,
+        blank=True
+    )
+    # Informações do Projeto
+    project_type = models.CharField(
+        _('type de projet'),
+        max_length=50,
+        choices=TYPE_CHOICES,
         default='interior'
     )
+    
     area_size  = models.DecimalField(
         _("Surface (m²)"), 
         max_digits=10, 
         decimal_places=2
     )
-    project_description = models.TextField(_('Description du projet'), null=True, blank=True)
-    preferred_date = models.DateField(_('Date préférée'), null=True, blank=True)
-    budget_range = models.CharField(_('Budget estimé'), max_length=50, null=True, blank=True)
     
+    description = models.TextField(_('Description du projet'), null=True, blank=True)
+    desired_start_date = models.DateField(
+        _('date de début souhaitée'),
+        default=timezone.now
+        
+    )
     
+    # Informações de Localização
+    address = models.CharField(_('Adresse'),max_length=255, null=True, blank=True)
+    postal_code = models.CharField(_('Code Postal'), max_length=10, null=True, blank=True)
+    city = models.CharField(_('Ville'), max_length=100, null=True, blank=True)
+    
+    # Informações BásicasInformações de Contato Adicionais
+    phone_number = models.CharField(_("Téléphone"), max_length=20)
+    contact_preference = models.CharField(
+        _('préférence de contact'),
+        max_length=20,
+        choices=CONTACT_PREFERENCES,
+        default='email'
+    )
     # Campos de Sistema
     status = models.CharField(
         _("Statut"), 
@@ -203,30 +227,36 @@ class Quote(models.Model):
         choices=STATUS_CHOICES,
         default='pending'
     )
-    
     created_at = models.DateTimeField(_("Date de création"), auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    estimated_price = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        null=True,
-        blank=True
-    )
-    admin_notes = models.TextField(blank=True)
     
-    reference_photos = models.ManyToManyField(
-        'QuotePhoto',
-        blank=True,
-        related_name='quotes'
-    )
     
-    def __str__(self):
-        return f"Devis #{self.id} - {self.name}"
+    class Meta:
+        verbose_name = _('devis')
+        verbose_name_plural = _('devis')
+        ordering = ['-created_at']
+
+    def __str__(self) -> str:
+        return f"Devis #{self.id} - {self.get_project_type_display()}"
+
+    def get_display_value(self, choices: List[Tuple[str, str]], value: str) -> str:
+        """Método auxiliar para obter o valor de exibição de choices"""
+        return dict(choices).get(value, value)
+
+    def get_project_type_display(self) -> str:
+        """Retorna o valor formatado do tipo de projeto"""
+        return self.get_display_value(self.TYPE_CHOICES, self.project_type)
+
+    def get_status_display(self) -> str:
+        """Retorna o valor formatado do status"""
+        return self.get_display_value(self.STATUS_CHOICES, self.status)
+
+    def get_contact_preference_display(self) -> str:
+        """Retorna o valor formatado da preferência de contato"""
+        return self.get_display_value(self.CONTACT_PREFERENCES, self.contact_preference)
         
 
-    class Meta:
-        verbose_name = _("Devis")
-        verbose_name_plural = _("Devis")
+    
 
 class QuotePhoto(models.Model):
     image = models.ImageField(upload_to='quotes/photos/')

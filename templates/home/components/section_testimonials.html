@@ -1,0 +1,217 @@
+{% load static %}
+{% load i18n %}
+
+<section class="testimonials py-5 bg-light">
+    <div class="container">
+        {% include 'components/section_header.html' with title="Témoignages" subtitle="Ce que disent nos clients" %}
+
+        <div class="row mb-4">
+            <div class="col-lg-6 mx-auto text-center">
+                <div class="d-flex align-items-center justify-content-center mb-3">
+                    <div class="rating-summary">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <span class="h2 mb-0 me-2">{{ average_rating|floatformat:1 }}</span>
+                            <div class="stars">
+                                {% for i in "12345"|make_list %}
+                                    {% if forloop.counter <= average_rating %}
+                                        <i class="fas fa-star text-warning"></i>
+                                    {% elif forloop.counter <= average_rating|add:"0.5" %}
+                                        <i class="fas fa-star-half-alt text-warning"></i>
+                                    {% else %}
+                                        <i class="far fa-star text-warning"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <small class="text-muted">Basé sur {{ total_reviews }} avis</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="testimonial-carousel">
+                    {% for testimonial in testimonials %}
+                        <div class="testimonial-item px-2">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        {% if testimonial.author_image %}
+                                            <img src="{{ testimonial.author_image.url }}" class="rounded-circle" width="50" height="50" alt="{{ testimonial.author_name }}">
+                                        {% else %}
+                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                {{ testimonial.author_name|make_list|first }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="ms-3">
+                                            <h5 class="mb-1">{{ testimonial.author_name }}</h5>
+                                            {% if testimonial.author_title %}
+                                                <small class="text-muted">{{ testimonial.author_title }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="stars mb-3">
+                                        {% for i in "12345"|make_list %}
+                                            <i class="fas fa-star {% if forloop.counter <= testimonial.rating %}text-warning{% else %}text-muted{% endif %}"></i>
+                                        {% endfor %}
+                                    </div>
+
+                                    <p class="testimonial-text mb-3">{{ testimonial.text }}</p>
+
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <small class="text-muted">
+                                            {{ testimonial.date_posted|date:"d F Y" }}
+                                        </small>
+                                        {% if testimonial.platform == 'google' %}
+                                            <img src="{% static 'img/google-logo.png' %}" alt="Google Review" height="20">
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#testimonialModal">
+                <i class="far fa-comment-alt me-2"></i>Laisser un avis
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Modal para novo depoimento -->
+<div class="modal fade" id="testimonialModal" tabindex="-1" aria-labelledby="testimonialModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="testimonialModalLabel">{% trans "Laisser un avis" %}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="testimonialForm" method="post" action="{% url 'submit_testimonial' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="author_name" class="form-label">{% trans "Nom" %}</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control" id="author_name" name="author_name" required placeholder="{% trans 'Votre nom' %}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="author_title" class="form-label">{% trans "Titre" %} <small class="text-muted">({% trans "optionnel" %})</small></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
+                            <input type="text" class="form-control" id="author_title" name="author_title" placeholder="{% trans 'Ex: Propriétaire, Architecte, etc.' %}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "Note" %}</label>
+                        <div class="star-rating">
+                            {% for i in "12345"|make_list %}
+                            <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" required>
+                            <label for="star{{ i }}" title="{{ i }} {% trans 'étoiles' %}">
+                                <i class="fas fa-star"></i>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="text" class="form-label">{% trans "Votre avis" %}</label>
+                        <textarea class="form-control" id="text" name="text" rows="4" required placeholder="{% trans 'Partagez votre expérience avec nous...' %}"></textarea>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Annuler" %}</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>{% trans "Envoyer" %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
+<style>
+    .testimonial-carousel .slick-slide {
+        margin: 0 10px;
+    }
+
+    .testimonial-text {
+        max-height: 6.4em;
+        line-height: 1.6;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .testimonial-text::after {
+        content: '...';
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        background: white;
+        padding-left: 4px;
+    }
+
+    .star-rating {
+        display: inline-flex;
+        flex-direction: row-reverse;
+        font-size: 1.5em;
+    }
+
+    .star-rating input {
+        display: none;
+    }
+
+    .star-rating label {
+        color: #ddd;
+        cursor: pointer;
+    }
+
+    .star-rating :checked ~ label {
+        color: #ffca08;
+    }
+
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+        color: #ffca08;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.testimonial-carousel').slick({
+            dots: true,
+            infinite: true,
+            speed: 300,
+            slidesToShow: 3,
+            slidesToScroll: 1,
+            responsive: [
+                {
+                    breakpoint: 992,
+                    settings: {
+                        slidesToShow: 2
+                    }
+                },
+                {
+                    breakpoint: 576,
+                    settings: {
+                        slidesToShow: 1
+                    }
+                }
+            ]
+        });
+    });
+</script>
+{% endblock %}

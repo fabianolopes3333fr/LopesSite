@@ -1,0 +1,31 @@
+{% load static %}
+{% load i18n %}
+
+<section class="gallery py-5 bg-light">
+    <div class="container">
+        {% include 'components/section_header.html' with title="Nos Réalisations" subtitle="Découvrez quelques-uns de nos projets récents" %}
+
+        <div class="row g-4">
+            {% for project in recent_projects %}
+            <div class="col-md-4">
+                <div class="gallery-item">
+                    <img src="{{ project.image.url }}" alt="{{ project.title }}" class="img-fluid rounded">
+                    <div class="gallery-overlay">
+                        <h3>{{ project.title }}</h3>
+                        <p>{{ project.description|truncatewords:20 }}</p>
+                        <a href="{% url 'service_detail' project.service.id %}#project-{{ project.id }}" class="btn btn-outline-light">Voir plus</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p>Aucun projet récent à afficher pour le moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="{% url 'services' %}" class="btn btn-primary btn-lg">Voir tous nos services et projets</a>
+        </div>
+    </div>
+</section>

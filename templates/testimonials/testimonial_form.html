@@ -1,0 +1,51 @@
+<!-- templates/testimonials/testimonial_form.html -->
+<form id="testimonialForm" method="post" action="{% url 'testimonials:submit' %}" class="needs-validation" novalidate>
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label">{{ form.author_name.label }}*</label>
+        {{ form.author_name }}
+        <div class="invalid-feedback">
+            {{ form.author_name.errors|join:", " }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">{{ form.author_title.label }}</label>
+        {{ form.author_title }}
+        <div class="invalid-feedback">
+            {{ form.author_title.errors|join:", " }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">{{ form.company.label }}</label>
+        {{ form.company }}
+        <div class="invalid-feedback">
+            {{ form.company.errors|join:", " }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">{{ form.rating.label }}*</label>
+        <div class="rating-container">
+            {{ form.rating }}
+        </div>
+        <div class="invalid-feedback">
+            {{ form.rating.errors|join:", " }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">{{ form.text.label }}*</label>
+        {{ form.text }}
+        <div class="invalid-feedback">
+            {{ form.text.errors|join:", " }}
+        </div>
+    </div>
+
+    <div class="text-end">
+        <button type="submit" class="btn btn-primary">
+            Envoyer mon témoignage
+        </button>
+    </div>
+</form>

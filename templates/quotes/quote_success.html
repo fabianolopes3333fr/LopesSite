@@ -1,0 +1,34 @@
+{% extends 'base/base_pages.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Demande de devis réussie" %} | Lopes Peinture{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <i class="fas fa-check-circle text-success fa-5x mb-4"></i>
+                <h1 class="mb-4">{% trans "Merci pour votre demande de devis !" %}</h1>
+                <p class="lead mb-4">{% trans "Votre demande a été envoyée avec succès. Notre équipe examinera votre demande et vous contactera dans les plus brefs délais." %}</p>
+                <p class="mb-5">{% trans "Numéro de référence de votre demande :" %} <strong>{{ quote_reference }}</strong></p>
+                <div class="d-flex justify-content-center">
+                    <a href="{% url 'home' %}" class="btn btn-primary me-3">
+                        <i class="fas fa-home me-2"></i>{% trans "Retour à l'accueil" %}
+                    </a>
+                    <a href="{% url 'services' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-paint-roller me-2"></i>{% trans "Nos services" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Você pode adicionar algum JavaScript aqui se necessário
+    // Por exemplo, para rastrear a conversão ou exibir uma notificação
+</script>
+{% endblock %}

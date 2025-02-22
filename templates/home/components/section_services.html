@@ -1,0 +1,31 @@
+{% load static %}
+{% load i18n %}
+
+<section class="services py-5">
+    <div class="container">
+        {% include 'components/section_header.html' with title=_("Nos Services") subtitle=_("Découvrez notre gamme complète de services de peinture professionnelle") %}
+
+        <div class="row g-4">
+            {% with services=services|default_if_none:'' %}
+            {% for service in services %}
+            <div class="col-md-6 col-lg-4">
+                {% include 'components/service_item.html' with
+                icon=service.icon
+                title=service.title
+                description=service.description
+                features=service.features
+                %}
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <p class="text-center">{% trans "Aucun service disponible pour le moment." %}</p>
+            </div>
+            {% endfor %}
+            {% endwith %}
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="{% url 'services' %}" class="btn btn-primary btn-lg">{% trans "Voir tous nos services" %}</a>
+        </div>
+    </div>
+</section>
