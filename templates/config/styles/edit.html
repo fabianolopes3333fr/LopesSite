@@ -1,0 +1,37 @@
+{% extends 'base/base_config.html' %}
+{% load crispy_forms_filters %}
+
+{% block page_title %}Style du site{% endblock %}
+
+{% block config_content %}
+<div class="card">
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form.primary_color|as_crispy_field }}
+                    {{ form.secondary_color|as_crispy_field }}
+                    {{ form.accent_color|as_crispy_field }}
+                    {{ form.background_color|as_crispy_field }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.font_family|as_crispy_field }}
+                    {{ form.heading_font|as_crispy_field }}
+                    {{ form.base_font_size|as_crispy_field }}
+                    {{ form.logo|as_crispy_field }}
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    {{ form.custom_css|as_crispy_field }}
+                </div>
+            </div>
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <a href="{% url 'config:dashboard' %}" class="btn btn-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -54,21 +54,18 @@ DJANGO_APPS = [
     
     
 ]
-# PHONENUMBER_DEFAULT_REGION = 'BR'
-# PHONENUMBER_DB_FORMAT = 'NATIONAL'
 
 THIRD_APPS = [ # são as Lib/app que instalamos no projeto
     'admin_thumbnails',
     'taggit',
-    # 'imagekit',
-    # 'django_cleanup.apps.CleanupConfig',
-    # 'drf_yasg',
-   
-    # 'widget_tweaks',
-    # 'crispy_forms',
-    # 'crispy_bootstrap4',
-    # 'django_countries',
-    # 'phonenumber_field',
+    'django_ckeditor_5',
+    'mptt',
+    'colorfield',
+    'celery',
+    'crispy_forms',
+    'crispy_bootstrap5',
+    'redis',
+    
 
     
 ]
@@ -82,12 +79,16 @@ PROJECT_APPS = [ # são os apps que criamos no projeto
     'apps.quotes',
     'apps.users',
     'apps.dashboard',
-    # 'apps.testimonials',
+    'apps.config',
 ]
 
 # INSTALLED_APPS é a variavel que django entende para fazer a leitura \
 # dos aplicativos então verifica a nomencratura.
 INSTALLED_APPS = DJANGO_APPS + THIRD_APPS + PROJECT_APPS
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -97,6 +98,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'utils.middleware.ConfigCacheMiddleware', 
+    'utils.middleware.RedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -112,6 +115,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'utils.context_processors.config_context',
             ],
         },
     },
@@ -171,13 +175,141 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_ROOT = BASE_DIR / 'static_root'
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static_root'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 
+# Configurações de upload
+# FILE_UPLOAD_PERMISSIONS = 0o644
+
+
+
+# Configurações do CKEditor Uploads
+
+CKEDITOR_CONFIGS = {
+'portal_config': {
+    # 'skin': 'moono',
+    # 'skin': 'office2013',
+    'toolbar_Basic': [
+        ['Source', '-', 'Bold', 'Italic']
+    ],
+    'toolbar_YourCustomToolbarConfig': [
+        {'name': 'document', 'items': [
+            'Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates'
+        ]},
+        {'name': 'clipboard', 'items': [
+            'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'
+        ]},
+        {'name': 'editing', 'items': ['Find', 'Replace', '-', 'SelectAll']},
+        {'name': 'forms',
+         'items': [
+             'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea',
+             'Select', 'Button', 'ImageButton', 'HiddenField'
+         ]},
+        '/',
+        {'name': 'basicstyles',
+         'items': [
+             'Bold', 'Italic', 'Underline', 'Strike', 'Subscript',
+             'Superscript', '-', 'RemoveFormat'
+         ]},
+        {'name': 'paragraph',
+         'items': [
+             'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent',
+             '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft',
+             'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-',
+             'BidiLtr', 'BidiRtl', 'Language'
+         ]},
+        {'name': 'links', 'items': ['Link', 'Unlink', 'Anchor']},
+        {'name': 'insert',
+         'items': [
+             'Image', 'Table', 'HorizontalRule',
+             'Smiley', 'SpecialChar', 'PageBreak', 'Iframe'
+         ]},
+        '/',
+        {'name': 'styles', 'items': ['Styles', 'Format', 'Font', 'FontSize']},
+        {'name': 'colors', 'items': ['TextColor', 'BGColor']},
+        {'name': 'tools', 'items': ['Maximize', 'ShowBlocks']},
+        {'name': 'about', 'items': ['About']},
+        '/',  # put this to force next toolbar on new line
+        {'name': 'yourcustomtools', 'items': [
+            # put the name of your editor.ui.addButton here
+            'Preview',
+            'Maximize',
+
+        ]},
+    ],
+    'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
+    # 'toolbarGroups': [{ 'name': 'document', 'groups': [ 'mode', 'document', 'doctools' ] }],
+    # 'height': 291,
+    # 'width': '100%',
+    # 'filebrowserWindowHeight': 725,
+    # 'filebrowserWindowWidth': 940,
+    # 'toolbarCanCollapse': True,
+    # 'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
+    'tabSpaces': 4,
+    'extraPlugins': ','.join([
+        'uploadimage',  # the upload image feature
+        # your extra plugins here
+        'div',
+        'autolink',
+        'autoembed',
+        'embedsemantic',
+        'autogrow',
+        # 'devtools',
+        'widget',
+        'lineutils',
+        'clipboard',
+        'dialog',
+        'dialogui',
+        'elementspath'
+    ]),
+    }
+}
+
+
+# Manter apenas estas
+# CKEDITOR_5_CONFIGS = {
+#     'default': {
+#         'toolbar': ['heading', '|', 'bold', 'italic', 'link',
+#                     'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', ],
+
+#     },
+# }
+
+CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+CKEDITOR_5_UPLOAD_PATH = "uploads/"
+
+# Configurações do Config (CMS)
+CONFIG_CACHE_DURATION = 3600  # 1 hora em segundos
+CONFIG_PAGE_CACHE_KEY_PREFIX = 'config_page_'
+CONFIG_MENU_CACHE_KEY_PREFIX = 'config_menu_'
+
+# Configurações de Templates
+CONFIG_TEMPLATES = [
+    ('default.html', _('Template par défaut')),
+    ('home.html', _('Page d\'accueil')),
+    ('services.html', _('Page de services')),
+    ('contact.html', _('Page de contact')),
+]
+
+# Configurações de SEO
+CONFIG_SEO_FIELDS = True
+CONFIG_ENABLE_META_DESCRIPTION = True
+CONFIG_DEFAULT_META_DESCRIPTION = 'Service de peinture professionnel'
+
+# Configurações MPTT
+MPTT_ADMIN_LEVEL_INDENT = 20
+
+# Configurações de cache
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+    }
+}
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -205,8 +337,16 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'config': {  # Mudando de 'cms' para 'config'
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
     },
 }
+# Configuração de cache
+CONFIG_CACHE_PREFIX = 'config_'
+CONFIG_PAGE_CACHE_TIME = 3600
 
 # Configurações de e-mail
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

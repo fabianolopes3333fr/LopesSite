@@ -1,0 +1,75 @@
+<!-- templates/config/dashboard.html -->
+{% extends 'base/base_config.html' %}
+
+{% block page_title %}Tableau de bord{% endblock %}
+
+{% block config_content %}
+<div class="row g-4">
+    <!-- Estatísticas -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted mb-1">Pages totales</h6>
+                <h3 class="mb-0">{{ total_pages }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted mb-1">Pages publiées</h6>
+                <h3 class="mb-0">{{ published_pages }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted mb-1">Menus</h6>
+                <h3 class="mb-0">{{ total_menus }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pages Recentes -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Pages récentes</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Titre</th>
+                                <th>Statut</th>
+                                <th>Date de création</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for page in recent_pages %}
+                            <tr>
+                                <td>{{ page.title }}</td>
+                                <td>
+                                    <span class="badge {% if page.status == 'published' %}bg-success{% else %}bg-warning{% endif %}">
+                                        {{ page.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ page.created_at|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <a href="{% url 'config:page_edit' page.pk %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

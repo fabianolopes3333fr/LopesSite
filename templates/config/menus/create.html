@@ -1,0 +1,16 @@
+{% extends 'base/base_config.html' %}
+
+{% block page_title %}Créer un nouveau menu{% endblock %}
+
+{% block config_content %}
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Créer</button>
+            <a href="{% url 'config:menu_list' %}" class="btn btn-secondary">Annuler</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

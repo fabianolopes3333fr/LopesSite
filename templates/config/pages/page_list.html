@@ -1,0 +1,75 @@
+{% extends 'base/base_config.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/page_list.css' %}">
+{% endblock %}
+{% block page_title %}Liste des pages{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'page_create' %}" class="btn btn-primary">
+    <i class="fas fa-plus me-2"></i>Créer une nouvelle page
+</a>
+{% endblock %}
+
+{% block config_content %}
+<div class="card">
+    <div class="card-body">
+        {% if pages %}
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Slug</th>
+                        <th>Statut</th>
+                        <th>Date de création</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for page in pages %}
+                    <tr>
+                        <td>{{ page.title }}</td>
+                        <td>{{ page.slug }}</td>
+                        <td>
+                            <span class="badge {% if page.status == 'published' %}bg-success{% else %}bg-warning{% endif %}">
+                                {{ page.get_status_display }}
+                            </span>
+                        </td>
+                        <td>{{ page.created_at|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'page_update' page.id %}" class="btn btn-sm btn-outline-primary" title="Modifier">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'page_preview' page.id %}" class="btn btn-sm btn-outline-info" title="Prévisualiser" target="_blank">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <button class="btn btn-sm btn-outline-danger delete-page" data-id="{{ page.id }}" title="Supprimer">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-center">Aucune page trouvée.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% include 'components/pagination.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/page_list.js' %}"></script>
+<script>
+    document.querySelectorAll('.delete-page').forEach(button => {
+        button.addEventListener('click', function() {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette page ?')) {
+                window.location.href = "{% url 'page_delete' 0 %}".replace('0', this.dataset.id);
+            }
+        });
+    });
+</script>
+{% endblock %}

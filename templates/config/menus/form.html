@@ -1,0 +1,23 @@
+{% extends 'base/base_config.html' %}
+{% load crispy_forms_filters %}
+
+{% block page_title %}
+{% if form.instance.pk %}Modifier le menu{% else %}Créer un nouveau menu{% endif %}
+{% endblock %}
+
+{% block config_content %}
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>Enregistrer
+            </button>
+            <a href="{% url 'config:menu_list' %}" class="btn btn-secondary">
+                <i class="fas fa-times me-2"></i>Annuler
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

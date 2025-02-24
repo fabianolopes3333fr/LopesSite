@@ -1,0 +1,54 @@
+<!-- templates/base/base_pages.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <style>
+        :root {
+            --primary-color: {
+                    {
+                    site_style.primary_color
+                }
+            }
+
+            ;
+
+            --secondary-color: {
+                    {
+                    site_style.secondary_color
+                }
+            }
+
+            ;
+
+            --accent-color: {
+                    {
+                    site_style.accent_color
+                }
+            }
+
+            ;
+
+            --font-family: {
+                    {
+                    site_style.font_family
+                }
+            }
+
+            ;
+        }
+    </style>
+    {{ site_style.custom_css|safe }}
+</head>
+
+<body>
+    <nav>
+        {% for item in main_menu %}
+        <a href="{{ item.url }}">{{ item.name }}</a>
+        {% endfor %}
+    </nav>
+    {% block content %}{% endblock %}
+</body>
+
+</html>

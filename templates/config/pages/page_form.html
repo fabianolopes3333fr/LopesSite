@@ -1,0 +1,81 @@
+{% extends 'base/base_config.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/page_form.css' %}">
+{% endblock %}
+{% block config_content %}
+<div class="container mt-4">
+    <h1 class="mb-4">{% if page %}Modifier{% else %}Créer{% endif %} une page</h1>
+
+    <form method="post" enctype="multipart/form-data" class="page-form">
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Contenu principal</h5>
+                        {{ form.title.label_tag }}
+                        {{ form.title }}
+                        {{ form.content.label_tag }}
+                        {{ form.content }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Paramètres</h5>
+                        {{ form.slug.label_tag }}
+                        {{ form.slug }}
+                        {{ form.status.label_tag }}
+                        {{ form.status }}
+                        {{ form.parent.label_tag }}
+                        {{ form.parent }}
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">SEO</h5>
+                        {{ form.meta_title.label_tag }}
+                        {{ form.meta_title }}
+                        {{ form.meta_description.label_tag }}
+                        {{ form.meta_description }}
+                        {{ form.meta_keywords.label_tag }}
+                        {{ form.meta_keywords }}
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Open Graph</h5>
+                        {{ form.og_title.label_tag }}
+                        {{ form.og_title }}
+                        {{ form.og_description.label_tag }}
+                        {{ form.og_description }}
+                        {{ form.og_image.label_tag }}
+                        {{ form.og_image }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <a href="{% url 'page_list' %}" class="btn btn-secondary">Retour à la liste</a>
+                {% if page %}
+                <a href="{% url 'page_delete' page.id %}" class="btn btn-danger float-right" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette page ?');">Supprimer</a>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/page_form.js' %}"></script>
+{% endblock %}

@@ -14,7 +14,11 @@ urlpatterns = [
     path('contact/', include('apps.contact.urls')),
     path('quotes/', include('apps.quotes.urls')),
     path('accounts/', include('apps.users.urls')),
-]
+    path('config/', include('apps.config.urls')),
+    
+    path('ckeditor5/', include('django_ckeditor_5.urls')),
+    
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

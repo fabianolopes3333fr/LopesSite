@@ -1,0 +1,19 @@
+{% extends 'base/base_config.html' %}
+{% load static %}
+
+{% block extra_css %}
+{{ form.media.css }}
+{% endblock %}
+
+{% block extra_js %}
+{{ form.media.js }}
+{% endblock %}
+
+{% block config_content %}
+<h2>{{ title }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Sauvegarder</button>
+</form>
+{% endblock %}

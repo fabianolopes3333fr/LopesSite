@@ -1,0 +1,60 @@
+{% extends 'base/base_config.html' %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    .color-preview {
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        margin-right: 5px;
+        border: 1px solid #ddd;
+    }
+</style>
+{% endblock %}
+{% block config_content %}
+<h2>Liste des styles</h2>
+<a href="{% url 'style_create' %}" class="btn btn-primary mb-3">Créer un nouveau style</a>
+
+{% if styles %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Couleur primaire</th>
+                <th>Couleur secondaire</th>
+                <th>Couleur d'accent</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for style in styles %}
+            <tr>
+                <td>{{ style.id }}</td>
+                <td><span class="color-preview" style="background-color: {{ style.primary_color }};"></span>{{ style.primary_color }}</td>
+                <td><span class="color-preview" style="background-color: {{ style.secondary_color }};"></span>{{ style.secondary_color }}</td>
+                <td><span class="color-preview" style="background-color: {{ style.accent_color }};"></span>{{ style.accent_color }}</td>
+                <td>
+                    <a href="{% url 'style_update' style.id %}" class="btn btn-sm btn-warning">Modifier</a>
+                    <button class="btn btn-sm btn-danger delete-style" data-id="{{ style.id }}">Supprimer</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Aucun style n'a été créé pour le moment.</p>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.querySelectorAll('.delete-style').forEach(button => {
+        button.addEventListener('click', function() {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce style ?')) {
+                window.location.href = "{% url 'style_delete' 0 %}".replace('0', this.dataset.id);
+            }
+        });
+    });
+</script>
+{% endblock %}

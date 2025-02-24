@@ -1,0 +1,11 @@
+{% extends 'base/base_config.html' %}
+
+{% block config_content %}
+<h2>Supprimer le style</h2>
+<p>Êtes-vous sûr de vouloir supprimer ce style ?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+    <a href="{% url 'config:style_list' %}" class="btn btn-secondary">Annuler</a>
+</form>
+{% endblock %}

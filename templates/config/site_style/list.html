@@ -1,0 +1,90 @@
+{% extends 'base/base_config.html' %}
+
+{% block page_title %}Style du site{% endblock %}
+
+{% block header_actions %}
+{% if not site_style %}
+<a href="{% url 'config:site_style_create' %}" class="btn btn-primary">
+    <i class="fas fa-plus me-2"></i>Créer le style du site
+</a>
+{% endif %}
+{% endblock %}
+
+{% block config_content %}
+<div class="card">
+    <div class="card-body">
+        {% if site_style %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Paramètre</th>
+                        <th>Valeur</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Couleur primaire</td>
+                        <td><span class="color-preview" style="background-color: {{ site_style.primary_color }};"></span> {{ site_style.primary_color }}</td>
+                    </tr>
+                    <tr>
+                        <td>Couleur secondaire</td>
+                        <td><span class="color-preview" style="background-color: {{ site_style.secondary_color }};"></span> {{ site_style.secondary_color }}</td>
+                    </tr>
+                    <tr>
+                        <td>Couleur d'accent</td>
+                        <td><span class="color-preview" style="background-color: {{ site_style.accent_color }};"></span> {{ site_style.accent_color }}</td>
+                    </tr>
+                    <tr>
+                        <td>Couleur de fond</td>
+                        <td><span class="color-preview" style="background-color: {{ site_style.background_color }};"></span> {{ site_style.background_color }}</td>
+                    </tr>
+                    <tr>
+                        <td>Police principale</td>
+                        <td>{{ site_style.font_family }}</td>
+                    </tr>
+                    <tr>
+                        <td>Police des titres</td>
+                        <td>{{ site_style.heading_font }}</td>
+                    </tr>
+                    <tr>
+                        <td>Taille de police de base</td>
+                        <td>{{ site_style.base_font_size }}</td>
+                    </tr>
+                    <tr>
+                        <td>Logo</td>
+                        <td>
+                            {% if site_style.logo %}
+                            <img src="{{ site_style.logo.url }}" alt="Logo" style="max-width: 100px; max-height: 100px;">
+                            {% else %}
+                            Aucun logo
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-3">
+            <a href="{% url 'config:site_style_edit' site_style.pk %}" class="btn btn-primary">
+                <i class="fas fa-edit me-2"></i>Modifier le style
+            </a>
+        </div>
+        {% else %}
+        <p>Aucun style de site n'a été défini. Veuillez en créer un.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .color-preview {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        border: 1px solid #ccc;
+        vertical-align: middle;
+    }
+</style>
+{% endblock %}
