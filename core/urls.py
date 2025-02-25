@@ -15,6 +15,8 @@ urlpatterns = [
     path('quotes/', include('apps.quotes.urls')),
     path('accounts/', include('apps.users.urls')),
     path('config/', include('apps.config.urls')),
+    path('pages/', include('apps.pages.urls')),
+    path('widgets/', include('apps.widgets.urls')),
     
     path('ckeditor5/', include('django_ckeditor_5.urls')),
     

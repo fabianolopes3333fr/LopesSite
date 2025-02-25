@@ -1,6 +1,8 @@
 # apps/config/models.py
 from django.conf import settings
 from django.db import models
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 import json
@@ -13,7 +15,6 @@ from django.contrib.auth.models import User
 from mptt.models import MPTTModel, TreeForeignKey
 from django.utils import timezone
 from datetime import datetime
-
 
 
 
@@ -255,6 +256,7 @@ class Page(MPTTModel):
         return reverse('page_detail', kwargs={'slug': self.slug})
 
     
+    
 class PageVersionConfig(models.Model):
     page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name='version_configs')
     content = CKEditor5Field(_('Content'))
@@ -395,4 +397,6 @@ class Menu(MPTTModel):
 
     def __str__(self):
         return self.name
+
+# novo modelo apartir deste ponto 
 

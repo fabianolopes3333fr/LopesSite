@@ -1,0 +1,1653 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}
+{% if form.instance.pk %}
+{% trans "Edit" %}: {{ form.instance.title }}
+{% else %}
+{% trans "Create New Page" %}
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<!-- CSS para editor de conteúdo -->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs5.min.css" rel="stylesheet">
+<!-- CSS para seletor de data/hora -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<!-- CSS para selecionador de cores -->
+<link href="https://cdn.jsdelivr.net/npm/spectrum-colorpicker2/dist/spectrum.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                {% if form.instance.pk %}
+                {% trans "Edit Page" %}: {{ form.instance.title }}
+                {% else %}
+                {% trans "Create New Page" %}
+                {% endif %}
+            </h1>
+
+            {% if form.instance.pk %}
+            <div class="btn-group">
+                {% if form.instance.status == 'published' %}
+                <a href="{{ form.instance.get_absolute_url }}" class="btn btn-outline-primary" target="_blank">
+                    <i class="fas fa-eye"></i> {% trans "View Page" %}
+                </a>
+                <a href="{% url 'pages:page_unpublish' pk=form.instance.pk %}" class="btn btn-outline-warning">
+                    <i class="fas fa-times-circle"></i> {% trans "Unpublish" %}
+                </a>
+                {% elif form.instance.status == 'draft' %}
+                {% if can_publish %}
+                <a href="{% url 'pages:page_publish' pk=form.instance.pk %}" class="btn btn-outline-success">
+                    <i class="fas fa-check-circle"></i> {% trans "Publish" %}
+                </a>
+                {% else %}
+                <a href="{% url 'pages:page_request_review' pk=form.instance.pk %}" class="btn btn-outline-info">
+                    <i class="fas fa-clipboard-check"></i> {% trans "Request Review" %}
+                </a>
+                {% endif %}
+                {% elif form.instance.status == 'review' %}
+                {% if can_publish %}
+                <a href="{% url 'pages:page_publish' pk=form.instance.pk %}" class="btn btn-outline-success">
+                    <i class="fas fa-check-circle"></i> {% trans "Approve & Publish" %}
+                </a>
+                {% endif %}
+                {% endif %}
+
+                <a href="{% url 'pages:page_delete' pk=form.instance.pk %}" class="btn btn-outline-danger">
+                    <i class="fas fa-trash"></i> {% trans "Delete" %}
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if warning_message %}
+        <div class="alert alert-warning">
+            {{ warning_message }}
+        </div>
+        {% endif %}
+
+        <!-- Formulário de página com tabs para diferentes seções -->
+        <form method="post" enctype="multipart/form-data" id="pageForm">
+            {% csrf_token %}
+
+            <!-- Navegação por tabs -->
+            <ul class="nav nav-tabs mb-3" id="pageFormTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#content-pane" type="button" role="tab" aria-controls="content-pane" aria-selected="true">
+                        <i class="fas fa-edit me-2"></i> {% trans "Content" %}
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings-pane" type="button" role="tab" aria-controls="settings-pane" aria-selected="false">
+                        <i class="fas fa-cog me-2"></i> {% trans "Settings" %}
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo-pane" type="button" role="tab" aria-controls="seo-pane" aria-selected="false">
+                        <i class="fas fa-search me-2"></i> {% trans "SEO" %}
+                    </button>
+                </li>
+
+                {% if form.instance.pk %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="custom-fields-tab" data-bs-toggle="tab" data-bs-target="#custom-fields-pane" type="button" role="tab" aria-controls="custom-fields-pane" aria-selected="false">
+                        <i class="fas fa-th-list me-2"></i> {% trans "Custom Fields" %}
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="galleries-tab" data-bs-toggle="tab" data-bs-target="#galleries-pane" type="button" role="tab" aria-controls="galleries-pane" aria-selected="false">
+                        <i class="fas fa-images me-2"></i> {% trans "Galleries" %}
+                    </button>
+                </li>
+                {% endif %}
+            </ul>
+
+            <!-- Conteúdo das tabs -->
+            <div class="tab-content p-3 border border-top-0 rounded-bottom mb-4" id="pageFormTabContent">
+                <!-- Tab de conteúdo principal -->
+                <div class="tab-pane fade show active" id="content-pane" role="tabpanel" aria-labelledby="content-tab">
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }} *</label>
+                        <input type="text" name="{{ form.title.name }}" id="{{ form.title.id_for_label }}" class="form-control {% if form.title.errors %}is-invalid{% endif %}" value="{{ form.title.value|default:'' }}" required>
+                        {% if form.title.errors %}
+                        <div class="invalid-feedback">{{ form.title.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "The title of your page as it will appear in headings and navigation." %}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.slug.id_for_label }}" class="form-label">{{ form.slug.label }} *</label>
+                        <div class="input-group">
+                            <input type="text" name="{{ form.slug.name }}" id="{{ form.slug.id_for_label }}" class="form-control {% if form.slug.errors %}is-invalid{% endif %}" value="{{ form.slug.value|default:'' }}" required>
+                            <button class="btn btn-outline-secondary" type="button" id="generateSlugBtn">
+                                {% trans "Generate" %}
+                            </button>
+                        </div>
+                        {% if form.slug.errors %}
+                        <div class="invalid-feedback">{{ form.slug.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "URL identifier for your page. Use only lowercase letters, numbers, and hyphens." %}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.summary.id_for_label }}" class="form-label">{{ form.summary.label }}</label>
+                        <textarea name="{{ form.summary.name }}" id="{{ form.summary.id_for_label }}" class="form-control {% if form.summary.errors %}is-invalid{% endif %}" rows="3">{{ form.summary.value|default:'' }}</textarea>
+                        {% if form.summary.errors %}
+                        <div class="invalid-feedback">{{ form.summary.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "A brief summary of the page content. Used in page listings and SEO." %}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.content.id_for_label }}" class="form-label">{{ form.content.label }}</label>
+                        <textarea name="{{ form.content.name }}" id="{{ form.content.id_for_label }}" class="form-control editor {% if form.content.errors %}is-invalid{% endif %}" rows="10">{{ form.content.value|default:'' }}</textarea>
+                        {% if form.content.errors %}
+                        <div class="invalid-feedback">{{ form.content.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Tab de configurações -->
+                <div class="tab-pane fade" id="settings-pane" role="tabpanel" aria-labelledby="settings-tab">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.template.id_for_label }}" class="form-label">{{ form.template.label }} *</label>
+                            <select name="{{ form.template.name }}" id="{{ form.template.id_for_label }}" class="form-select {% if form.template.errors %}is-invalid{% endif %}" required>
+                                <option value="">{% trans "Select a template" %}</option>
+                                {% for template in available_templates %}
+                                <option value="{{ template.id }}" {% if form.template.value|stringformat:'s'==template.id|stringformat:'s' %}selected{% endif %}>
+                                    {{ template.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            {% if form.template.errors %}
+                            <div class="invalid-feedback">{{ form.template.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">{% trans "The template defines the layout and available fields." %}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.parent.id_for_label }}" class="form-label">{{ form.parent.label }}</label>
+                            {{ form.parent }}
+                            {% if form.parent.errors %}
+                            <div class="invalid-feedback">{{ form.parent.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">{% trans "Parent page in the hierarchy. Leave empty for a top-level page." %}</div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }} *</label>
+                            <select name="{{ form.status.name }}" id="{{ form.status.id_for_label }}" class="form-select {% if form.status.errors %}is-invalid{% endif %}" required>
+                                {% for value, label in form.fields.status.choices %}
+                                <option value="{{ value }}" {% if form.status.value==value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+
+
+                            {% for value, label in form.fields.status.choices %}
+                                    <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            {% if form.status.errors %}
+                                <div class="invalid-feedback">{{ form.status.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">{% trans "Current publication status of the page." %}</div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ form.visibility.id_for_label }}" class="form-label">{{ form.visibility.label }} *</label>
+                            <select name="{{ form.visibility.name }}" id="{{ form.visibility.id_for_label }}" 
+                                    class="form-select {% if form.visibility.errors %}is-invalid{% endif %}" required>
+                                {% for value, label in form.fields.visibility.choices %}
+                                    <option value="{{ value }}" {% if form.visibility.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            {% if form.visibility.errors %}
+                                <div class="invalid-feedback">{{ form.visibility.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">{% trans "Access control for the page." %}</div>
+                        </div>
+                    </div>
+                    
+                    <div id="passwordField" class="mb-3 {% if form.visibility.value != 'password' %}d-none{% endif %}">
+                        <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }} *</label>
+                        <input type="text" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" 
+                               class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
+                               value="{{ form.password.value|default:'' }}">
+                        {% if form.password.errors %}
+                            <div class="invalid-feedback">{{ form.password.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Password required to access the page when visibility is set to 'Password Protected'." %}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.categories.id_for_label }}" class="form-label">{{ form.categories.label }}</label>
+                        <select name="{{ form.categories.name }}" id="{{ form.categories.id_for_label }}" 
+                                class="form-select {% if form.categories.errors %}is-invalid{% endif %}" multiple>
+                            {% for category in available_categories %}
+                                <option value="{{ category.id }}" 
+                                    {% if category.id in form.categories.value|default:'' %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if form.categories.errors %}
+                            <div class="invalid-feedback">{{ form.categories.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Categories for organizing and grouping pages. Hold Ctrl/Cmd to select multiple." %}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "Additional Options" %}</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="{{ form.is_indexable.name }}" 
+                                   id="{{ form.is_indexable.id_for_label }}" 
+                                   {% if form.is_indexable.value %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ form.is_indexable.id_for_label }}">
+                                {{ form.is_indexable.label }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="{{ form.is_searchable.name }}" 
+                                   id="{{ form.is_searchable.id_for_label }}" 
+                                   {% if form.is_searchable.value %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ form.is_searchable.id_for_label }}">
+                                {{ form.is_searchable.label }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="{{ form.is_visible_in_menu.name }}" 
+                                   id="{{ form.is_visible_in_menu.id_for_label }}" 
+                                   {% if form.is_visible_in_menu.value %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ form.is_visible_in_menu.id_for_label }}">
+                                {{ form.is_visible_in_menu.label }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="{{ form.enable_comments.name }}" 
+                                   id="{{ form.enable_comments.id_for_label }}" 
+                                   {% if form.enable_comments.value %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ form.enable_comments.id_for_label }}">
+                                {{ form.enable_comments.label }}
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.permalink.id_for_label }}" class="form-label">{{ form.permalink.label }}</label>
+                        <input type="text" name="{{ form.permalink.name }}" id="{{ form.permalink.id_for_label }}" 
+                               class="form-control {% if form.permalink.errors %}is-invalid{% endif %}" 
+                               value="{{ form.permalink.value|default:'' }}">
+                        {% if form.permalink.errors %}
+                            <div class="invalid-feedback">{{ form.permalink.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Custom URL for this page. Leave empty to use the slug-based URL." %}</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.scheduled_at.id_for_label }}" class="form-label">{{ form.scheduled_at.label }}</label>
+                            <input type="text" name="{{ form.scheduled_at.name }}" id="{{ form.scheduled_at.id_for_label }}" 
+                                   class="form-control datepicker {% if form.scheduled_at.errors %}is-invalid{% endif %}" 
+                                   value="{{ form.scheduled_at.value|date:'Y-m-d H:i' if form.scheduled_at.value else '' }}">
+                            {% if form.scheduled_at.errors %}
+                                <div class="invalid-feedback">{{ form.scheduled_at.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">{% trans "Schedule this page to be published at a future date/time." %}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.cache_ttl.id_for_label }}" class="form-label">{{ form.cache_ttl.label }}</label>
+                            <input type="number" name="{{ form.cache_ttl.name }}" id="{{ form.cache_ttl.id_for_label }}" 
+                                   class="form-control {% if form.cache_ttl.errors %}is-invalid{% endif %}" 
+                                   value="{{ form.cache_ttl.value|default:'3600' }}">
+                            {% if form.cache_ttl.errors %}
+                                <div class="invalid-feedback">{{ form.cache_ttl.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">{% trans "Time in seconds that this page can be cached." %}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tab de SEO -->
+                <div class="tab-pane fade" id="seo-pane" role="tabpanel" aria-labelledby="seo-tab">
+                    <div class="mb-3">
+                        <label for="{{ form.meta_title.id_for_label }}" class="form-label">{{ form.meta_title.label }}</label>
+                        <input type="text" name="{{ form.meta_title.name }}" id="{{ form.meta_title.id_for_label }}" 
+                               class="form-control {% if form.meta_title.errors %}is-invalid{% endif %}" 
+                               value="{{ form.meta_title.value|default:'' }}">
+                        {% if form.meta_title.errors %}
+                            <div class="invalid-feedback">{{ form.meta_title.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Title used for SEO. If empty, the page title will be used." %}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.meta_description.id_for_label }}" class="form-label">{{ form.meta_description.label }}</label>
+                        <textarea name="{{ form.meta_description.name }}" id="{{ form.meta_description.id_for_label }}" 
+                                  class="form-control {% if form.meta_description.errors %}is-invalid{% endif %}" 
+                                  rows="3">{{ form.meta_description.value|default:'' }}</textarea>
+                        {% if form.meta_description.errors %}
+                            <div class="invalid-feedback">{{ form.meta_description.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Description used for SEO and social sharing. Recommended length: 150-160 characters." %}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.meta_keywords.id_for_label }}" class="form-label">{{ form.meta_keywords.label }}</label>
+                        <input type="text" name="{{ form.meta_keywords.name }}" id="{{ form.meta_keywords.id_for_label }}" 
+                               class="form-control {% if form.meta_keywords.errors %}is-invalid{% endif %}" 
+                               value="{{ form.meta_keywords.value|default:'' }}">
+                        {% if form.meta_keywords.errors %}
+                            <div class="invalid-feedback">{{ form.meta_keywords.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Keywords for search engines, separated by commas." %}</div>
+                    </div>
+                    
+                    <h5 class="mt-4 mb-3">{% trans "Open Graph" %}</h5>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.og_title.id_for_label }}" class="form-label">{{ form.og_title.label }}</label>
+                        <input type="text" name="{{ form.og_title.name }}" id="{{ form.og_title.id_for_label }}" 
+                               class="form-control {% if form.og_title.errors %}is-invalid{% endif %}" 
+                               value="{{ form.og_title.value|default:'' }}">
+                        {% if form.og_title.errors %}
+                            <div class="invalid-feedback">{{ form.og_title.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Title used for social media sharing. If empty, the meta title or page title will be used." %}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.og_description.id_for_label }}" class="form-label">{{ form.og_description.label }}</label>
+                        <textarea name="{{ form.og_description.name }}" id="{{ form.og_description.id_for_label }}" 
+                                  class="form-control {% if form.og_description.errors %}is-invalid{% endif %}" 
+                                  rows="3">{{ form.og_description.value|default:'' }}</textarea>
+                        {% if form.og_description.errors %}
+                            <div class="invalid-feedback">{{ form.og_description.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Description used for social media sharing. If empty, the meta description will be used." %}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.og_image.id_for_label }}" class="form-label">{{ form.og_image.label }}</label>
+                        <div class="input-group">
+                            <input type="file" name="{{ form.og_image.name }}" id="{{ form.og_image.id_for_label }}" 
+                                   class="form-control {% if form.og_image.errors %}is-invalid{% endif %}" 
+                                   accept="image/*">
+                            {% if form.instance.og_image %}
+                                <span class="input-group-text">
+                                    <a href="{{ form.instance.og_image.url }}" target="_blank">{% trans "View Current" %}</a>
+                                </span>
+                            {% endif %}
+                        </div>
+                        {% if form.og_image.errors %}
+                            <div class="invalid-feedback">{{ form.og_image.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Image used for social media sharing. Recommended size: 1200x630 pixels." %}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.og_type.id_for_label }}" class="form-label">{{ form.og_type.label }}</label>
+                        <select name="{{ form.og_type.name }}" id="{{ form.og_type.id_for_label }}" 
+                                class="form-select {% if form.og_type.errors %}is-invalid{% endif %}">
+                            {% for value, label in form.fields.og_type.choices %}
+                                <option value="{{ value }}" {% if form.og_type.value == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if form.og_type.errors %}
+                            <div class="invalid-feedback">{{ form.og_type.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Open Graph type for social media sharing." %}</div>
+                    </div>
+                    
+                    <h5 class="mt-4 mb-3">{% trans "Schema.org" %}</h5>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.schema_type.id_for_label }}" class="form-label">{{ form.schema_type.label }}</label>
+                        <select name="{{ form.schema_type.name }}" id="{{ form.schema_type.id_for_label }}" 
+                                class="form-select {% if form.schema_type.errors %}is-invalid{% endif %}">
+                            {% for value, label in form.fields.schema_type.choices %}
+                                <option value="{{ value }}" {% if form.schema_type.value == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if form.schema_type.errors %}
+                            <div class="invalid-feedback">{{ form.schema_type.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Schema.org type for structured data." %}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.schema_data.id_for_label }}" class="form-label">{{ form.schema_data.label }}</label>
+                        <textarea name="{{ form.schema_data.name }}" id="{{ form.schema_data.id_for_label }}" 
+                                  class="form-control json-editor {% if form.schema_data.errors %}is-invalid{% endif %}" 
+                                  rows="6">{{ form.schema_data.value|default:'' }}</textarea>
+                        {% if form.schema_data.errors %}
+                            <div class="invalid-feedback">{{ form.schema_data.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Additional JSON-LD data for Schema.org structured data." %}</div>
+                    </div>
+                </div>
+                
+                {% if form.instance.pk %}
+                <!-- Tab de campos personalizados -->
+                <div class="tab-pane fade" id="custom-fields-pane" role="tabpanel" aria-labelledby="custom-fields-tab">
+                    {% if form.custom_fields %}
+                        <div class="accordion" id="customFieldsAccordion">
+                            {% for custom_field in form.custom_fields %}
+                                <div class="accordion-item mb-3">
+                                    <h2 class="accordion-header" id="heading-{{ custom_field.group.slug }}">
+                                        <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" 
+                                                data-bs-toggle="collapse" data-bs-target="#collapse-{{ custom_field.group.slug }}" 
+                                                aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" 
+                                                aria-controls="collapse-{{ custom_field.group.slug }}">
+                                            {{ custom_field.group.name }}
+                                        </button>
+                                    </h2>
+                                    <div id="collapse-{{ custom_field.group.slug }}" 
+                                         class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" 
+                                         aria-labelledby="heading-{{ custom_field.group.slug }}" 
+                                         data-bs-parent="#customFieldsAccordion">
+                                        <div class="accordion-body">
+                                            {% for field in custom_field.fields %}
+                                                <div class="mb-3">
+                                                    <label for="{{ field.key }}" class="form-label">
+                                                        {{ field.field_def.name }}
+                                                        {% if field.field_def.is_required %}*{% endif %}
+                                                    </label>
+                                                    
+                                                    {% if field.field_def.field_type == 'text' %}
+                                                        <input type="text" name="{{ field.key }}" id="{{ field.key }}" 
+                                                               class="form-control" value="{{ field.value|default:'' }}"
+                                                               {% if field.field_def.is_required %}required{% endif %}
+                                                               {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}"{% endif %}>
+                                                    
+                                                    {% elif field.field_def.field_type == 'textarea' %}
+                                                        <textarea name="{{ field.key }}" id="{{ field.key }}" 
+                                                                  class="form-control" rows="4"
+                                                                  {% if field.field_def.is_required %}required{% endif %}
+                                                                  {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}"{% endif %}>{{ field.value|default:'' }}</textarea>
+                                                    
+                                                    {% elif field.field_def.field_type == 'richtext' %}
+                                                        <textarea name="{{ field.key }}" id="{{ field.key }}" 
+                                                                  class="form-control editor" rows="8"
+                                                                  {% if field.field_def.is_required %}required{% endif %}>{{ field.value|default:'' }}</textarea>
+                                                    
+                                                    {% elif field.field_def.field_type == 'email' %}
+                                                        <input type="email" name="{{ field.key }}" id="{{ field.key }}" 
+                                                               class="form-control" value="{{ field.value|default:'' }}"
+                                                               {% if field.field_def.is_required %}required{% endif %}
+                                                               {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}"{% endif %}>
+                                                    
+                                                    {% elif field.field_def.field_type == 'url' %}
+                                                        <input type="url" name="{{ field.key }}" id="{{ field.key }}" 
+                                                               class="form-control" value="{{ field.value|default:'' }}"
+                                                               {% if field.field_def.is_required %}required{% endif %}
+                                                               {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}"{% endif %}>
+                                                    
+                                                    {% elif field.field_def.field_type == 'integer' %}
+                                                        <input type="number" name="{{ field.key }}" id="{{ field.key }}" 
+                                                               class="form-control" value="{{ field.value|default:'' }}" step="1"
+                                                               {% if field.field_def.min_value %}min="{{ field.field_def.min_value }}"{% endif %}
+                                                               {% if field.field_def.max_value %}max="{{ field.field_def.max_value }}"{% endif %}
+                                                               {% if field.field_def.is_required %}required{% endif %}
+                                                               {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}"{% endif %}>
+                                                    
+                                                    {% elif field.field_def.field_type == 'decimal' %}
+                                                        <input type="number" name="{{ field.key }}" id="{{ field.key }}" 
+                                                               class="form-control" value="{{ field.value|default:'' }}" step="0.01"
+                                                               {% if field.field_def.min_value %}min="{{ field.field_def.min_value }}"{% endif %}
+                                                               {% if field.field_def.max_value %}max="{{ field.field_def.max_value }}"{% endif %}
+                                                               {% if field.field_def.is_required %}required{% endif %}
+                                                               {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}"{% endif %}>
+                                                    
+                                                    {% elif field.field_def.field_type == 'boolean' %}
+                                                        <div class="form-check">
+                                                            <input type="checkbox" name="{{ field.key }}" id="{{ field.key }}" 
+                                                                   class="form-check-input" value="True"
+                                                                   {% if field.value == 'True' or field.value == '1' or field.value == 'true' %}checked{% endif %}>
+                                                            <label class="form-check-label" for="{{ field.key }}">
+                                                                {{ field.field_def.help_text|default:_("Yes/No") }}
+                                                            </label>
+                                                        </div>
+                                                    
+                                                    {% elif field.field_def.field_type == 'date' %}
+                                                        <input type="text" name="{{ field.key }}" id="{{ field.key }}" 
+                                                               class="form-control datepicker-date" value="{{ field.value|default:'' }}"
+                                                               {% if field.field_def.is_required %}required{% endif %}
+                                                               {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}"{% endif %}>
+                                                    
+                                                    {% elif field.field_def.field_type == 'time' %}
+                                                        <input type="text" name="{{ field.key }}" id="{{ field.key }}" 
+                                                               class="form-control datepicker-time" value="{{ field.value|default:'' }}"
+                                                               {% if field.field_def.is_required %}required{% endif %}
+                                                               {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}"{% endif %}>
+                                                    
+                                                    {% elif field.field_def.field_type == 'datetime' %}
+                                                        <input type="text" name="{{ field.key }}" id="{{ field.key }}" 
+                                                               class="form-control datepicker" value="{{ field.value|default:'' }}"
+                                                               {% if field.field_def.is_required %}required{% endif %}
+                                                               {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}"{% endif %}>
+                                                    
+                                                    {% elif field.field_def.field_type == 'image' %}
+                                                        <div class="input-group">
+                                                            <input type="file" name="{{ field.key }}" id="{{ field.key }}" 
+                                                                   class="form-control" accept="image/*"
+                                                                   {% if field.field_def.is_required and not field.value %}required{% endif %}>
+                                                            {% if field.value %}
+                                                                <span class="input-group-text">
+                                                                    <a href="{{ field.value }}" target="_blank">{% trans "View Current" %}</a>
+                                                                </span>
+                                                            {% endif %}
+                                                        </div>
+                                                    
+                                                    {% elif field.field_def.field_type == 'file' %}
+                                                        <div class="input-group">
+                                                            <input type="file" name="{{ field.key }}" id="{{ field.key }}" 
+                                                                   class="form-control"
+                                                                   {% if field.field_def.allowed_extensions %}accept=".{{ field.field_def.allowed_extensions|join:',.' }}"{% endif %}
+                                                                   {% if field.field_def.is_required and not field.value %}required{% endif %}>
+                                                            {% if field.value %}
+                                                                <span class="input-group-text">
+                                                                    <a href="{{ field.value }}" target="_blank">{% trans "View Current" %}</a>
+                                                                </span>
+                                                            {% endif %}
+                                                        </div>
+                                                    
+                                                    {% elif field.field_def.field_type == 'select' %}
+                                                        <select name="{{ field.key }}" id="{{ field.key }}" 
+                                                                class="form-select"
+                                                                {% if field.field_def.is_required %}required{% endif %}>
+                                                            <option value="">{% trans "Select an option" %}</option>
+                                                            {% for option in field.field_def.get_options_as_list %}
+                                                                <option value="{{ option }}" {% if field.value == option %}selected{% endif %}>
+                                                                    {{ option }}
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    
+                                                    {% elif field.field_def.field_type == 'multiselect' %}
+                                                        <select name="{{ field.key }}" id="{{ field.key }}" 
+                                                                class="form-select" multiple
+                                                                {% if field.field_def.is_required %}required{% endif %}>
+                                                            {% for option in field.field_def.get_options_as_list %}
+                                                                <option value="{{ option }}" 
+                                                                        {% if option in field.value %}selected{% endif %}>
+                                                                    {{ option }}
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    
+                                                    {% elif field.field_def.field_type == 'color' %}
+                                                        <input type="text" name="{{ field.key }}" id="{{ field.key }}" 
+                                                               class="form-control colorpicker" value="{{ field.value|default:'#FFFFFF' }}"
+                                                               {% if field.field_def.is_required %}required{% endif %}>
+                                                    
+                                                    {% elif field.field_def.field_type == 'code' or field.field_def.field_type == 'json' %}
+                                                        <textarea name="{{ field.key }}" id="{{ field.key }}" 
+                                                                  class="form-control code-editor" rows="6"
+                                                                  {% if field.field_def.is_required %}required{% endif %}>{{ field.value|default:'' }}</textarea>
+                                                    
+                                                    {% else %}
+                                                        <input type="text" name="{{ field.key }}" id="{{ field.key }}" 
+                                                               class="form-control" value="{{ field.value|default:'' }}"
+                                                               {% if field.field_def.is_required %}required{% endif %}
+                                                               {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}"{% endif %}>
+                                                    {% endif %}
+                                                    
+                                                    {% if field.field_def.help_text %}
+                                                        <div class="form-text">{{ field.field_def.help_text }}</div>
+                                                    {% endif %}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            {% trans "No custom fields defined for this template." %}
+                            {% if change_template %}
+                                {% trans "Save the page first to load the custom fields for the new template." %}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Tab de galerias -->
+                <div class="tab-pane fade" id="galleries-pane" role="tabpanel" aria-labelledby="galleries-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0">{% trans "Image Galleries" %}</h4>
+                        <a href="{% url 'pages:gallery_create' page_id=form.instance.pk %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> {% trans "Create Gallery" %}
+                        </a>
+                    </div>
+                    
+                    {% if galleries %}
+                        <div class="row">
+                            {% for gallery in galleries %}
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header">
+                                            <h5 class="card-title mb-0">{{ gallery.name }}</h5>
+                                        </div>
+                                        {% with images=gallery.images.all %}
+                                            {% if images %}
+                                                <div class="gallery-preview">
+                                                    <div class="row p-2">
+                                                        {% for image in images|slice:":4" %}
+                                                            <div class="col-3 p-1">
+                                                                <img src="{{ image.image.url }}" alt="{{ image.alt_text }}" 
+                                                                     class="{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}
+    {% if form.instance.pk %}
+        {% trans "Edit" %}: {{ form.instance.title }}
+    {% else %}
+        {% trans "Create New Page" %}
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+    <!-- CSS para editor de conteúdo -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs5.min.css" rel="stylesheet">
+    <!-- CSS para seletor de data/hora -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- CSS para selecionador de cores -->
+    <link href="https://cdn.jsdelivr.net/npm/spectrum-colorpicker2/dist/spectrum.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                {% if form.instance.pk %}
+                    {% trans "Edit Page" %}: {{ form.instance.title }}
+                {% else %}
+                    {% trans "Create New Page" %}
+                {% endif %}
+            </h1>
+            
+            {% if form.instance.pk %}
+                <div class="btn-group">
+                    {% if form.instance.status == 'published' %}
+                        <a href="{{ form.instance.get_absolute_url }}" class="btn btn-outline-primary" target="_blank">
+                            <i class="fas fa-eye"></i> {% trans "View Page" %}
+                        </a>
+                        <a href="{% url 'pages:page_unpublish' pk=form.instance.pk %}" class="btn btn-outline-warning">
+                            <i class="fas fa-times-circle"></i> {% trans "Unpublish" %}
+                        </a>
+                    {% elif form.instance.status == 'draft' %}
+                        {% if can_publish %}
+                            <a href="{% url 'pages:page_publish' pk=form.instance.pk %}" class="btn btn-outline-success">
+                                <i class="fas fa-check-circle"></i> {% trans "Publish" %}
+                            </a>
+                        {% else %}
+                            <a href="{% url 'pages:page_request_review' pk=form.instance.pk %}" class="btn btn-outline-info">
+                                <i class="fas fa-clipboard-check"></i> {% trans "Request Review" %}
+                            </a>
+                        {% endif %}
+                    {% elif form.instance.status == 'review' %}
+                        {% if can_publish %}
+                            <a href="{% url 'pages:page_publish' pk=form.instance.pk %}" class="btn btn-outline-success">
+                                <i class="fas fa-check-circle"></i> {% trans "Approve & Publish" %}
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                    
+                    <a href="{% url 'pages:page_delete' pk=form.instance.pk %}" class="btn btn-outline-danger">
+                        <i class="fas fa-trash"></i> {% trans "Delete" %}
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        {% if warning_message %}
+            <div class="alert alert-warning">
+                {{ warning_message }}
+            </div>
+        {% endif %}
+        
+        <!-- Formulário de página com tabs para diferentes seções -->
+        <form method="post" enctype="multipart/form-data" id="pageForm">
+            {% csrf_token %}
+            
+            <!-- Navegação por tabs -->
+            <ul class="nav nav-tabs mb-3" id="pageFormTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#content-pane" type="button" role="tab" aria-controls="content-pane" aria-selected="true">
+                        <i class="fas fa-edit me-2"></i> {% trans "Content" %}
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings-pane" type="button" role="tab" aria-controls="settings-pane" aria-selected="false">
+                        <i class="fas fa-cog me-2"></i> {% trans "Settings" %}
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo-pane" type="button" role="tab" aria-controls="seo-pane" aria-selected="false">
+                        <i class="fas fa-search me-2"></i> {% trans "SEO" %}
+                    </button>
+                </li>
+                
+                {% if form.instance.pk %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="custom-fields-tab" data-bs-toggle="tab" data-bs-target="#custom-fields-pane" type="button" role="tab" aria-controls="custom-fields-pane" aria-selected="false">
+                        <i class="fas fa-th-list me-2"></i> {% trans "Custom Fields" %}
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="galleries-tab" data-bs-toggle="tab" data-bs-target="#galleries-pane" type="button" role="tab" aria-controls="galleries-pane" aria-selected="false">
+                        <i class="fas fa-images me-2"></i> {% trans "Galleries" %}
+                    </button>
+                </li>
+                {% endif %}
+            </ul>
+            
+            <!-- Conteúdo das tabs -->
+            <div class="tab-content p-3 border border-top-0 rounded-bottom mb-4" id="pageFormTabContent">
+                <!-- Tab de conteúdo principal -->
+                <div class="tab-pane fade show active" id="content-pane" role="tabpanel" aria-labelledby="content-tab">
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }} *</label>
+                        <input type="text" name="{{ form.title.name }}" id="{{ form.title.id_for_label }}" 
+                               class="form-control {% if form.title.errors %}is-invalid{% endif %}" 
+                               value="{{ form.title.value|default:'' }}" required>
+                        {% if form.title.errors %}
+                            <div class="invalid-feedback">{{ form.title.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "The title of your page as it will appear in headings and navigation." %}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.slug.id_for_label }}" class="form-label">{{ form.slug.label }} *</label>
+                        <div class="input-group">
+                            <input type="text" name="{{ form.slug.name }}" id="{{ form.slug.id_for_label }}" 
+                                   class="form-control {% if form.slug.errors %}is-invalid{% endif %}" 
+                                   value="{{ form.slug.value|default:'' }}" required>
+                            <button class="btn btn-outline-secondary" type="button" id="generateSlugBtn">
+                                {% trans "Generate" %}
+                            </button>
+                        </div>
+                        {% if form.slug.errors %}
+                            <div class="invalid-feedback">{{ form.slug.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "URL identifier for your page. Use only lowercase letters, numbers, and hyphens." %}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.summary.id_for_label }}" class="form-label">{{ form.summary.label }}</label>
+                        <textarea name="{{ form.summary.name }}" id="{{ form.summary.id_for_label }}" 
+                                  class="form-control {% if form.summary.errors %}is-invalid{% endif %}" 
+                                  rows="3">{{ form.summary.value|default:'' }}</textarea>
+                        {% if form.summary.errors %}
+                            <div class="invalid-feedback">{{ form.summary.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "A brief summary of the page content. Used in page listings and SEO." %}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.content.id_for_label }}" class="form-label">{{ form.content.label }}</label>
+                        <textarea name="{{ form.content.name }}" id="{{ form.content.id_for_label }}" 
+                                  class="form-control editor {% if form.content.errors %}is-invalid{% endif %}" 
+                                  rows="10">{{ form.content.value|default:'' }}</textarea>
+                        {% if form.content.errors %}
+                            <div class="invalid-feedback">{{ form.content.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Tab de configurações -->
+                <div class="tab-pane fade" id="settings-pane" role="tabpanel" aria-labelledby="settings-tab">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.template.id_for_label }}" class="form-label">{{ form.template.label }} *</label>
+                            <select name="{{ form.template.name }}" id="{{ form.template.id_for_label }}" 
+                                    class="form-select {% if form.template.errors %}is-invalid{% endif %}" required>
+                                <option value="">{% trans "Select a template" %}</option>
+                                {% for template in available_templates %}
+                                    <option value="{{ template.id }}" {% if form.template.value|stringformat:'s' == template.id|stringformat:'s' %}selected{% endif %}>
+                                        {{ template.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            {% if form.template.errors %}
+                                <div class="invalid-feedback">{{ form.template.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">{% trans "The template defines the layout and available fields." %}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.parent.id_for_label }}" class="form-label">{{ form.parent.label }}</label>
+                            {{ form.parent }}
+                            {% if form.parent.errors %}
+                                <div class="invalid-feedback">{{ form.parent.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">{% trans "Parent page in the hierarchy. Leave empty for a top-level page." %}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }} *</label>
+                            <select name="{{ form.status.name }}" id="{{ form.status.id_for_label }}" 
+                                    class="form-select {% if form.status.errors %}is-invalid{% endif %}" required>
+                                {% for value, label in form.fields.status.choices %}
+                                    <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+
+                {% for value, label in form.fields.status.choices %}
+                <option value="{{ value }}" {% if form.status.value==value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+                {% endfor %}
+                </select>
+                {% if form.status.errors %}
+                <div class="invalid-feedback">{{ form.status.errors.0 }}</div>
+                {% endif %}
+                <div class="form-text">{% trans "Current publication status of the page." %}</div>
+                </div>
+                
+                <div class="col-md-6">
+                    <label for="{{ form.visibility.id_for_label }}" class="form-label">{{ form.visibility.label }} *</label>
+                    <select name="{{ form.visibility.name }}" id="{{ form.visibility.id_for_label }}" class="form-select {% if form.visibility.errors %}is-invalid{% endif %}" required>
+                        {% for value, label in form.fields.visibility.choices %}
+                        <option value="{{ value }}" {% if form.visibility.value==value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.visibility.errors %}
+                    <div class="invalid-feedback">{{ form.visibility.errors.0 }}</div>
+                    {% endif %}
+                    <div class="form-text">{% trans "Access control for the page." %}</div>
+                </div>
+                </div>
+                
+                <div id="passwordField" class="mb-3 {% if form.visibility.value != 'password' %}d-none{% endif %}">
+                    <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }} *</label>
+                    <input type="text" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" class="form-control {% if form.password.errors %}is-invalid{% endif %}" value="{{ form.password.value|default:'' }}">
+                    {% if form.password.errors %}
+                    <div class="invalid-feedback">{{ form.password.errors.0 }}</div>
+                    {% endif %}
+                    <div class="form-text">{% trans "Password required to access the page when visibility is set to 'Password Protected'." %}</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.categories.id_for_label }}" class="form-label">{{ form.categories.label }}</label>
+                    <select name="{{ form.categories.name }}" id="{{ form.categories.id_for_label }}" class="form-select {% if form.categories.errors %}is-invalid{% endif %}" multiple>
+                        {% for category in available_categories %}
+                        <option value="{{ category.id }}" {% if category.id in form.categories.value|default:'' %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.categories.errors %}
+                    <div class="invalid-feedback">{{ form.categories.errors.0 }}</div>
+                    {% endif %}
+                    <div class="form-text">{% trans "Categories for organizing and grouping pages. Hold Ctrl/Cmd to select multiple." %}</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">{% trans "Additional Options" %}</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="{{ form.is_indexable.name }}" id="{{ form.is_indexable.id_for_label }}" {% if form.is_indexable.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.is_indexable.id_for_label }}">
+                            {{ form.is_indexable.label }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="{{ form.is_searchable.name }}" id="{{ form.is_searchable.id_for_label }}" {% if form.is_searchable.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.is_searchable.id_for_label }}">
+                            {{ form.is_searchable.label }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="{{ form.is_visible_in_menu.name }}" id="{{ form.is_visible_in_menu.id_for_label }}" {% if form.is_visible_in_menu.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.is_visible_in_menu.id_for_label }}">
+                            {{ form.is_visible_in_menu.label }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="{{ form.enable_comments.name }}" id="{{ form.enable_comments.id_for_label }}" {% if form.enable_comments.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.enable_comments.id_for_label }}">
+                            {{ form.enable_comments.label }}
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.permalink.id_for_label }}" class="form-label">{{ form.permalink.label }}</label>
+                    <input type="text" name="{{ form.permalink.name }}" id="{{ form.permalink.id_for_label }}" class="form-control {% if form.permalink.errors %}is-invalid{% endif %}" value="{{ form.permalink.value|default:'' }}">
+                    {% if form.permalink.errors %}
+                    <div class="invalid-feedback">{{ form.permalink.errors.0 }}</div>
+                    {% endif %}
+                    <div class="form-text">{% trans "Custom URL for this page. Leave empty to use the slug-based URL." %}</div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="{{ form.scheduled_at.id_for_label }}" class="form-label">{{ form.scheduled_at.label }}</label>
+                        <input type="text" name="{{ form.scheduled_at.name }}" id="{{ form.scheduled_at.id_for_label }}" class="form-control datepicker {% if form.scheduled_at.errors %}is-invalid{% endif %}" value="{{ form.scheduled_at.value|date:'Y-m-d H:i' if form.scheduled_at.value else '' }}">
+                        {% if form.scheduled_at.errors %}
+                        <div class="invalid-feedback">{{ form.scheduled_at.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Schedule this page to be published at a future date/time." %}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.cache_ttl.id_for_label }}" class="form-label">{{ form.cache_ttl.label }}</label>
+                        <input type="number" name="{{ form.cache_ttl.name }}" id="{{ form.cache_ttl.id_for_label }}" class="form-control {% if form.cache_ttl.errors %}is-invalid{% endif %}" value="{{ form.cache_ttl.value|default:'3600' }}">
+                        {% if form.cache_ttl.errors %}
+                        <div class="invalid-feedback">{{ form.cache_ttl.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Time in seconds that this page can be cached." %}</div>
+                    </div>
+                </div>
+                </div>
+                
+                <!-- Tab de SEO -->
+                <div class="tab-pane fade" id="seo-pane" role="tabpanel" aria-labelledby="seo-tab">
+                    <div class="mb-3">
+                        <label for="{{ form.meta_title.id_for_label }}" class="form-label">{{ form.meta_title.label }}</label>
+                        <input type="text" name="{{ form.meta_title.name }}" id="{{ form.meta_title.id_for_label }}" class="form-control {% if form.meta_title.errors %}is-invalid{% endif %}" value="{{ form.meta_title.value|default:'' }}">
+                        {% if form.meta_title.errors %}
+                        <div class="invalid-feedback">{{ form.meta_title.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Title used for SEO. If empty, the page title will be used." %}</div>
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="{{ form.meta_description.id_for_label }}" class="form-label">{{ form.meta_description.label }}</label>
+                        <textarea name="{{ form.meta_description.name }}" id="{{ form.meta_description.id_for_label }}" class="form-control {% if form.meta_description.errors %}is-invalid{% endif %}" rows="3">{{ form.meta_description.value|default:'' }}</textarea>
+                        {% if form.meta_description.errors %}
+                        <div class="invalid-feedback">{{ form.meta_description.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Description used for SEO and social sharing. Recommended length: 150-160 characters." %}</div>
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="{{ form.meta_keywords.id_for_label }}" class="form-label">{{ form.meta_keywords.label }}</label>
+                        <input type="text" name="{{ form.meta_keywords.name }}" id="{{ form.meta_keywords.id_for_label }}" class="form-control {% if form.meta_keywords.errors %}is-invalid{% endif %}" value="{{ form.meta_keywords.value|default:'' }}">
+                        {% if form.meta_keywords.errors %}
+                        <div class="invalid-feedback">{{ form.meta_keywords.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Keywords for search engines, separated by commas." %}</div>
+                    </div>
+                
+                    <h5 class="mt-4 mb-3">{% trans "Open Graph" %}</h5>
+                
+                    <div class="mb-3">
+                        <label for="{{ form.og_title.id_for_label }}" class="form-label">{{ form.og_title.label }}</label>
+                        <input type="text" name="{{ form.og_title.name }}" id="{{ form.og_title.id_for_label }}" class="form-control {% if form.og_title.errors %}is-invalid{% endif %}" value="{{ form.og_title.value|default:'' }}">
+                        {% if form.og_title.errors %}
+                        <div class="invalid-feedback">{{ form.og_title.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Title used for social media sharing. If empty, the meta title or page title will be used." %}</div>
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="{{ form.og_description.id_for_label }}" class="form-label">{{ form.og_description.label }}</label>
+                        <textarea name="{{ form.og_description.name }}" id="{{ form.og_description.id_for_label }}" class="form-control {% if form.og_description.errors %}is-invalid{% endif %}" rows="3">{{ form.og_description.value|default:'' }}</textarea>
+                        {% if form.og_description.errors %}
+                        <div class="invalid-feedback">{{ form.og_description.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Description used for social media sharing. If empty, the meta description will be used." %}</div>
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="{{ form.og_image.id_for_label }}" class="form-label">{{ form.og_image.label }}</label>
+                        <div class="input-group">
+                            <input type="file" name="{{ form.og_image.name }}" id="{{ form.og_image.id_for_label }}" class="form-control {% if form.og_image.errors %}is-invalid{% endif %}" accept="image/*">
+                            {% if form.instance.og_image %}
+                            <span class="input-group-text">
+                                <a href="{{ form.instance.og_image.url }}" target="_blank">{% trans "View Current" %}</a>
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% if form.og_image.errors %}
+                        <div class="invalid-feedback">{{ form.og_image.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Image used for social media sharing. Recommended size: 1200x630 pixels." %}</div>
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="{{ form.og_type.id_for_label }}" class="form-label">{{ form.og_type.label }}</label>
+                        <select name="{{ form.og_type.name }}" id="{{ form.og_type.id_for_label }}" class="form-select {% if form.og_type.errors %}is-invalid{% endif %}">
+                            {% for value, label in form.fields.og_type.choices %}
+                            <option value="{{ value }}" {% if form.og_type.value==value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if form.og_type.errors %}
+                        <div class="invalid-feedback">{{ form.og_type.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Open Graph type for social media sharing." %}</div>
+                    </div>
+                
+                    <h5 class="mt-4 mb-3">{% trans "Schema.org" %}</h5>
+                
+                    <div class="mb-3">
+                        <label for="{{ form.schema_type.id_for_label }}" class="form-label">{{ form.schema_type.label }}</label>
+                        <select name="{{ form.schema_type.name }}" id="{{ form.schema_type.id_for_label }}" class="form-select {% if form.schema_type.errors %}is-invalid{% endif %}">
+                            {% for value, label in form.fields.schema_type.choices %}
+                            <option value="{{ value }}" {% if form.schema_type.value==value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if form.schema_type.errors %}
+                        <div class="invalid-feedback">{{ form.schema_type.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Schema.org type for structured data." %}</div>
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="{{ form.schema_data.id_for_label }}" class="form-label">{{ form.schema_data.label }}</label>
+                        <textarea name="{{ form.schema_data.name }}" id="{{ form.schema_data.id_for_label }}" class="form-control json-editor {% if form.schema_data.errors %}is-invalid{% endif %}" rows="6">{{ form.schema_data.value|default:'' }}</textarea>
+                        {% if form.schema_data.errors %}
+                        <div class="invalid-feedback">{{ form.schema_data.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">{% trans "Additional JSON-LD data for Schema.org structured data." %}</div>
+                    </div>
+                </div>
+                
+                {% if form.instance.pk %}
+                <!-- Tab de campos personalizados -->
+                <div class="tab-pane fade" id="custom-fields-pane" role="tabpanel" aria-labelledby="custom-fields-tab">
+                    {% if form.custom_fields %}
+                    <div class="accordion" id="customFieldsAccordion">
+                        {% for custom_field in form.custom_fields %}
+                        <div class="accordion-item mb-3">
+                            <h2 class="accordion-header" id="heading-{{ custom_field.group.slug }}">
+                                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ custom_field.group.slug }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse-{{ custom_field.group.slug }}">
+                                    {{ custom_field.group.name }}
+                                </button>
+                            </h2>
+                            <div id="collapse-{{ custom_field.group.slug }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading-{{ custom_field.group.slug }}" data-bs-parent="#customFieldsAccordion">
+                                <div class="accordion-body">
+                                    {% for field in custom_field.fields %}
+                                    <div class="mb-3">
+                                        <label for="{{ field.key }}" class="form-label">
+                                            {{ field.field_def.name }}
+                                            {% if field.field_def.is_required %}*{% endif %}
+                                        </label>
+                
+                                        {% if field.field_def.field_type == 'text' %}
+                                        <input type="text" name="{{ field.key }}" id="{{ field.key }}" class="form-control" value="{{ field.value|default:'' }}" {% if field.field_def.is_required %}required{% endif %} {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}" {% endif %}>
+                
+                                        {% elif field.field_def.field_type == 'textarea' %}
+                                        <textarea name="{{ field.key }}" id="{{ field.key }}" class="form-control" rows="4" {% if field.field_def.is_required %}required{% endif %} {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}" {% endif %}>{{ field.value|default:'' }}</textarea>
+                
+                                        {% elif field.field_def.field_type == 'richtext' %}
+                                        <textarea name="{{ field.key }}" id="{{ field.key }}" class="form-control editor" rows="8" {% if field.field_def.is_required %}required{% endif %}>{{ field.value|default:'' }}</textarea>
+                
+                                        {% elif field.field_def.field_type == 'email' %}
+                                        <input type="email" name="{{ field.key }}" id="{{ field.key }}" class="form-control" value="{{ field.value|default:'' }}" {% if field.field_def.is_required %}required{% endif %} {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}" {% endif %}>
+                
+                                        {% elif field.field_def.field_type == 'url' %}
+                                        <input type="url" name="{{ field.key }}" id="{{ field.key }}" class="form-control" value="{{ field.value|default:'' }}" {% if field.field_def.is_required %}required{% endif %} {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}" {% endif %}>
+                
+                                        {% elif field.field_def.field_type == 'integer' %}
+                                        <input type="number" name="{{ field.key }}" id="{{ field.key }}" class="form-control" value="{{ field.value|default:'' }}" step="1" {% if field.field_def.min_value %}min="{{ field.field_def.min_value }}" {% endif %} {% if field.field_def.max_value %}max="{{ field.field_def.max_value }}" {% endif %} {% if field.field_def.is_required %}required{% endif %} {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}" {% endif %}>
+                
+                                        {% elif field.field_def.field_type == 'decimal' %}
+                                        <input type="number" name="{{ field.key }}" id="{{ field.key }}" class="form-control" value="{{ field.value|default:'' }}" step="0.01" {% if field.field_def.min_value %}min="{{ field.field_def.min_value }}" {% endif %} {% if field.field_def.max_value %}max="{{ field.field_def.max_value }}" {% endif %} {% if field.field_def.is_required %}required{% endif %} {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}" {% endif %}>
+                
+                                        {% elif field.field_def.field_type == 'boolean' %}
+                                        <div class="form-check">
+                                            <input type="checkbox" name="{{ field.key }}" id="{{ field.key }}" class="form-check-input" value="True" {% if field.value=='True' or field.value=='1' or field.value=='true' %}checked{% endif %}>
+                                            <label class="form-check-label" for="{{ field.key }}">
+                                                {{ field.field_def.help_text|default:_("Yes/No") }}
+                                            </label>
+                                        </div>
+                
+                                        {% elif field.field_def.field_type == 'date' %}
+                                        <input type="text" name="{{ field.key }}" id="{{ field.key }}" class="form-control datepicker-date" value="{{ field.value|default:'' }}" {% if field.field_def.is_required %}required{% endif %} {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}" {% endif %}>
+                
+                                        {% elif field.field_def.field_type == 'time' %}
+                                        <input type="text" name="{{ field.key }}" id="{{ field.key }}" class="form-control datepicker-time" value="{{ field.value|default:'' }}" {% if field.field_def.is_required %}required{% endif %} {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}" {% endif %}>
+                
+                                        {% elif field.field_def.field_type == 'datetime' %}
+                                        <input type="text" name="{{ field.key }}" id="{{ field.key }}" class="form-control datepicker" value="{{ field.value|default:'' }}" {% if field.field_def.is_required %}required{% endif %} {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}" {% endif %}>
+                
+                                        {% elif field.field_def.field_type == 'image' %}
+                                        <div class="input-group">
+                                            <input type="file" name="{{ field.key }}" id="{{ field.key }}" class="form-control" accept="image/*" {% if field.field_def.is_required and not field.value %}required{% endif %}>
+                                            {% if field.value %}
+                                            <span class="input-group-text">
+                                                <a href="{{ field.value }}" target="_blank">{% trans "View Current" %}</a>
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                
+                                        {% elif field.field_def.field_type == 'file' %}
+                                        <div class="input-group">
+                                            <input type="file" name="{{ field.key }}" id="{{ field.key }}" class="form-control" {% if field.field_def.allowed_extensions %}accept=".{{ field.field_def.allowed_extensions|join:',.' }}" {% endif %} {% if field.field_def.is_required and not field.value %}required{% endif %}>
+                                            {% if field.value %}
+                                            <span class="input-group-text">
+                                                <a href="{{ field.value }}" target="_blank">{% trans "View Current" %}</a>
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                
+                                        {% elif field.field_def.field_type == 'select' %}
+                                        <select name="{{ field.key }}" id="{{ field.key }}" class="form-select" {% if field.field_def.is_required %}required{% endif %}>
+                                            <option value="">{% trans "Select an option" %}</option>
+                                            {% for option in field.field_def.get_options_as_list %}
+                                            <option value="{{ option }}" {% if field.value==option %}selected{% endif %}>
+                                                {{ option }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                
+                                        {% elif field.field_def.field_type == 'multiselect' %}
+                                        <select name="{{ field.key }}" id="{{ field.key }}" class="form-select" multiple {% if field.field_def.is_required %}required{% endif %}>
+                                            {% for option in field.field_def.get_options_as_list %}
+                                            <option value="{{ option }}" {% if option in field.value %}selected{% endif %}>
+                                                {{ option }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                
+                                        {% elif field.field_def.field_type == 'color' %}
+                                        <input type="text" name="{{ field.key }}" id="{{ field.key }}" class="form-control colorpicker" value="{{ field.value|default:'#FFFFFF' }}" {% if field.field_def.is_required %}required{% endif %}>
+                
+                                        {% elif field.field_def.field_type == 'code' or field.field_def.field_type == 'json' %}
+                                        <textarea name="{{ field.key }}" id="{{ field.key }}" class="form-control code-editor" rows="6" {% if field.field_def.is_required %}required{% endif %}>{{ field.value|default:'' }}</textarea>
+                
+                                        {% else %}
+                                        <input type="text" name="{{ field.key }}" id="{{ field.key }}" class="form-control" value="{{ field.value|default:'' }}" {% if field.field_def.is_required %}required{% endif %} {% if field.field_def.placeholder %}placeholder="{{ field.field_def.placeholder }}" {% endif %}>
+                                        {% endif %}
+                
+                                        {% if field.field_def.help_text %}
+                                        <div class="form-text">{{ field.field_def.help_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        {% trans "No custom fields defined for this template." %}
+                        {% if change_template %}
+                        {% trans "Save the page first to load the custom fields for the new template." %}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Tab de galerias -->
+                <div class="tab-pane fade" id="galleries-pane" role="tabpanel" aria-labelledby="galleries-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0">{% trans "Image Galleries" %}</h4>
+                        <a href="{% url 'pages:gallery_create' page_id=form.instance.pk %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> {% trans "Create Gallery" %}
+                        </a>
+                    </div>
+                
+                    {% if galleries %}
+                    <div class="row">
+                        {% for gallery in galleries %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">{{ gallery.name }}</h5>
+                                </div>
+                                {% with images=gallery.images.all %}
+                                {% if images %}
+                                <div class="gallery-preview">
+                                    <div class="row p-2">
+                                        {% for image in images|slice:":4" %}
+                                        <div class="col-3 p-1">
+                                            <img src="{{ image.image.url }}" alt="{{ image.alt_text }}" class="img-thumbnail w-100 h-100 object-fit-cover">
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% if images.count > 4 %}
+                                <div class="card-body">
+                                    <p class="card-text text-center text-muted">
+                                        {% blocktrans with count=images.count|add:"-4" %}
+                                        +{{ count }} more images
+                                        {% endblocktrans %}
+                                    </p>
+                                </div>
+                                {% endif %}
+                                {% else %}
+                                <div class="card-body">
+                                    <p class="card-text text-center text-muted">
+                                        {% trans "No images in this gallery" %}
+                                    </p>
+                                </div>
+                                {% endif %}
+                                {% endwith %}
+                                <div class="card-footer">
+                                    <div class="btn-group w-100">
+                                        <a href="{% url 'pages:gallery_update' pk=gallery.pk %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-images"></i> {% trans "Manage Images" %}
+                                        </a>
+                                        <a href="{% url 'pages:gallery_delete' pk=gallery.pk %}" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i> {% trans "Delete Gallery" %}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        {% trans "No galleries created yet. Click the 'Create Gallery' button to add one." %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                </div>
+                
+                <!-- Barra de ação flutuante -->
+                <div class="action-bar bg-white border-top py-3 fixed-bottom">
+                    <div class="container">
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'pages:page_list' %}" class="btn btn-outline-secondary">
+                                {% trans "Cancel" %}
+                            </a>
+                
+                            <div class="btn-group">
+                                <button type="submit" name="action" value="save" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> {% trans "Save" %}
+                                </button>
+                
+                                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="visually-hidden">{% trans "Toggle Dropdown" %}</span>
+                                </button>
+                
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <button type="submit" name="action" value="save_continue" class="dropdown-item">
+                                            {% trans "Save and continue editing" %}
+                                        </button>
+                                    </li>
+                                    {% if can_publish and form.instance.pk and form.instance.status != 'published' %}
+                                    <li>
+                                        <button type="submit" name="action" value="save_publish" class="dropdown-item">
+                                            {% trans "Save and publish" %}
+                                        </button>
+                                    </li>
+                                    {% endif %}
+                                    {% if form.instance.pk %}
+                                    <li>
+                                        <button type="submit" name="action" value="save_preview" class="dropdown-item">
+                                            {% trans "Save and preview" %}
+                                        </button>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </form>
+                </div>
+                </div>
+                {% endblock %}
+                
+                {% block extra_js %}
+                <!-- JS para o editor de conteúdo -->
+                <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs5.min.js"></script>
+                <!-- JS para editor de código -->
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+                <!-- JS para seletor de data/hora -->
+                <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+                <!-- JS para selecionador de cores -->
+                <script src="https://cdn.jsdelivr.net/npm/spectrum-colorpicker2/dist/spectrum.min.js"></script>
+                
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        // Inicializa o editor WYSIWYG para o campo de conteúdo
+                        $('.editor').summernote({
+                            height: 300,
+                            toolbar: [
+                                ['style', ['style']],
+                                ['font', ['bold', 'underline', 'clear']],
+                                ['color', ['color']],
+                                ['para', ['ul', 'ol', 'paragraph']],
+                                ['table', ['table']],
+                                ['insert', ['link', 'picture', 'video']],
+                                ['view', ['fullscreen', 'codeview', 'help']]
+                            ],
+                            callbacks: {
+                                onImageUpload: function (files) {
+                                    // Aqui você pode implementar o upload de imagens para o servidor
+                                    // e inserir a URL da imagem no editor
+                                    alert('Upload de imagens não implementado nesta versão.');
+                                }
+                            }
+                        });
+
+                        // Inicializa o seletor de data/hora
+                        $('.datepicker').flatpickr({
+                            enableTime: true,
+                            dateFormat: 'Y-m-d H:i',
+                            time_24hr: true
+                        });
+
+                        $('.datepicker-date').flatpickr({
+                            dateFormat: 'Y-m-d'
+                        });
+
+                        $('.datepicker-time').flatpickr({
+                            enableTime: true,
+                            noCalendar: true,
+                            dateFormat: 'H:i',
+                            time_24hr: true
+                        });
+
+                        // Inicializa o selecionador de cores
+                        $('.colorpicker').spectrum({
+                            type: "component",
+                            showInput: true,
+                            showInitial: true,
+                            showAlpha: true,
+                            allowEmpty: true
+                        });
+
+                        // Inicializa o editor de código para campos JSON e código
+                        $('.code-editor').each(function () {
+                            let mode = 'javascript';
+                            if ($(this).hasClass('css-editor')) mode = 'css';
+                            if ($(this).hasClass('html-editor')) mode = 'htmlmixed';
+
+                            CodeMirror.fromTextArea(this, {
+                                lineNumbers: true,
+                                mode: mode,
+                                theme: 'default',
+                                lineWrapping: true,
+                                viewportMargin: Infinity
+                            });
+                        });
+
+                        // Gerador automático de slug
+                        $('#generateSlugBtn').click(function () {
+                            const title = $('#id_title').val();
+                            if (title) {
+                                const slug = title.toLowerCase()
+                                    .replace(/[^\w ]+/g, '')
+                                    .replace(/ +/g, '-');
+                                $('#id_slug').val(slug);
+
+                                // Verifica se o slug já existe
+                                checkSlug(slug);
+                            }
+                        });
+
+                        // Verifica se o slug já existe quando o usuário digita no campo slug
+                        $('#id_slug').blur(function () {
+                            const slug = $(this).val();
+                            if (slug) {
+                                checkSlug(slug);
+                            }
+                        });
+
+                        // Mostra/esconde o campo de senha quando o tipo de visibilidade muda
+                        $('#id_visibility').change(function () {
+                            if ($(this).val() === 'password') {
+                                $('#passwordField').removeClass('d-none');
+                                $('#id_password').attr('required', true);
+                            } else {
+                                $('#passwordField').addClass('d-none');
+                                $('#id_password').attr('required', false);
+                            }
+                        });
+
+                        // Função para verificar se o slug já existe
+                        function checkSlug(slug) {
+                            const pageId = '{{ form.instance.pk|default:"" }}';
+                            $.ajax({
+                                url: '{% url "pages:page_check_slug" %}',
+                                data: {
+                                    slug: slug,
+                                    page_id: pageId
+                                },
+                                dataType: 'json',
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                success: function (data) {
+                                    if (!data.valid) {
+                                        // Exibe um alerta se o slug já estiver em uso
+                                        alert(data.message);
+                                    }
+                                }
+                            });
+                        }
+
+                        // Previne o envio do formulário quando o usuário pressiona Enter
+                        $('#pageForm').on('keypress', function (e) {
+                            if (e.which === 13 && e.target.tagName !== 'TEXTAREA') {
+                                e.preventDefault();
+                                return false;
+                            }
+                        });
+                    });
+                </script>
+                {% endblock %}
+                {% comment %} {% extends "base.html" %}
+                {% load i18n %}
+                {% load static %}
+                
+                {% block title %}
+                {% if form.instance.pk %}
+                {% trans "Edit" %}: {{ form.instance.title }}
+                {% else %}
+                {% trans "Create New Page" %}
+                {% endif %}
+                {% endblock %}
+                
+                {% block extra_css %}
+                <!-- CSS para editor de conteúdo -->
+                <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs5.min.css" rel="stylesheet">
+                <!-- CSS para seletor de data/hora -->
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+                <!-- CSS para selecionador de cores -->
+                <link href="https://cdn.jsdelivr.net/npm/spectrum-colorpicker2/dist/spectrum.min.css" rel="stylesheet">
+                {% endblock %}
+                
+                {% block content %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h1>
+                                {% if form.instance.pk %}
+                                {% trans "Edit Page" %}: {{ form.instance.title }}
+                                {% else %}
+                                {% trans "Create New Page" %}
+                                {% endif %}
+                            </h1>
+                
+                            {% if form.instance.pk %}
+                            <div class="btn-group">
+                                {% if form.instance.status == 'published' %}
+                                <a href="{{ form.instance.get_absolute_url }}" class="btn btn-outline-primary" target="_blank">
+                                    <i class="fas fa-eye"></i> {% trans "View Page" %}
+                                </a>
+                                <a href="{% url 'pages:page_unpublish' pk=form.instance.pk %}" class="btn btn-outline-warning">
+                                    <i class="fas fa-times-circle"></i> {% trans "Unpublish" %}
+                                </a>
+                                {% elif form.instance.status == 'draft' %}
+                                {% if can_publish %}
+                                <a href="{% url 'pages:page_publish' pk=form.instance.pk %}" class="btn btn-outline-success">
+                                    <i class="fas fa-check-circle"></i> {% trans "Publish" %}
+                                </a>
+                                {% else %}
+                                <a href="{% url 'pages:page_request_review' pk=form.instance.pk %}" class="btn btn-outline-info">
+                                    <i class="fas fa-clipboard-check"></i> {% trans "Request Review" %}
+                                </a>
+                                {% endif %}
+                                {% elif form.instance.status == 'review' %}
+                                {% if can_publish %}
+                                <a href="{% url 'pages:page_publish' pk=form.instance.pk %}" class="btn btn-outline-success">
+                                    <i class="fas fa-check-circle"></i> {% trans "Approve & Publish" %}
+                                </a>
+                                {% endif %}
+                                {% endif %}
+                
+                                <a href="{% url 'pages:page_delete' pk=form.instance.pk %}" class="btn btn-outline-danger">
+                                    <i class="fas fa-trash"></i> {% trans "Delete" %}
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                
+                        {% if warning_message %}
+                        <div class="alert alert-warning">
+                            {{ warning_message }}
+                        </div>
+                        {% endif %}
+                
+                        <!-- Formulário de página com tabs para diferentes seções -->
+                        <form method="post" enctype="multipart/form-data" id="pageForm">
+                            {% csrf_token %}
+                
+                            <!-- Navegação por tabs -->
+                            <ul class="nav nav-tabs mb-3" id="pageFormTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#content-pane" type="button" role="tab" aria-controls="content-pane" aria-selected="true">
+                                        <i class="fas fa-edit me-2"></i> {% trans "Content" %}
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings-pane" type="button" role="tab" aria-controls="settings-pane" aria-selected="false">
+                                        <i class="fas fa-cog me-2"></i> {% trans "Settings" %}
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo-pane" type="button" role="tab" aria-controls="seo-pane" aria-selected="false">
+                                        <i class="fas fa-search me-2"></i> {% trans "SEO" %}
+                                    </button>
+                                </li>
+                
+                                {% if form.instance.pk %}
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="custom-fields-tab" data-bs-toggle="tab" data-bs-target="#custom-fields-pane" type="button" role="tab" aria-controls="custom-fields-pane" aria-selected="false">
+                                        <i class="fas fa-th-list me-2"></i> {% trans "Custom Fields" %}
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="galleries-tab" data-bs-toggle="tab" data-bs-target="#galleries-pane" type="button" role="tab" aria-controls="galleries-pane" aria-selected="false">
+                                        <i class="fas fa-images me-2"></i> {% trans "Galleries" %}
+                                    </button>
+                                </li>
+                                {% endif %}
+                            </ul>
+                
+                            <!-- Conteúdo das tabs -->
+                            <div class="tab-content p-3 border border-top-0 rounded-bottom mb-4" id="pageFormTabContent">
+                                <!-- Tab de conteúdo principal -->
+                                <div class="tab-pane fade show active" id="content-pane" role="tabpanel" aria-labelledby="content-tab">
+                                    <div class="mb-3">
+                                        <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }} *</label>
+                                        <input type="text" name="{{ form.title.name }}" id="{{ form.title.id_for_label }}" class="form-control {% if form.title.errors %}is-invalid{% endif %}" value="{{ form.title.value|default:'' }}" required>
+                                        {% if form.title.errors %}
+                                        <div class="invalid-feedback">{{ form.title.errors.0 }}</div>
+                                        {% endif %}
+                                        <div class="form-text">{% trans "The title of your page as it will appear in headings and navigation." %}</div>
+                                    </div>
+                
+                                    <div class="mb-3">
+                                        <label for="{{ form.slug.id_for_label }}" class="form-label">{{ form.slug.label }} *</label>
+                                        <div class="input-group">
+                                            <input type="text" name="{{ form.slug.name }}" id="{{ form.slug.id_for_label }}" class="form-control {% if form.slug.errors %}is-invalid{% endif %}" value="{{ form.slug.value|default:'' }}" required>
+                                            <button class="btn btn-outline-secondary" type="button" id="generateSlugBtn">
+                                                {% trans "Generate" %}
+                                            </button>
+                                        </div>
+                                        {% if form.slug.errors %}
+                                        <div class="invalid-feedback">{{ form.slug.errors.0 }}</div>
+                                        {% endif %}
+                                        <div class="form-text">{% trans "URL identifier for your page. Use only lowercase letters, numbers, and hyphens." %}</div>
+                                    </div>
+                
+                                    <div class="mb-3">
+                                        <label for="{{ form.summary.id_for_label }}" class="form-label">{{ form.summary.label }}</label>
+                                        <textarea name="{{ form.summary.name }}" id="{{ form.summary.id_for_label }}" class="form-control {% if form.summary.errors %}is-invalid{% endif %}" rows="3">{{ form.summary.value|default:'' }}</textarea>
+                                        {% if form.summary.errors %}
+                                        <div class="invalid-feedback">{{ form.summary.errors.0 }}</div>
+                                        {% endif %}
+                                        <div class="form-text">{% trans "A brief summary of the page content. Used in page listings and SEO." %}</div>
+                                    </div>
+                
+                                    <div class="mb-3">
+                                        <label for="{{ form.content.id_for_label }}" class="form-label">{{ form.content.label }}</label>
+                                        <textarea name="{{ form.content.name }}" id="{{ form.content.id_for_label }}" class="form-control editor {% if form.content.errors %}is-invalid{% endif %}" rows="10">{{ form.content.value|default:'' }}</textarea>
+                                        {% if form.content.errors %}
+                                        <div class="invalid-feedback">{{ form.content.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                
+                                <!-- Tab de configurações -->
+                                <div class="tab-pane fade" id="settings-pane" role="tabpanel" aria-labelledby="settings-tab">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="{{ form.template.id_for_label }}" class="form-label">{{ form.template.label }} *</label>
+                                            <select name="{{ form.template.name }}" id="{{ form.template.id_for_label }}" class="form-select {% if form.template.errors %}is-invalid{% endif %}" required>
+                                                <option value="">{% trans "Select a template" %}</option>
+                                                {% for template in available_templates %}
+                                                <option value="{{ template.id }}" {% if form.template.value|stringformat:'s'==template.id|stringformat:'s' %}selected{% endif %}>
+                                                    {{ template.name }}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                            {% if form.template.errors %}
+                                            <div class="invalid-feedback">{{ form.template.errors.0 }}</div>
+                                            {% endif %}
+                                            <div class="form-text">{% trans "The template defines the layout and available fields." %}</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="{{ form.parent.id_for_label }}" class="form-label">{{ form.parent.label }}</label>
+                                            {{ form.parent }}
+                                            {% if form.parent.errors %}
+                                            <div class="invalid-feedback">{{ form.parent.errors.0 }}</div>
+                                            {% endif %}
+                                            <div class="form-text">{% trans "Parent page in the hierarchy. Leave empty for a top-level page." %}</div>
+                                        </div>
+                                    </div>
+                
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }} *</label>
+                                            <select name="{{ form.status.name }}" id="{{ form.status.id_for_label }}" class="form-select {% if form.status.errors %}is-invalid{% endif %}" required>
+                                                {% for value, label in form.fields.status.choices %}
+                                                <option value="{{ value }}" {% if form.status.value==value %}selected{% endif %}>
+                                                    {{ label }}
+                                                </option>
+                                                {% endfor %}
+                                            </select> {% endcomment %}

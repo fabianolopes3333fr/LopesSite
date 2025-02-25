@@ -1,0 +1,165 @@
+# templates/layouts/header/default.html
+
+{% load static %}
+{% load template_tags %}
+{% load i18n %}
+
+<!-- template-meta: {"name": "Default Header", "type": "header", "description": "Header padrão com navbar responsivo"} -->
+
+<div class="header-wrapper">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="{% static 'img/logo.png' %}" alt="{% trans " Logo" %}" height="40">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="{% trans " Toggle navigation" %}">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <!-- Menu Principal -->
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/">{% trans "Home" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about/">{% trans "About" %}</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarServices" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% trans "Services" %}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarServices">
+                            <li><a class="dropdown-item" href="/services/service1/">{% trans "Service 1" %}</a></li>
+                            <li><a class="dropdown-item" href="/services/service2/">{% trans "Service 2" %}</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/services/">{% trans "All Services" %}</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact/">{% trans "Contact" %}</a>
+                    </li>
+                </ul>
+
+                <!-- Busca e Ações Rápidas -->
+                <div class="d-flex">
+                    <form class="d-flex me-2">
+                        <input class="form-control me-2" type="search" placeholder="{% trans " Search" %}" aria-label="Search">
+                        <button class="btn btn-outline-success" type="submit">{% trans "Search" %}</button>
+                    </form>
+
+                    <!-- Botões de Ação -->
+                    <div class="d-flex align-items-center">
+                        <!-- Botão de Login / Usuário -->
+                        {% if user.is_authenticated %}
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                <li><a class="dropdown-item" href="/accounts/profile/">{% trans "Profile" %}</a></li>
+                                {% if user.is_staff %}
+                                <li><a class="dropdown-item" href="{% url 'admin:index' %}">{% trans "Admin" %}</a></li>
+                                {% endif %}
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="/accounts/logout/">{% trans "Logout" %}</a></li>
+                            </ul>
+                        </div>
+                        {% else %}
+                        <a href="/accounts/login/" class="btn btn-outline-primary">
+                            <i class="fas fa-sign-in-alt"></i> {% trans "Login" %}
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Área editável do header -->
+    <div class="header-content">
+        {% if is_edit_mode and user.is_staff %}
+        {% editable_region 'header_content' template_slug='default_header' placeholder='Adicione conteúdo ao header aqui' %}
+        {% else %}
+        {% render_region 'header_content' 'default_header' %}
+        {% endif %}
+    </div>
+</div>
+
+# templates/layouts/footer/default.html
+
+{% load static %}
+{% load template_tags %}
+{% load i18n %}
+
+<!-- template-meta: {"name": "Default Footer", "type": "footer", "description": "Footer padrão com 3 colunas e área de copyright"} -->
+
+<div class="footer-wrapper bg-dark text-white py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Coluna 1: Sobre -->
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h5>{% trans "About Us" %}</h5>
+                <p>{% trans "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam at lorem sem. Nullam commodo lacus et velit fermentum, eget placerat dui ornare." %}</p>
+                <div class="social-icons mt-3">
+                    <a href="#" class="text-white me-2"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-white me-2"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-white me-2"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-white me-2"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <!-- Coluna 2: Links Rápidos -->
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h5>{% trans "Quick Links" %}</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="/" class="text-white text-decoration-none">{% trans "Home" %}</a></li>
+                    <li class="mb-2"><a href="/about/" class="text-white text-decoration-none">{% trans "About" %}</a></li>
+                    <li class="mb-2"><a href="/services/" class="text-white text-decoration-none">{% trans "Services" %}</a></li>
+                    <li class="mb-2"><a href="/portfolio/" class="text-white text-decoration-none">{% trans "Portfolio" %}</a></li>
+                    <li class="mb-2"><a href="/blog/" class="text-white text-decoration-none">{% trans "Blog" %}</a></li>
+                    <li class="mb-2"><a href="/contact/" class="text-white text-decoration-none">{% trans "Contact" %}</a></li>
+                </ul>
+            </div>
+
+            <!-- Coluna 3: Contato -->
+            <div class="col-md-4">
+                <h5>{% trans "Contact Us" %}</h5>
+                <address>
+                    <p class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> {% trans "123 Street Name, City, Country" %}</p>
+                    <p class="mb-2"><i class="fas fa-phone-alt me-2"></i> {% trans "+123 456 7890" %}</p>
+                    <p class="mb-2"><i class="fas fa-envelope me-2"></i> <a href="mailto:info@example.com" class="text-white text-decoration-none">info@example.com</a></p>
+                </address>
+
+                <!-- Área para widget ou newsletter -->
+                <div class="mt-3">
+                    {% if is_edit_mode and user.is_staff %}
+                    {% editable_widget_area 'footer_widgets' template_slug='default_footer' placeholder='Adicione widgets ao footer aqui' %}
+                    {% else %}
+                    {% render_widget_area 'footer_widgets' 'default_footer' %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Copyright -->
+<div class="copyright bg-dark text-white-50 py-3 border-top border-secondary">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 text-center text-md-start">
+                <p class="mb-0">{% trans "© 2025 Your Company. All Rights Reserved." %}</p>
+            </div>
+            <div class="col-md-6 text-center text-md-end">
+                <p class="mb-0">
+                    {% trans "Designed by" %} <a href="#" class="text-white">{% trans "Your Company" %}</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

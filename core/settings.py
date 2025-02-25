@@ -51,6 +51,7 @@ DJANGO_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'django.contrib.humanize',
+    'django.contrib.sites',
     
     
 ]
@@ -80,6 +81,8 @@ PROJECT_APPS = [ # são os apps que criamos no projeto
     'apps.users',
     'apps.dashboard',
     'apps.config',
+    'apps.pages',
+    'apps.widgets',
 ]
 
 # INSTALLED_APPS é a variavel que django entende para fazer a leitura \
@@ -374,3 +377,5 @@ LOGOUT_REDIRECT_URL = 'home'
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
 
 MAX_FAILED_LOGIN_ATTEMPTS = 5
+
+SITE_ID = 1

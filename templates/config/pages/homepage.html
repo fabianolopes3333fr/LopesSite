@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1>{{ page.title }}</h1>
+    <p>{{ page.description }}</p>
+</div>
+{% for block in page.content_blocks.all %}
+{% include block.get_template_name %}
+{% endfor %}
+{% endblock %}

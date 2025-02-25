@@ -1,0 +1,125 @@
+{% load static %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'pt-br' }}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% trans "CMS" %}{% endblock %}</title>
+
+    <!-- Meta tags -->
+    <meta name="description" content="{% block meta_description %}{% endblock %}">
+    {% block extra_meta %}{% endblock %}
+
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+
+    {% block extra_css %}{% endblock %}
+
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="bg-dark text-white py-3 mb-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <a href="{% url 'pages:page_list' %}" class="text-white text-decoration-none">
+                        <h1 class="h3 mb-0">{% trans "CMS System" %}</h1>
+                    </a>
+                </div>
+                <div class="col-md-8">
+                    <div class="d-flex justify-content-end">
+                        {% if user.is_authenticated %}
+                        <div class="dropdown me-3">
+                            <button class="btn btn-outline-light dropdown-toggle" type="button" id="adminMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-cog"></i> {% trans "Admin" %}
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="adminMenuDropdown">
+                                <li><a class="dropdown-item" href="{% url 'pages:page_create' %}">{% trans "Create Page" %}</a></li>
+                                <li><a class="dropdown-item" href="{% url 'pages:template_list' %}">{% trans "Templates" %}</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="{% url 'admin:index' %}">{% trans "Django Admin" %}</a></li>
+                            </ul>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-light dropdown-toggle" type="button" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user"></i> {{ user.username }}
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="userMenuDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'pages:notification_list' %}">
+                                        {% trans "Notifications" %}
+                                        {% with unread_count=user.page_notifications.filter.count %}
+                                        {% if unread_count %}
+                                        <span class="badge bg-danger">{{ unread_count }}</span>
+                                        {% endif %}
+                                        {% endwith %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">{% trans "Logout" %}</a></li>
+                            </ul>
+                        </div>
+                        {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-light">{% trans "Login" %}</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        {% if messages %}
+        <div class="messages mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p>&copy; {% now "Y" %} {% trans "Your Company" %}</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="{% url 'pages:sitemap' %}" class="text-white me-3">{% trans "Sitemap" %}</a>
+                    <a href="{% url 'pages:rss_feed' %}" class="text-white">{% trans "RSS Feed" %}</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

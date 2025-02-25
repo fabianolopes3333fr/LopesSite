@@ -1,0 +1,292 @@
+# templates/layouts/sidebar/default.html
+
+{% load static %}
+{% load template_tags %}
+{% load i18n %}
+
+<!-- template-meta: {"name": "Default Sidebar", "type": "sidebar", "description": "Sidebar padrão com widgets e navegação"} -->
+
+<div class="sidebar-wrapper">
+    <!-- Área de Pesquisa -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">{% trans "Search" %}</h5>
+            <form class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="{% trans " Search" %}" aria-label="Search">
+                <button class="btn btn-outline-primary" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Categorias -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">{% trans "Categories" %}</h5>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {% trans "Category 1" %}
+                    <span class="badge bg-primary rounded-pill">14</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {% trans "Category 2" %}
+                    <span class="badge bg-primary rounded-pill">8</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {% trans "Category 3" %}
+                    <span class="badge bg-primary rounded-pill">3</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {% trans "Category 4" %}
+                    <span class="badge bg-primary rounded-pill">9</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {% trans "Category 5" %}
+                    <span class="badge bg-primary rounded-pill">6</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Posts Recentes -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">{% trans "Recent Posts" %}</h5>
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled">
+                <li class="mb-3">
+                    <a href="#" class="text-decoration-none">
+                        <div class="d-flex">
+                            <img src="{% static 'img/placeholder.jpg' %}" alt="Post" class="img-fluid me-2" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div>
+                                <h6 class="mb-1">{% trans "Post Title 1" %}</h6>
+                                <small class="text-muted">{% trans "February 20, 2025" %}</small>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <li class="mb-3">
+                    <a href="#" class="text-decoration-none">
+                        <div class="d-flex">
+                            <img src="{% static 'img/placeholder.jpg' %}" alt="Post" class="img-fluid me-2" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div>
+                                <h6 class="mb-1">{% trans "Post Title 2" %}</h6>
+                                <small class="text-muted">{% trans "February 15, 2025" %}</small>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <li class="mb-3">
+                    <a href="#" class="text-decoration-none">
+                        <div class="d-flex">
+                            <img src="{% static 'img/placeholder.jpg' %}" alt="Post" class="img-fluid me-2" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div>
+                                <h6 class="mb-1">{% trans "Post Title 3" %}</h6>
+                                <small class="text-muted">{% trans "February 10, 2025" %}</small>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Tags -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">{% trans "Tags" %}</h5>
+        </div>
+        <div class="card-body">
+            <div class="d-flex flex-wrap gap-2">
+                <a href="#" class="btn btn-sm btn-outline-secondary">{% trans "Tag 1" %}</a>
+                <a href="#" class="btn btn-sm btn-outline-secondary">{% trans "Tag 2" %}</a>
+                <a href="#" class="btn btn-sm btn-outline-secondary">{% trans "Tag 3" %}</a>
+                <a href="#" class="btn btn-sm btn-outline-secondary">{% trans "Tag 4" %}</a>
+                <a href="#" class="btn btn-sm btn-outline-secondary">{% trans "Tag 5" %}</a>
+                <a href="#" class="btn btn-sm btn-outline-secondary">{% trans "Tag 6" %}</a>
+                <a href="#" class="btn btn-sm btn-outline-secondary">{% trans "Tag 7" %}</a>
+                <a href="#" class="btn btn-sm btn-outline-secondary">{% trans "Tag 8" %}</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Área de widgets dinâmicos -->
+    <div class="sidebar-widgets">
+        {% if is_edit_mode and user.is_staff %}
+        {% editable_widget_area 'sidebar_widgets' template_slug='default_sidebar' placeholder='Adicione widgets à sidebar aqui' %}
+        {% else %}
+        {% render_widget_area 'sidebar_widgets' 'default_sidebar' %}
+        {% endif %}
+    </div>
+</div>
+
+# templates/components/include_component.html
+
+{% load static %}
+{% load template_tags %}
+{% load i18n %}
+
+{% if error %}
+<div class="alert alert-danger">
+    {{ error }}
+</div>
+{% else %}
+{% if is_edit_mode and user.is_staff %}
+<div class="component-wrapper" data-component="{{ component.slug }}" data-instance-id="{{ instance_id|default:'' }}">
+    <div class="component-toolbar">
+        <span class="component-name">{{ component.name }}</span>
+        <div class="component-actions">
+            <button type="button" class="btn btn-sm btn-outline-primary edit-component" title="{% trans " Edit Component" %}">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger remove-component" title="{% trans " Remove Component" %}">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+    </div>
+    <div class="component-content">
+        {{ rendered_content|safe }}
+    </div>
+</div>
+{% else %}
+{{ rendered_content|safe }}
+{% endif %}
+{% endif %}
+
+# templates/admin/editable_region_controls.html
+
+{% load static %}
+{% load template_tags %}
+{% load i18n %}
+
+<div class="editable-region" data-region="{{ region.slug }}" data-template="{{ template.slug }}">
+    <div class="region-toolbar">
+        <span class="region-name">{{ region.name }}</span>
+        <div class="region-actions">
+            <button type="button" class="btn btn-sm btn-outline-primary add-component-btn" data-bs-toggle="modal" data-bs-target="#addComponentModal-{{ region.slug }}">
+                <i class="fas fa-plus"></i> {% trans "Add Component" %}
+            </button>
+        </div>
+    </div>
+
+    {% if not content %}
+    <div class="empty-region-placeholder">
+        <p>{{ placeholder }}</p>
+    </div>
+    {% endif %}
+
+    <div class="region-content">
+        <!-- O conteúdo da região será inserido após esta div -->
+    </div>
+</div>
+
+<!-- Modal para adicionar componentes -->
+<div class="modal fade" id="addComponentModal-{{ region.slug }}" tabindex="-1" aria-labelledby="addComponentModalLabel-{{ region.slug }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addComponentModalLabel-{{ region.slug }}">{% trans "Add Component to" %} {{ region.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    {% for component_type, type_name in component_types %}
+                    <div class="col-md-4 mb-4">
+                        <h6>{{ type_name }}</h6>
+                        <div class="list-group">
+                            {% for component in available_components %}
+                            {% if component.component_type == component_type %}
+                            <button type="button" class="list-group-item list-group-item-action add-component" data-component="{{ component.slug }}" data-region="{{ region.slug }}" data-template="{{ template.slug }}">
+                                <div class="d-flex align-items-center">
+                                    {% if component.icon %}
+                                    <i class="{{ component.icon }} me-2"></i>
+                                    {% endif %}
+                                    <span>{{ component.name }}</span>
+                                </div>
+                            </button>
+                            {% endif %}
+                            {% empty %}
+                            <div class="list-group-item text-muted">{% trans "No components available" %}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Close" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+# templates/admin/editable_widget_area_controls.html
+
+{% load static %}
+{% load template_tags %}
+{% load i18n %}
+
+<div class="editable-widget-area" data-area="{{ area.slug }}" data-template="{{ template.slug }}">
+    <div class="widget-area-toolbar">
+        <span class="widget-area-name">{{ area.name }}</span>
+        <div class="widget-area-actions">
+            <button type="button" class="btn btn-sm btn-outline-primary add-widget-btn" data-bs-toggle="modal" data-bs-target="#addWidgetModal-{{ area.slug }}">
+                <i class="fas fa-plus"></i> {% trans "Add Widget" %}
+            </button>
+        </div>
+    </div>
+
+    {% if not content %}
+    <div class="empty-widget-area-placeholder">
+        <p>{{ placeholder }}</p>
+    </div>
+    {% endif %}
+
+    <div class="widget-area-content">
+        <!-- O conteúdo da área de widgets será inserido após esta div -->
+    </div>
+</div>
+
+<!-- Modal para adicionar widgets -->
+<div class="modal fade" id="addWidgetModal-{{ area.slug }}" tabindex="-1" aria-labelledby="addWidgetModalLabel-{{ area.slug }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addWidgetModalLabel-{{ area.slug }}">{% trans "Add Widget to" %} {{ area.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    {% for widget_type, type_name in widget_types %}
+                    <div class="col-md-4 mb-4">
+                        <h6>{{ type_name }}</h6>
+                        <div class="list-group">
+                            {% for widget in available_widgets %}
+                            {% if widget.widget_type == widget_type %}
+                            <button type="button" class="list-group-item list-group-item-action add-widget" data-widget="{{ widget.slug }}" data-area="{{ area.slug }}" data-template="{{ template.slug }}">
+                                <div class="d-flex align-items-center">
+                                    {% if widget.icon %}
+                                    <i class="{{ widget.icon }} me-2"></i>
+                                    {% endif %}
+                                    <span>{{ widget.name }}</span>
+                                </div>
+                            </button>
+                            {% endif %}
+                            {% empty %}
+                            <div class="list-group-item text-muted">{% trans "No widgets available" %}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Close" %}</button>
+            </div>
+        </div>
+    </div>
+</div>

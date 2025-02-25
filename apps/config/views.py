@@ -7,6 +7,7 @@ from django.views.decorators.cache import cache_page
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import DetailView
 from django.views.decorators.http import require_POST
 from .models import Page, SiteStyle, Menu, PageVersionConfig, CustomField, FieldGroup
 from .forms import PageForm, SiteStyleForm, MenuForm, CustomFieldForm, FieldGroupForm
@@ -20,6 +21,7 @@ import logging
 logger = logging.getLogger('config')
 
 ITEMS_PER_PAGE = 10
+
 
 #@login_required
 #@permission_required('config.dashboard_view_config')

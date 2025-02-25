@@ -1,0 +1,10 @@
+<div class="card">
+    <img src="{{ image_url }}" class="card-img-top" alt="{{ image_alt }}">
+    <div class="card-body">
+        <h5 class="card-title">{{ title }}</h5>
+        <p class="card-text">{{ content }}</p>
+        {% if button_text %}
+        <a href="{{ button_url }}" class="btn btn-primary">{{ button_text }}</a>
+        {% endif %}
+    </div>
+</div>

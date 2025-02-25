@@ -1,0 +1,194 @@
+/**
+ * styles.css - Estilos principais para o sistema de CMS
+ */
+
+/* Espaçamento para a barra de ação fixa no rodapé */
+body {
+    padding-bottom: 70px;
+}
+
+/* Estilos para a navegação de breadcrumb */
+.breadcrumb {
+    background-color: #f8f9fa;
+    padding: 0.75rem 1rem;
+    border-radius: 0.25rem;
+}
+
+/* Estilos para a página de detalhes */
+.page-meta {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.page-content img {
+    max-width: 100%;
+    height: auto;
+}
+
+.page-custom-fields .card {
+    transition: all 0.3s ease;
+}
+
+.page-custom-fields .card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Estilos para galerias de imagens */
+.gallery-preview {
+    max-height: 150px;
+    overflow: hidden;
+}
+
+.gallery-preview img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+/* Estilos para comentários */
+.comment-content,
+.reply-content {
+    background-color: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    margin: 0.5rem 0;
+}
+
+/* Estilos para formulários */
+.required label:after {
+    content: "*";
+    color: #dc3545;
+    margin-left: 0.25rem;
+}
+
+.form-help-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+/* Estilos para o editor visual */
+.note-editor {
+    margin-bottom: 1rem;
+}
+
+.CodeMirror {
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    height: auto !important;
+}
+
+/* Estilos para a barra de ação flutuante */
+.action-bar {
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para o modo de edição em regiões e áreas de widgets */
+.editable-region,
+.editable-widget-area {
+    border: 2px dashed #dee2e6;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.25rem;
+    position: relative;
+}
+
+.region-toolbar,
+.widget-area-toolbar {
+    background-color: #f8f9fa;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.empty-region-placeholder,
+.empty-widget-area-placeholder {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    text-align: center;
+    border-radius: 0.25rem;
+    border: 1px dashed #dee2e6;
+}
+
+/* Estilos para componentes e widgets */
+.component-wrapper,
+.widget-wrapper {
+    border: 1px solid #dee2e6;
+    margin-bottom: 1rem;
+    border-radius: 0.25rem;
+    position: relative;
+}
+
+.component-toolbar,
+.widget-toolbar {
+    background-color: #f8f9fa;
+    padding: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.component-content,
+.widget-content {
+    padding: 1rem;
+}
+
+/* Estilos para arrastar e soltar */
+.sortable-ghost {
+    opacity: 0.5;
+    background-color: #e9ecef;
+}
+
+.sortable-chosen {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.sortable-drag {
+    border: 2px dashed #6c757d;
+}
+
+/* Estilos para notificações */
+.badge-notification {
+    position: relative;
+    top: -8px;
+    right: -8px;
+    font-size: 0.6rem;
+    padding: 0.2rem 0.4rem;
+}
+
+/* Estilos para cartões no dashboard */
+.dashboard-card {
+    transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card .icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .action-bar {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .page-meta span {
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .page-meta span.mx-2 {
+        display: none;
+    }
+}

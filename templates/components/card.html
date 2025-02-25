@@ -4,7 +4,7 @@ Uso: {% include 'components/card.html' with title="Título" content="Conteúdo" 
 
 <div class="card mb-4">
     {% if image_url %}
-        <img src="{{ image_url }}" class="card-img-top" alt="{{ title }}">
+        <img src="{{ image_url }}" class="card-img-top" alt="{{ image_alt }}">
     {% endif %}
     <div class="card-body">
         <h5 class="card-title">{{ title }}</h5>

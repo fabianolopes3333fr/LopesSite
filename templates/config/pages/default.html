@@ -1,0 +1,8 @@
+{% extends 'base_cms/base.html' %}
+
+{% block content %}
+<h1>{{ page.title }}</h1>
+{% for block in page.content_blocks.all %}
+{% include block.get_template_name %}
+{% endfor %}
+{% endblock %}

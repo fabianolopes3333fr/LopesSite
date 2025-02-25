@@ -1,0 +1,550 @@
+# Exemplos de Componentes para o sistema de templates
+
+# 1. Card
+"""
+{
+    "name": "Card",
+    "slug": "card",
+    "component_type": "card",
+    "description": "Componente de card com título, imagem, texto e botão",
+    "template_code": """
+<div class="card {{ custom_classes }}">
+    {% if image %}
+        <img src="{{ image }}" class="card-img-top" alt="{{ title|default:'Card image' }}">
+    {% endif %}
+    <div class="card-body">
+        {% if title %}
+            <h5 class="card-title">{{ title }}</h5>
+        {% endif %}
+        {% if subtitle %}
+            <h6 class="card-subtitle mb-2 text-muted">{{ subtitle }}</h6>
+        {% endif %}
+        {% if content %}
+            <p class="card-text">{{ content }}</p>
+        {% endif %}
+        {% if button_text and button_url %}
+            <a href="{{ button_url }}" class="btn btn-{{ button_style|default:'primary' }}">{{ button_text }}</a>
+        {% endif %}
+    </div>
+    {% if footer_text %}
+        <div class="card-footer text-muted">
+            {{ footer_text }}
+        </div>
+    {% endif %}
+</div>
+""",
+    "css_code": "",
+    "js_code": "",
+    "default_context": {
+        "title": "Card Title",
+        "subtitle": "Card Subtitle",
+        "content": "Some quick example text to build on the card title and make up the bulk of the card's content.",
+        "image": "/static/img/placeholder.jpg",
+        "button_text": "Go somewhere",
+        "button_url": "#",
+        "button_style": "primary",
+        "footer_text": ""
+    },
+    "icon": "fas fa-square"
+}
+"""
+
+# 2. Slider/Carousel
+"""
+{
+    "name": "Carousel",
+    "slug": "carousel",
+    "component_type": "carousel",
+    "description": "Componente de carousel para exibir múltiplas imagens em slideshow",
+    "template_code": """
+<div id="carousel-{{ id|default:'carousel' }}" class="carousel slide {{ custom_classes }}" data-bs-ride="carousel">
+    {% if show_indicators %}
+    <div class="carousel-indicators">
+        {% for slide in slides %}
+        <button type="button" data-bs-target="#carousel-{{ id|default:'carousel' }}" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="carousel-inner">
+        {% for slide in slides %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <img src="{{ slide.image }}" class="d-block w-100" alt="{{ slide.alt|default:'Slide' }}">
+            {% if slide.title or slide.subtitle %}
+            <div class="carousel-caption d-none d-md-block">
+                {% if slide.title %}<h5>{{ slide.title }}</h5>{% endif %}
+                {% if slide.subtitle %}<p>{{ slide.subtitle }}</p>{% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if show_controls %}
+    <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ id|default:'carousel' }}" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ id|default:'carousel' }}" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+    {% endif %}
+</div>
+""",
+    "css_code": "",
+    "js_code": "",
+    "default_context": {
+        "id": "demo-carousel",
+        "show_indicators": true,
+        "show_controls": true,
+        "slides": [
+            {
+                "image": "/static/img/slide1.jpg",
+                "alt": "First slide",
+                "title": "First slide label",
+                "subtitle": "Some representative placeholder content for the first slide."
+            },
+            {
+                "image": "/static/img/slide2.jpg",
+                "alt": "Second slide",
+                "title": "Second slide label",
+                "subtitle": "Some representative placeholder content for the second slide."
+            },
+            {
+                "image": "/static/img/slide3.jpg",
+                "alt": "Third slide",
+                "title": "Third slide label",
+                "subtitle": "Some representative placeholder content for the third slide."
+            }
+        ]
+    },
+    "icon": "fas fa-images"
+}
+"""
+
+# 3. Accordion
+"""
+{
+    "name": "Accordion",
+    "slug": "accordion",
+    "component_type": "accordion",
+    "description": "Componente de acordeão para exibir conteúdo em seções expansíveis",
+    "template_code": """
+<div class="accordion {{ custom_classes }}" id="{{ id|default:'accordion' }}">
+    {% for item in items %}
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="heading-{{ id|default:'accordion' }}-{{ forloop.counter }}">
+            <button class="accordion-button {% if not item.expanded %}collapsed{% endif %}" type="button" 
+                    data-bs-toggle="collapse" data-bs-target="#collapse-{{ id|default:'accordion' }}-{{ forloop.counter }}" 
+                    aria-expanded="{{ item.expanded|yesno:'true,false' }}" 
+                    aria-controls="collapse-{{ id|default:'accordion' }}-{{ forloop.counter }}">
+                {{ item.title }}
+            </button>
+        </h2>
+        <div id="collapse-{{ id|default:'accordion' }}-{{ forloop.counter }}" 
+             class="accordion-collapse collapse {% if item.expanded %}show{% endif %}" 
+             aria-labelledby="heading-{{ id|default:'accordion' }}-{{ forloop.counter }}" 
+             {% if parent_only %}data-bs-parent="#{{ id|default:'accordion' }}"{% endif %}>
+            <div class="accordion-body">
+                {{ item.content }}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+""",
+    "css_code": "",
+    "js_code": "",
+    "default_context": {
+        "id": "demo-accordion",
+        "parent_only": true,
+        "items": [
+            {
+                "title": "Accordion Item #1",
+                "content": "This is the first item's accordion body. It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element.",
+                "expanded": true
+            },
+            {
+                "title": "Accordion Item #2",
+                "content": "This is the second item's accordion body. It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element.",
+                "expanded": false
+            },
+            {
+                "title": "Accordion Item #3",
+                "content": "This is the third item's accordion body. It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element.",
+                "expanded": false
+            }
+        ]
+    },
+    "icon": "fas fa-layer-group"
+}
+"""
+
+# 4. Alert
+"""
+{
+    "name": "Alert",
+    "slug": "alert",
+    "component_type": "alert",
+    "description": "Componente de alerta para exibir mensagens importantes",
+    "template_code": """
+<div class="alert alert-{{ type|default:'primary' }} {{ custom_classes }} {% if dismissible %}alert-dismissible fade show{% endif %}" role="alert">
+    {% if icon %}<i class="{{ icon }} me-2"></i>{% endif %}
+    {% if heading %}<h4 class="alert-heading">{{ heading }}</h4>{% endif %}
+    {{ message }}
+    {% if dismissible %}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    {% endif %}
+</div>
+""",
+    "css_code": "",
+    "js_code": "",
+    "default_context": {
+        "type": "primary",
+        "message": "A simple primary alert with an example link. Give it a click if you like.",
+        "heading": "",
+        "icon": "",
+        "dismissible": false
+    },
+    "icon": "fas fa-exclamation-circle"
+}
+"""
+
+# 5. Tabs
+"""
+{
+    "name": "Tabs",
+    "slug": "tabs",
+    "component_type": "nav_tabs",
+    "description": "Componente de abas para organizar conteúdo em múltiplas seções",
+    "template_code": """
+<div class="{{ custom_classes }}">
+    <ul class="nav nav-{{ style|default:'tabs' }} {% if justified %}nav-justified{% endif %}" id="{{ id|default:'tabs' }}" role="tablist">
+        {% for tab in tabs %}
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if forloop.first %}active{% endif %}" 
+                    id="{{ id|default:'tabs' }}-{{ tab.id|default:forloop.counter }}-tab" 
+                    data-bs-toggle="tab" 
+                    data-bs-target="#{{ id|default:'tabs' }}-{{ tab.id|default:forloop.counter }}" 
+                    type="button" role="tab" 
+                    aria-controls="{{ id|default:'tabs' }}-{{ tab.id|default:forloop.counter }}" 
+                    aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+                {% if tab.icon %}<i class="{{ tab.icon }} me-2"></i>{% endif %}
+                {{ tab.title }}
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+    <div class="tab-content" id="{{ id|default:'tabs' }}Content">
+        {% for tab in tabs %}
+        <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" 
+             id="{{ id|default:'tabs' }}-{{ tab.id|default:forloop.counter }}" 
+             role="tabpanel" 
+             aria-labelledby="{{ id|default:'tabs' }}-{{ tab.id|default:forloop.counter }}-tab">
+            <div class="pt-3">
+                {{ tab.content }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+""",
+    "css_code": "",
+    "js_code": "",
+    "default_context": {
+        "id": "demo-tabs",
+        "style": "tabs",
+        "justified": false,
+        "tabs": [
+            {
+                "id": "home",
+                "title": "Home",
+                "icon": "fas fa-home",
+                "content": "This is the home tab content. Raw denim you probably haven't heard of them jean shorts Austin."
+            },
+            {
+                "id": "profile",
+                "title": "Profile",
+                "icon": "fas fa-user",
+                "content": "This is the profile tab content. Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid."
+            },
+            {
+                "id": "contact",
+                "title": "Contact",
+                "icon": "fas fa-envelope",
+                "content": "This is the contact tab content. Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo."
+            }
+        ]
+    },
+    "icon": "fas fa-folder"
+}
+"""
+
+# 6. Modal
+"""
+{
+    "name": "Modal",
+    "slug": "modal",
+    "component_type": "modal",
+    "description": "Componente de modal para exibir conteúdo em janela popup",
+    "template_code": """
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-{{ button_style|default:'primary' }} {{ custom_classes }}" data-bs-toggle="modal" data-bs-target="#{{ id|default:'modal' }}">
+    {% if button_icon %}<i class="{{ button_icon }} me-2"></i>{% endif %}
+    {{ button_text }}
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="{{ id|default:'modal' }}" tabindex="-1" aria-labelledby="{{ id|default:'modal' }}Label" aria-hidden="true">
+    <div class="modal-dialog {% if size %}modal-{{ size }}{% endif %} {% if centered %}modal-dialog-centered{% endif %} {% if scrollable %}modal-dialog-scrollable{% endif %}">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="{{ id|default:'modal' }}Label">{{ title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{ content }}
+            </div>
+            {% if show_footer %}
+            <div class="modal-footer">
+                {% if show_close_button %}
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ close_text }}</button>
+                {% endif %}
+                {% if show_primary_button %}
+                <button type="button" class="btn btn-{{ primary_button_style|default:'primary' }}">{{ primary_button_text }}</button>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+""",
+    "css_code": "",
+    "js_code": "",
+    "default_context": {
+        "id": "demo-modal",
+        "button_text": "Launch modal",
+        "button_style": "primary",
+        "button_icon": "",
+        "title": "Modal title",
+        "content": "Modal body text goes here.",
+        "size": "",
+        "centered": false,
+        "scrollable": false,
+        "show_footer": true,
+        "show_close_button": true,
+        "close_text": "Close",
+        "show_primary_button": true,
+        "primary_button_text": "Save changes",
+        "primary_button_style": "primary"
+    },
+    "icon": "fas fa-window-maximize"
+}
+"""
+
+# 7. Progress
+"""
+{
+    "name": "Progress Bar",
+    "slug": "progress",
+    "component_type": "progress",
+    "description": "Componente de barra de progresso para exibir o progresso de uma tarefa",
+    "template_code": """
+<div class="{{ custom_classes }}">
+    {% if label %}<label>{{ label }}</label>{% endif %}
+    <div class="progress {% if height %}progress-{{ height }}{% endif %}">
+        <div class="progress-bar bg-{{ type|default:'primary' }} {% if striped %}progress-bar-striped{% endif %} {% if animated %}progress-bar-animated{% endif %}" 
+             role="progressbar" 
+             style="width: {{ value }}%" 
+             aria-valuenow="{{ value }}" 
+             aria-valuemin="0" 
+             aria-valuemax="100">
+            {% if show_percentage %}{{ value }}%{% endif %}
+        </div>
+    </div>
+</div>
+""",
+    "css_code": "",
+    "js_code": "",
+    "default_context": {
+        "value": 50,
+        "type": "primary",
+        "striped": false,
+        "animated": false,
+        "height": "",
+        "label": "Progress",
+        "show_percentage": true
+    },
+    "icon": "fas fa-tasks"
+}
+"""
+
+# 8. Gallery
+"""
+{
+    "name": "Gallery",
+    "slug": "gallery",
+    "component_type": "gallery",
+    "description": "Componente de galeria para exibir múltiplas imagens em grade",
+    "template_code": """
+<div class="row {{ custom_classes }}">
+    {% for image in images %}
+    <div class="col-{{ cols|default:'md-4' }} mb-4">
+        <div class="card h-100">
+            <a href="{{ image.full|default:image.thumbnail }}" class="gallery-item" data-fancybox="gallery-{{ id|default:'gallery' }}">
+                <img src="{{ image.thumbnail }}" class="card-img-top" alt="{{ image.alt|default:'Gallery image' }}">
+            </a>
+            {% if image.title or image.description %}
+            <div class="card-body">
+                {% if image.title %}<h5 class="card-title">{{ image.title }}</h5>{% endif %}
+                {% if image.description %}<p class="card-text">{{ image.description }}</p>{% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+""",
+    "css_code": "",
+    "js_code": """
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if Fancybox is available
+    if (typeof Fancybox !== 'undefined') {
+        Fancybox.bind('[data-fancybox]', {
+            // Fancybox options
+        });
+    }
+});
+""",
+    "default_context": {
+        "id": "demo-gallery",
+        "cols": "md-4",
+        "images": [
+            {
+                "thumbnail": "/static/img/gallery1-thumb.jpg",
+                "full": "/static/img/gallery1.jpg",
+                "alt": "Gallery image 1",
+                "title": "Image 1",
+                "description": "Description for image 1"
+            },
+            {
+                "thumbnail": "/static/img/gallery2-thumb.jpg",
+                "full": "/static/img/gallery2.jpg",
+                "alt": "Gallery image 2",
+                "title": "Image 2",
+                "description": "Description for image 2"
+            },
+            {
+                "thumbnail": "/static/img/gallery3-thumb.jpg",
+                "full": "/static/img/gallery3.jpg",
+                "alt": "Gallery image 3",
+                "title": "Image 3",
+                "description": "Description for image 3"
+            }
+        ]
+    },
+    "icon": "fas fa-images"
+}
+"""
+
+# 9. Button Group
+"""
+{
+    "name": "Button Group",
+    "slug": "button_group",
+    "component_type": "button_group",
+    "description": "Componente de grupo de botões para agrupar botões relacionados",
+    "template_code": """
+<div class="btn-group{% if size %}-{{ size }}{% endif %} {{ custom_classes }}" role="group" aria-label="{{ label|default:'Button group' }}">
+    {% for button in buttons %}
+    <button type="button" class="btn btn-{{ button.style|default:'primary' }}" {% if button.disabled %}disabled{% endif %}>
+        {% if button.icon %}<i class="{{ button.icon }} {% if button.text %}me-2{% endif %}"></i>{% endif %}
+        {{ button.text|default:'' }}
+    </button>
+    {% endfor %}
+</div>
+""",
+    "css_code": "",
+    "js_code": "",
+    "default_context": {
+        "label": "Button group example",
+        "size": "",
+        "buttons": [
+            {
+                "text": "Left",
+                "style": "primary",
+                "icon": "",
+                "disabled": false
+            },
+            {
+                "text": "Middle",
+                "style": "primary",
+                "icon": "",
+                "disabled": false
+            },
+            {
+                "text": "Right",
+                "style": "primary",
+                "icon": "",
+                "disabled": false
+            }
+        ]
+    },
+    "icon": "fas fa-grip-horizontal"
+}
+"""
+
+# 10. Breadcrumb
+"""
+{
+    "name": "Breadcrumb",
+    "slug": "breadcrumb",
+    "component_type": "breadcrumb",
+    "description": "Componente de navegação breadcrumb para indicar a localização atual do usuário",
+    "template_code": """
+<nav aria-label="breadcrumb" class="{{ custom_classes }}">
+    <ol class="breadcrumb">
+        {% for item in items %}
+        <li class="breadcrumb-item {% if item.active %}active{% endif %}" {% if item.active %}aria-current="page"{% endif %}>
+            {% if item.active %}
+                {% if item.icon %}<i class="{{ item.icon }} me-2"></i>{% endif %}
+                {{ item.text }}
+            {% else %}
+                <a href="{{ item.url }}">
+                    {% if item.icon %}<i class="{{ item.icon }} me-2"></i>{% endif %}
+                    {{ item.text }}
+                </a>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+</nav>
+""",
+    "css_code": "",
+    "js_code": "",
+    "default_context": {
+        "items": [
+            {
+                "text": "Home",
+                "url": "/",
+                "icon": "fas fa-home",
+                "active": false
+            },
+            {
+                "text": "Library",
+                "url": "/library/",
+                "icon": "",
+                "active": false
+            },
+            {
+                "text": "Data",
+                "url": "",
+                "icon": "",
+                "active": true
+            }
+        ]
+    },
+    "icon": "fas fa-route"
+}
+"""
