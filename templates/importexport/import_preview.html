@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Import Preview" %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1>{% trans "Import Preview" %}</h1>
+        <p class="lead">{% trans "Review and confirm the import operation" %}</p>
+
+        <!-- Import Summary -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">{% trans "Import Summary" %}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>{% trans "File:" %}</strong> {{ file_name }}</p>
+                        <p><strong>{% trans "Size:" %}</strong> {{ file_size|filesizeformat }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>{% trans "Total Pages:" %}</strong> {{ total_pages }}</p>
+                        <p>
+                            <strong>{% trans "Pages Preview:" %}</strong>
+                            {% if total_pages > 10 %}
+                            {% trans "Showing first 10 of" %} {{ total_pages }}
+                            {% else %}
+                            {% trans "Showing all" %} {{ total_pages }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="alert alert-success">
+                            <h6>{% trans "New Pages" %}</h6>
+                            <p class="mb-0">{{ new_pages }} {% trans "pages will be created" %}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="alert alert-warning">
+                            <h6>{% trans "Existing Pages" %}</h6>
+                            <p class="mb-0">{{ existing_pages }} {% trans "pages already exist" %}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Import Options -->
+        <form method="post" action="{% url 'importexport:import_process' %}">
+            {% csrf_token %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{% trans "Import Options" %}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="duplicate_action" class="form-label">{% trans "When a page already exists:" %}</label>
+                        <select class="form-select" id="duplicate_action" name="duplicate_action">
+                            <option value="skip">{% trans "Skip (don't import)" %}</option>
+                            <option value="update">{% trans "Update existing page" %}</option>
+                            <option value="create_new">{% trans "Create as new page (with new slug)" %}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="update_author" name="update_author">
+                            <label class="form-check-label" for="update_author">
+                                {% trans "Update original author if specified in import file" %}
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 update-options" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">{% trans "When updating existing pages:" %}</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="replace_fields" name="replace_fields">
+                                    <label class="form-check-label" for="replace_fields">
+                                        {% trans "Replace all custom fields (instead of only updating existing)" %}
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="replace_meta" name="replace_meta">
+                                    <label class="form-check-label" for="replace_meta">
+                                        {% trans "Replace all metadata (instead of only updating existing)" %}
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="replace_galleries" name="replace_galleries">
+                                    <label class="form-check-label" for="replace_galleries">
+                                        {% trans "Replace all galleries and images (instead of only adding new)" %}
+                                    </label>
+                                </div>
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="checkbox" id="replace_categories" name="replace_categories">
+                                    <label class="form-check-label" for="replace_categories">
+                                        {% trans "Replace all categories (instead of adding to existing)" %}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pages Preview -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{% trans "Pages Preview" %}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th width="40%">{% trans "Title" %}</th>
+                                    <th width="20%">{% trans "Slug" %}</th>
+                                    <th width="20%">{% trans "Template" %}</th>
+                                    <th width="20%">{% trans "Status" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for page in pages_preview %}
+                                <tr>
+                                    <td>{{ page.title }}</td>
+                                    <td>{{ page.slug }}</td>
+                                    <td>{{ page.template }}</td>
+                                    <td>
+                                        {% if page.status == 'published' %}
+                                        <span class="badge bg-success">{% trans "Published" %}</span>
+                                        {% elif page.status == 'draft' %}
+                                        <span class="badge bg-secondary">{% trans "Draft" %}</span>
+                                        {% elif page.status == 'review' %}
+                                        <span class="badge bg-info">{% trans "In Review" %}</span>
+                                        {% elif page.status == 'scheduled' %}
+                                        <span class="badge bg-warning">{% trans "Scheduled" %}</span>
+                                        {% elif page.status == 'archived' %}
+                                        <span class="badge bg-dark">{% trans "Archived" %}</span>
+                                        {% else %}
+                                        <span class="badge bg-light text-dark">{{ page.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-end mb-4">
+                <a href="{% url 'importexport:import_form' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-1"></i> {% trans "Cancel" %}
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-file-import me-1"></i> {% trans "Import Content" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Show update options only when "update" is selected
+        const duplicateAction = document.getElementById('duplicate_action');
+        const updateOptions = document.querySelector('.update-options');
+
+        duplicateAction.addEventListener('change', function () {
+            if (duplicateAction.value === 'update') {
+                updateOptions.style.display = 'block';
+            } else {
+                updateOptions.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

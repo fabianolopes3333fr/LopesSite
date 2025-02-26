@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Export Content" %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1>{% trans "Export Content" %}</h1>
+        <p class="lead">{% trans "Select pages to export to different formats" %}</p>
+
+        <!-- Filters -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">{% trans "Filters" %}</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" action="{% url 'importexport:export_list' %}" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="search" class="form-label">{% trans "Search" %}</label>
+                        <input type="text" class="form-control" id="search" name="search" value="{{ search }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="status" class="form-label">{% trans "Status" %}</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">{% trans "All" %}</option>
+                            {% for status_value, status_label in status_choices %}
+                            <option value="{{ status_value }}" {% if status==status_value %}selected{% endif %}>{{ status_label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="category" class="form-label">{% trans "Category" %}</label>
+                        <select class="form-select" id="category" name="category">
+                            <option value="">{% trans "All" %}</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.slug }}" {% if category==cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">{% trans "Filter" %}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Export Form -->
+        <form method="post" action="{% url 'importexport:export_selected' %}">
+            {% csrf_token %}
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">{% trans "Pages" %}</h5>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-outline-primary select-all">{% trans "Select All" %}</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary deselect-all">{% trans "Deselect All" %}</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if page_obj %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th width="5%"><input type="checkbox" id="select-all-checkbox"></th>
+                                    <th width="40%">{% trans "Title" %}</th>
+                                    <th width="15%">{% trans "Status" %}</th>
+                                    <th width="20%">{% trans "Last Updated" %}</th>
+                                    <th width="20%">{% trans "Categories" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for page in page_obj %}
+                                <tr>
+                                    <td><input type="checkbox" name="selected_pages" value="{{ page.id }}" class="page-checkbox"></td>
+                                    <td>
+                                        <strong>{{ page.title }}</strong>
+                                        <small class="d-block text-muted">{{ page.slug }}</small>
+                                    </td>
+                                    <td>
+                                        {% if page.status == 'published' %}
+                                        <span class="badge bg-success">{% trans "Published" %}</span>
+                                        {% elif page.status == 'draft' %}
+                                        <span class="badge bg-secondary">{% trans "Draft" %}</span>
+                                        {% elif page.status == 'review' %}
+                                        <span class="badge bg-info">{% trans "In Review" %}</span>
+                                        {% elif page.status == 'scheduled' %}
+                                        <span class="badge bg-warning">{% trans "Scheduled" %}</span>
+                                        {% elif page.status == 'archived' %}
+                                        <span class="badge bg-dark">{% trans "Archived" %}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ page.updated_at|date:"d M Y, H:i" }}</td>
+                                    <td>
+                                        {% for cat in page.categories.all %}
+                                        <span class="badge bg-light text-dark">{{ cat.name }}</span>
+                                        {% empty %}
+                                        <span class="text-muted">{% trans "No category" %}</span>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                    <nav aria-label="{% trans 'Page navigation' %}" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if category %}&category={{ category }}{% endif %}" aria-label="{% trans 'First' %}">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if category %}&category={{ category }}{% endif %}" aria-label="{% trans 'Previous' %}">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <li class="page-item"><a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if category %}&category={{ category }}{% endif %}">{{ num }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if category %}&category={{ category }}{% endif %}" aria-label="{% trans 'Next' %}">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if category %}&category={{ category }}{% endif %}" aria-label="{% trans 'Last' %}">
+                                        <span aria-hidden="true">&raquo;&raquo;</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                    {% else %}
+                    <div class="alert alert-info">
+                        {% trans "No pages found." %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Export Options -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{% trans "Export Options" %}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="export_format" class="form-label">{% trans "Export Format" %}</label>
+                            <select class="form-select" id="export_format" name="export_format" required>
+                                <option value="json">JSON</option>
+                                <option value="xml">XML</option>
+                                <option value="csv">CSV</option>
+                                <option value="yaml">YAML</option>
+                                <option value="zip">ZIP (with media files)</option>
+                            </select>
+                            <div class="form-text">{% trans "Choose the format for your exported content" %}</div>
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary" id="export-button" disabled>
+                                <i class="fas fa-download me-1"></i> {% trans "Export Selected Pages" %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle select all checkbox
+        const selectAllCheckbox = document.getElementById('select-all-checkbox');
+        const pageCheckboxes = document.querySelectorAll('.page-checkbox');
+        const exportButton = document.getElementById('export-button');
+
+        // Enable export button if at least one page is selected
+        function updateExportButton() {
+            const selectedCount = document.querySelectorAll('.page-checkbox:checked').length;
+            exportButton.disabled = selectedCount === 0;
+            if (selectedCount > 0) {
+                exportButton.textContent = `Export ${selectedCount} Selected Page${selectedCount > 1 ? 's' : ''}`;
+            } else {
+                exportButton.textContent = 'Export Selected Pages';
+            }
+        }
+
+        // Toggle all checkboxes
+        selectAllCheckbox.addEventListener('change', function () {
+            pageCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+            updateExportButton();
+        });
+
+        // Update select all checkbox when individual checkboxes change
+        pageCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                const allChecked = Array.from(pageCheckboxes).every(c => c.checked);
+                const anyChecked = Array.from(pageCheckboxes).some(c => c.checked);
+
+                selectAllCheckbox.checked = allChecked;
+                selectAllCheckbox.indeterminate = anyChecked && !allChecked;
+
+                updateExportButton();
+            });
+        });
+
+        // Button to select all
+        document.querySelector('.select-all').addEventListener('click', function () {
+            pageCheckboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+            updateExportButton();
+        });
+
+        // Button to deselect all
+        document.querySelector('.deselect-all').addEventListener('click', function () {
+            pageCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+            updateExportButton();
+        });
+
+        // Initial button state
+        updateExportButton();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Detalhes da Solicitação de Revisão" %} - {{ revision_request.page.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">{% trans "Detalhes da Solicitação de Revisão" %}</h1>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">{{ revision_request.page.title }}</h5>
+            <p class="card-text"><strong>{% trans "Status" %}:</strong> {{ revision_request.get_status_display }}</p>
+            <p class="card-text"><strong>{% trans "Solicitado por" %}:</strong> {{ revision_request.requested_by.get_full_name }}</p>
+            <p class="card-text"><strong>{% trans "Data da Solicitação" %}:</strong> {{ revision_request.requested_at|date:"d/m/Y H:i" }}</p>
+            <p class="card-text"><strong>{% trans "Comentário" %}:</strong> {{ revision_request.comment }}</p>
+
+            {% if revision_request.reviewer %}
+            <p class="card-text"><strong>{% trans "Revisor" %}:</strong> {{ revision_request.reviewer.get_full_name }}</p>
+            {% endif %}
+
+            {% if revision_request.reviewer_comment %}
+            <p class="card-text"><strong>{% trans "Comentário do Revisor" %}:</strong> {{ revision_request.reviewer_comment }}</p>
+            {% endif %}
+
+            {% if revision_request.completed_at %}
+            <p class="card-text"><strong>{% trans "Data de Conclusão" %}:</strong> {{ revision_request.completed_at|date:"d/m/Y H:i" }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if revision_request.status == 'pending' and perms.pages.can_review_pages %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">{% trans "Ações de Revisão" %}</h5>
+            <form method="post" action="{% url 'pages:revision_request_review' revision_request.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="reviewer_comment">{% trans "Comentário do Revisor" %}</label>
+                    <textarea name="reviewer_comment" id="reviewer_comment" class="form-control" rows="3"></textarea>
+                </div>
+                <button type="submit" name="action" value="approve" class="btn btn-success mt-2">{% trans "Aprovar" %}</button>
+                <button type="submit" name="action" value="reject" class="btn btn-danger mt-2">{% trans "Rejeitar" %}</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <a href="{% url 'pages:revision_request_list' %}" class="btn btn-secondary">{% trans "Voltar para a lista" %}</a>
+</div>
+{% endblock %}

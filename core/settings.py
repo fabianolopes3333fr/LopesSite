@@ -66,6 +66,8 @@ THIRD_APPS = [ # são as Lib/app que instalamos no projeto
     'crispy_forms',
     'crispy_bootstrap5',
     'redis',
+    'rest_framework',
+    
     
 
     
@@ -83,6 +85,9 @@ PROJECT_APPS = [ # são os apps que criamos no projeto
     'apps.config',
     'apps.pages',
     'apps.widgets',
+    'apps.api',
+    'apps.importexport',
+    'apps.cdn',
 ]
 
 # INSTALLED_APPS é a variavel que django entende para fazer a leitura \

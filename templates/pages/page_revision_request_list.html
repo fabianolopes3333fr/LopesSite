@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Solicitações de Revisão de Páginas" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">{% trans "Solicitações de Revisão de Páginas" %}</h1>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">{% trans "Filtros" %}</h5>
+            <form method="get" action="{% url 'pages:revision_request_list' %}">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="status">{% trans "Status" %}</label>
+                        <select name="status" id="status" class="form-control">
+                            <option value="">{% trans "Todos" %}</option>
+                            <option value="pending">{% trans "Pendente" %}</option>
+                            <option value="approved">{% trans "Aprovado" %}</option>
+                            <option value="rejected">{% trans "Rejeitado" %}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="date_from">{% trans "Data de" %}</label>
+                        <input type="date" name="date_from" id="date_from" class="form-control">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="date_to">{% trans "Data até" %}</label>
+                        <input type="date" name="date_to" id="date_to" class="form-control">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="page">{% trans "Página" %}</label>
+                        <input type="text" name="page" id="page" class="form-control" placeholder="{% trans 'Título da página' %}">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">{% trans "Filtrar" %}</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de solicitações -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{% trans "Solicitações de Revisão" %}</h5>
+            {% if revision_requests %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>{% trans "Página" %}</th>
+                            <th>{% trans "Solicitado por" %}</th>
+                            <th>{% trans "Status" %}</th>
+                            <th>{% trans "Data da Solicitação" %}</th>
+                            <th>{% trans "Ações" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in revision_requests %}
+                        <tr>
+                            <td>{{ request.page.title }}</td>
+                            <td>{{ request.requested_by.get_full_name }}</td>
+                            <td><span class="badge {% if request.status == 'pending' %}bg-warning{% elif request.status == 'approved' %}bg-success{% else %}bg-danger{% endif %}">{{ request.get_status_display }}</span></td>
+                            <td>{{ request.requested_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'pages:revision_request_detail' request.id %}" class="btn btn-sm btn-info">{% trans "Detalhes" %}</a>
+                                {% if request.status == 'pending' and perms.pages.can_review_pages %}
+                                <a href="{% url 'pages:revision_request_review' request.id %}" class="btn btn-sm btn-primary">{% trans "Revisar" %}</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginação -->
+            {% include "partials/pagination.html" with page_obj=revision_requests %}
+
+            {% else %}
+            <p>{% trans "Nenhuma solicitação de revisão encontrada." %}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        document.getElementById('status').value = urlParams.get('status') || '';
+        document.getElementById('date_from').value = urlParams.get('date_from') || '';
+        document.getElementById('date_to').value = urlParams.get('date_to') || '';
+        document.getElementById('page').value = urlParams.get('page') || '';
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Notificações de Páginas" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">{% trans "Notificações de Páginas" %}</h1>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">{% trans "Filtros" %}</h5>
+            <form method="get" action="{% url 'pages:notification_list' %}">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="type">{% trans "Tipo" %}</label>
+                        <select name="type" id="type" class="form-control">
+                            <option value="">{% trans "Todos" %}</option>
+                            {% for type, label in notification_types %}
+                            <option value="{{ type }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="date_from">{% trans "Data de" %}</label>
+                        <input type="date" name="date_from" id="date_from" class="form-control">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="date_to">{% trans "Data até" %}</label>
+                        <input type="date" name="date_to" id="date_to" class="form-control">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">{% trans "Filtrar" %}</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de notificações -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{% trans "Notificações" %}</h5>
+            {% if notifications %}
+            <div class="list-group">
+                {% for notification in notifications %}
+                <a href="{% url 'pages:notification_detail' notification.id %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ notification.get_type_display }}</h5>
+                        <small>{{ notification.created_at|date:"d/m/Y H:i" }}</small>
+                    </div>
+                    <p class="mb-1">{{ notification.message|truncatewords:20 }}</p>
+                    <small>{% trans "Página" %}: {{ notification.page.title }}</small>
+                </a>
+                {% endfor %}
+            </div>
+
+            <!-- Paginação -->
+            {% include "partials/pagination.html" with page_obj=notifications %}
+
+            {% else %}
+            <p>{% trans "Nenhuma notificação encontrada." %}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        document.getElementById('type').value = urlParams.get('type') || '';
+        document.getElementById('date_from').value = urlParams.get('date_from') || '';
+        document.getElementById('date_to').value = urlParams.get('date_to') || '';
+    });
+</script>
+{% endblock %}

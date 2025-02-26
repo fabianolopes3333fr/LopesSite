@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Detalhes da Notificação" %} - {{ notification.get_type_display }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">{% trans "Detalhes da Notificação" %}</h1>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ notification.get_type_display }}</h5>
+            <p class="card-text"><strong>{% trans "Data" %}:</strong> {{ notification.created_at|date:"d/m/Y H:i" }}</p>
+            <p class="card-text"><strong>{% trans "Página" %}:</strong> <a href="{{ notification.page.get_absolute_url }}">{{ notification.page.title }}</a></p>
+            <p class="card-text"><strong>{% trans "Mensagem" %}:</strong> {{ notification.message }}</p>
+
+            {% if notification.actor %}
+            <p class="card-text"><strong>{% trans "Realizado por" %}:</strong> {{ notification.actor.get_full_name }}</p>
+            {% endif %}
+
+            {% if notification.data %}
+            <h6>{% trans "Informações adicionais" %}:</h6>
+            <pre>{{ notification.data|pprint }}</pre>
+            {% endif %}
+        </div>
+    </div>
+
+    <a href="{% url 'pages:notification_list' %}" class="btn btn-secondary mt-3">{% trans "Voltar para a lista" %}</a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Você pode adicionar JavaScript personalizado aqui, se necessário
+</script>
+{% endblock %}

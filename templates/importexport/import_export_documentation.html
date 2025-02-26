@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Import/Export Documentation" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .doc-section {
+        margin-bottom: 2rem;
+    }
+
+    .doc-section h3 {
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .doc-image {
+        max-width: 100%;
+        height: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        margin: 1rem 0;
+    }
+
+    .format-table th {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <!-- Table of Contents -->
+        <div class="card mb-4 sticky-top" style="top: 2rem; z-index: 1000;">
+            <div class="card-header">
+                <h5 class="card-title mb-0">{% trans "Contents" %}</h5>
+            </div>
+            <div class="card-body">
+                <nav id="toc" class="nav flex-column">
+                    <a class="nav-link" href="#introduction">{% trans "Introduction" %}</a>
+                    <a class="nav-link" href="#exporting">{% trans "Exporting Content" %}</a>
+                    <a class="nav-link" href="#importing">{% trans "Importing Content" %}</a>
+                    <a class="nav-link" href="#formats">{% trans "File Formats" %}</a>
+                    <a class="nav-link" href="#troubleshooting">{% trans "Troubleshooting" %}</a>
+                    <a class="nav-link" href="#best-practices">{% trans "Best Practices" %}</a>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <h1>{% trans "Import/Export Documentation" %}</h1>
+
+        <!-- Introduction -->
+        <div id="introduction" class="doc-section">
+            <h3>{% trans "Introduction" %}</h3>
+            <p>
+                {% trans "The Import/Export system allows you to transfer content between different environments or backup your content. You can export pages, including their metadata, custom fields, and media files, and import them into another system." %}
+            </p>
+            <p>
+                {% trans "This system supports multiple file formats to accommodate different use cases:" %}
+            </p>
+            <ul>
+                <li><strong>JSON</strong> - {% trans "Full featured exports with all metadata" %}</li>
+                <li><strong>CSV</strong> - {% trans "Simple format for basic page data" %}</li>
+                <li><strong>ZIP</strong> - {% trans "Complete exports including media files" %}</li>
+            </ul>
+        </div>
+
+        <!-- Exporting Content -->
+        <div id="exporting" class="doc-section">
+            <h3>{% trans "Exporting Content" %}</h3>
+            <p>
+                {% trans "To export content from your CMS:" %}
+            </p>
+
+            <ol>
+                <li>{% trans "Navigate to" %} <code>Import/Export &gt; Export Content</code> {% trans "in the main menu" %}</li>
+                <li>{% trans "Use the filters to find the pages you want to export" %}</li>
+                <li>{% trans "Select the pages by checking the boxes (or use 'Select All')" %}</li>
+                <li>{% trans "Choose an export format from the dropdown menu:" %}
+                    <ul>
+                        <li><strong>JSON</strong> - {% trans "For full data including custom fields" %}</li>
+                        <li><strong>XML</strong> - {% trans "Alternative structured format" %}</li>
+                        <li><strong>CSV</strong> - {% trans "For simple tabular data (basic fields only)" %}</li>
+                        <li><strong>YAML</strong> - {% trans "Human-readable alternative to JSON" %}</li>
+                        <li><strong>ZIP</strong> - {% trans "For complete export with media files" %}</li>
+                    </ul>
+                </li>
+                <li>{% trans "Click 'Export Selected Pages'" %}</li>
+                <li>{% trans "The file will be downloaded to your computer" %}</li>
+            </ol>
+
+            <div class="alert alert-info">
+                <strong>{% trans "Tip:" %}</strong> {% trans "For a complete backup including all media files, use the ZIP format. For data migration without media, JSON is recommended." %}
+            </div>
+        </div>
+
+        <!-- Importing Content -->
+        <div id="importing" class="doc-section">
+            <h3>{% trans "Importing Content" %}</h3>
+            <p>
+                {% trans "To import content into your CMS:" %}
+            </p>
+
+            <ol>
+                <li>{% trans "Navigate to" %} <code>Import/Export &gt; Import Content</code> {% trans "in the main menu" %}</li>
+                <li>{% trans "Click 'Choose File' and select the file to import" %}</li>
+                <li>{% trans "Click 'Upload & Preview'" %}</li>
+                <li>{% trans "Review the import summary and preview of pages to be imported" %}</li>
+                <li>{% trans "Configure import options:" %}
+                    <ul>
+                        <li><strong>{% trans "When a page already exists" %}</strong> - {% trans "Choose to skip, update, or create a new page" %}</li>
+                        <li><strong>{% trans "Update original author" %}</strong> - {% trans "Whether to set the original author from the import file" %}</li>
+                        <li>{% trans "For updates, choose whether to replace fields, metadata, galleries, and categories" %}</li>
+                    </ul>
+                </li>
+                <li>{% trans "Click 'Import Content' to begin the import process" %}</li>
+                <li>{% trans "Wait for the confirmation message, then browse to see the imported pages" %}</li>
+            </ol>
+
+            <div class="alert alert-warning">
+                <strong>{% trans "Important:" %}</strong> {% trans "Before importing, make sure that any referenced templates, categories, and parent pages already exist in the system." %}
+            </div>
+        </div>
+
+        <!-- File Formats -->
+        <div id="formats" class="doc-section">
+            <h3>{% trans "File Formats" %}</h3>
+
+            <table class="table table-bordered format-table">
+                <thead>
+                    <tr>
+                        <th>{% trans "Format" %}</th>
+                        <th>{% trans "Pros" %}</th>
+                        <th>{% trans "Cons" %}</th>
+                        <th>{% trans "Best For" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>JSON</td>
+                        <td>
+                            <ul>
+                                <li>{% trans "Preserves all metadata" %}</li>
+                                <li>{% trans "Includes custom fields" %}</li>
+                                <li>{% trans "Maintains relationships" %}</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                <li>{% trans "Doesn't include media files" %}</li>
+                                <li>{% trans "Large files can be difficult to edit manually" %}</li>
+                            </ul>
+                        </td>
+                        <td>{% trans "Migrating content between environments without media" %}</td>
+                    </tr>
+                    <tr>
+                        <td>CSV</td>
+                        <td>
+                            <ul>
+                                <li>{% trans "Simple, tabular format" %}</li>
+                                <li>{% trans "Can be edited in Excel or similar tools" %}</li>
+                                <li>{% trans "Good for batch imports" %}</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                <li>{% trans "Limited to basic fields only" %}</li>
+                                <li>{% trans "No custom fields or complex data" %}</li>
+                                <li>{% trans "No media files" %}</li>
+                            </ul>
+                        </td>
+                        <td>{% trans "Bulk creation of simple pages or spreadsheet integration" %}</td>
+                    </tr>
+                    <tr>
+                        <td>ZIP</td>
+                        <td>
+                            <ul>
+                                <li>{% trans "Includes all page data" %}</li>
+                                <li>{% trans "Includes media files" %}</li>
+                                <li>{% trans "Complete backup solution" %}</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                <li>{% trans "Larger file size" %}</li>
+                                <li>{% trans "More complex to manage manually" %}</li>
+                                <li>{% trans "Requires correct file structure" %}</li>
+                            </ul>
+                        </td>
+                        <td>{% trans "Complete site migration or backup with media files" %}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div id="troubleshooting" class="doc-section">
+            <h3>{% trans "Troubleshooting" %}</h3>
+
+            <div class="accordion" id="troubleshootingAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            {% trans "Import fails with 'Template not found' error" %}
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#troubleshootingAccordion">
+                        <div class="accordion-body">
+                            <p>{% trans "This error occurs when the import file references a template that doesn't exist in the target system." %}</p>
+                            <p><strong>{% trans "Solution:" %}</strong></p>
+                            <ol>
+                                <li>{% trans "Create the missing template in the target system with the same slug" %}</li>
+                                <li>{% trans "Alternatively, edit the import file to use an existing template slug" %}</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            {% trans "Images are missing after import" %}
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#troubleshootingAccordion">
+                        <div class="accordion-body">
+                            <p>{% trans "This typically happens when importing from JSON or CSV formats, which don't include media files." %}</p>
+                            <p><strong>{% trans "Solution:" %}</strong></p>
+                            <ol>
+                                <li>{% trans "Use ZIP format for exports that need to include media" %}</li>
+                                <li>{% trans "Manually copy media files from the source to the target environment" %}</li>
+                                <li>{% trans "Ensure media paths in both environments match" %}</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            {% trans "Custom fields are not imported correctly" %}
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#troubleshootingAccordion">
+                        <div class="accordion-body">
+                            <p>{% trans "Custom fields may not import correctly if the field definitions differ between environments." %}</p>
+                            <p><strong>{% trans "Solution:" %}</strong></p>
+                            <ol>
+                                <li>{% trans "Ensure the target system has the same templates with identical field groups and definitions" %}</li>
+                                <li>{% trans "Check that field slugs match exactly between environments" %}</li>
+                                <li>{% trans "Use the 'replace_fields' option when updating existing pages" %}</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            {% trans "Import results in 'File too large' error" %}
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#troubleshootingAccordion">
+                        <div class="accordion-body">
+                            <p>{% trans "PHP or server settings may limit the size of file uploads." %}</p>
+                            <p><strong>{% trans "Solution:" %}</strong></p>
+                            <ol>
+                                <li>{% trans "Split your export into smaller files with fewer pages" %}</li>
+                                <li>{% trans "Increase PHP upload limits in php.ini (upload_max_filesize and post_max_size)" %}</li>
+                                <li>{% trans "For ZIP files with media, consider using FTP to transfer files instead" %}</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Best Practices -->
+        <div id="best-practices" class="doc-section">
+            <h3>{% trans "Best Practices" %}</h3>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{% trans "Creating Backups" %}</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>{% trans "Schedule regular exports of your content using the ZIP format" %}</li>
+                        <li>{% trans "Store backups in a secure location separate from your hosting environment" %}</li>
+                        <li>{% trans "Include a date in your backup file names for easy identification" %}</li>
+                        <li>{% trans "Test restoring from your backups periodically to ensure they work" %}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{% trans "Migrating Between Environments" %}</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>{% trans "Ensure templates, categories, and user accounts exist in the target system before importing" %}</li>
+                        <li>{% trans "Always test imports on a staging environment before production" %}</li>
+                        <li>{% trans "Use the same system version in both source and target environments when possible" %}</li>
+                        <li>{% trans "Create a backup of the target system before performing large imports" %}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{% trans "Bulk Content Creation" %}</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>{% trans "Use CSV for creating multiple simple pages at once" %}</li>
+                        <li>{% trans "Create a template CSV by exporting a few example pages first" %}</li>
+                        <li>{% trans "For pages with custom fields, create one page manually first, then export as JSON to use as a template" %}</li>
+                        <li>{% trans "When importing to create new content, use 'create_new' for the duplicate action to avoid conflicts" %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Smooth scrolling for table of contents
+    document.addEventListener('DOMContentLoaded', function () {
+        const tocLinks = document.querySelectorAll('#toc a');
+        tocLinks.forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                window.scrollTo({
+                    top: targetElement.offsetTop - 20,
+                    behavior: 'smooth'
+                });
+
+                // Update active link
+                tocLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Highlight active section on scroll
+        window.addEventListener('scroll', function () {
+            const scrollPosition = window.scrollY;
+
+            document.querySelectorAll('.doc-section').forEach(section => {
+                if (section.offsetTop <= scrollPosition + 100) {
+                    const id = section.getAttribute('id');
+                    tocLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${id}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

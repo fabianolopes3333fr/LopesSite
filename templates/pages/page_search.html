@@ -2,18 +2,19 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% if current_category %}{{ current_category.name }} - {% endif %}{% trans "Pages" %}{% endblock %}
+{% block title %}{% trans "Search Results" %} - {% if query %}{{ query }}{% else %}{% trans "All Pages" %}{% endif %}{% endblock %}
 
-{% block meta_description %}{% trans "List of pages" %}{% if current_category %} {% trans "in category" %} {{ current_category.name }}{% endif %}{% endblock %}
+{% block meta_description %}{% trans "Search results for pages" %}{% if query %} {% trans "matching" %} "{{ query }}"{% endif %}{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">{% trans "Pages" %}{% if current_category %} - {{ current_category.name }}{% endif %}</h1>
+    <h1 class="mb-4">{% trans "Search Results" %}{% if query %} - "{{ query }}"{% endif %}</h1>
 
     <!-- Filtros -->
     <div class="card mb-4">
         <div class="card-body">
-            <h5 class="card-title">{% trans "Filters" %}</h5>
-            <form method="get" action="{% url 'pages:page_list' %}">
+            <h5 class="card-title">{% trans "Search and Filters" %}</h5>
+            <form method="get" action="{% url 'pages:page_search' %}">
                 <div class="row">
                     <div class="col-md-3 mb-3">
                         <label for="q">{% trans "Search" %}</label>
@@ -24,7 +25,7 @@
                         <select name="category" id="category" class="form-control">
                             <option value="">{% trans "All Categories" %}</option>
                             {% for category in categories %}
-                            <option value="{{ category.slug }}" {% if current_category.slug == category.slug %}selected{% endif %}>{{ category.name }}</option>
+                            <option value="{{ category.slug }}" {% if selected_category == category.slug %}selected{% endif %}>{{ category.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -37,15 +38,15 @@
                         <input type="date" name="date_to" id="date_to" class="form-control" value="{{ date_to }}">
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
+                <button type="submit" class="btn btn-primary">{% trans "Search" %}</button>
             </form>
         </div>
     </div>
 
-    <!-- Lista de páginas -->
+    <!-- Resultados da busca -->
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">{% trans "Pages" %}</h5>
+            <h5 class="card-title">{% trans "Search Results" %}</h5>
             {% if pages %}
             <div class="row">
                 {% for page in pages %}
@@ -71,7 +72,7 @@
             {% include "partials/pagination.html" with page_obj=pages %}
 
             {% else %}
-            <p>{% trans "No pages found." %}</p>
+            <p>{% trans "No pages found matching your search criteria." %}</p>
             {% endif %}
         </div>
     </div>

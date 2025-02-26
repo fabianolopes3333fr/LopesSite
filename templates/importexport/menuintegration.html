@@ -1,0 +1,13 @@
+{% comment %}
+Adicione este snippet ao seu menu principal, geralmente no arquivo base.html ou header.html
+{% endcomment %}
+
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="importExportDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-exchange-alt"></i> {% trans "Import/Export" %}
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="importExportDropdown">
+        <li><a class="dropdown-item" href="{% url 'importexport:export_list' %}">{% trans "Export Content" %}</a></li>
+        <li><a class="dropdown-item" href="{% url 'importexport:import_form' %}">{% trans "Import Content" %}</a></li>
+    </ul>
+</li>

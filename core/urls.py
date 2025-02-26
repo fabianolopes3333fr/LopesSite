@@ -17,6 +17,10 @@ urlpatterns = [
     path('config/', include('apps.config.urls')),
     path('pages/', include('apps.pages.urls')),
     path('widgets/', include('apps.widgets.urls')),
+    path('api/', include('apps.api.urls')),
+    path('importexport/', include('apps.importexport.urls')),
+    path('cdn/', include('apps.cdn.urls')),
+    
     
     path('ckeditor5/', include('django_ckeditor_5.urls')),
     

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Import Content" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .import-formats-help {
+        font-size: 0.9rem;
+    }
+
+    .import-formats-help .format-name {
+        font-weight: bold;
+        color: #0d6efd;
+    }
+
+    .format-details {
+        margin: 0.5rem 0 1rem 1.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1>{% trans "Import Content" %}</h1>
+        <p class="lead">{% trans "Import pages from various file formats" %}</p>
+
+        <!-- Import Form -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">{% trans "Import File" %}</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'importexport:import_preview' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label for="import_file" class="form-label">{% trans "Select file to import" %} *</label>
+                        <input type="file" class="form-control" id="import_file" name="import_file" required accept=".json,.csv,.zip">
+                        <div class="form-text">{% trans "Choose a file in one of the supported formats." %}</div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload me-1"></i> {% trans "Upload & Preview" %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Supported Formats Help -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">{% trans "Supported Formats" %}</h5>
+            </div>
+            <div class="card-body import-formats-help">
+                <div class="mb-3">
+                    <div class="format-name">JSON (.json)</div>
+                    <div class="format-details">
+                        {% trans "JSON files containing page data. Best for full exports, preserves all metadata and field values." %}
+                        <code>{"pages": [{"title": "Page Title", "slug": "page-slug", ...}]}</code>
+                    </div>
+
+                    <div class="format-name">CSV (.csv)</div>
+                    <div class="format-details">
+                        {% trans "CSV files with basic page data. Good for bulk imports of simple pages." %}
+                        <code>ID,Title,Slug,Summary,Status,Template,...</code>
+                    </div>
+
+                    <div class="format-name">ZIP (.zip)</div>
+                    <div class="format-details">
+                        {% trans "ZIP archive containing a JSON file plus media (images, files). Best for complete migration with files." %}
+                        <ul>
+                            <li>pages.json - {% trans "Contains page data" %}</li>
+                            <li>media/ - {% trans "Directory with images and files" %}</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <h6>{% trans "Tips for Successful Import" %}</h6>
+                    <ul class="mb-0">
+                        <li>{% trans "Make sure templates referenced in your import file exist in the system" %}</li>
+                        <li>{% trans "ZIP imports can handle media files but folder structure must match your export" %}</li>
+                        <li>{% trans "CSV imports only include basic fields, without custom fields or media" %}</li>
+                        <li>{% trans "For best results, import content to the same system version that exported it" %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
