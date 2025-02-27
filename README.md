@@ -2,9 +2,6 @@
 
 # Briefing para Desenvolvimento de CONFIG Personalizado em Django
 
-# Prompt para Claude VSCode - Implementação de CMS Personalizado
-
-Olá Claude, estou desenvolvendo um sistema completo de gerenciamento  em Django e preciso implementar um sistema de CMS CONFIG personalizado que permita ao cliente editar todo o conteúdo e estilo do site através de um painel administrativo. Por favor, me ajude com esta implementação seguindo estas especificações:
 
 ## Visão Geral do Projeto
 - **Nome do Projeto**: CONFIG Personalizado para Serviços de Pintura
@@ -65,6 +62,73 @@ Olá Claude, estou desenvolvendo um sistema completo de gerenciamento  em Django
   - Tipos de campo (texto, rich text, imagem, galeria, vídeo, arquivo, mapa, etc.)
   - Validação por tipo de campo
   - Grupos de campos para organização
+  
+### Detalhamento de items de desenvolvimento
+  ## 1. Hierarquia de Páginas (parent/child) 
+- [✅] Modelo de dados com relação hierárquica (utilizando MPTT ou similar)
+- [✅] Interface para visualizar a estrutura de árvore de páginas
+- [✅] Funcionalidade de arrastar e soltar para reorganizar páginas
+- [✅] Validação para evitar ciclos na hierarquia
+- [✅] Breadcrumbs dinâmicos baseados na hierarquia
+- [✅] URLs aninhadas refletindo a estrutura hierárquica
+- [✅] Controle de herança de configurações (tema, permissões, etc.)
+
+## 2. Metadados Completos
+- [✅] Campos SEO (meta_title, meta_description, meta_keywords)
+- [✅] Campos Open Graph (og_title, og_description, og_image, og_type)
+- [✅] Campos Schema.org (schema_type e dados JSON estruturados)
+- [✅] Preview de resultados de busca no editor
+- [✅] Preview de compartilhamento em redes sociais
+- [✅] Validação de tamanhos (título máx. 60 caracteres, descrição máx. 160)
+- [✅] Contador de caracteres para campos com limite
+- [✅] Sugestões de otimização SEO
+
+## 3. Versionamento de Conteúdo
+- [✅] Sistema de histórico de versões com data/hora e autor
+- [✅] Modelo para armazenar snapshots de páginas
+- [✅] Interface para comparar versões lado a lado
+- [✅] Funcionalidade de restauração para versões anteriores
+- [✅] Comentários por versão para documentar alterações
+- [✅] Armazenamento eficiente (apenas diferenças entre versões)
+- [✅] Limpeza automática de versões antigas (configurável)
+
+## 4. Sistema de Status
+- [✅] Estados de página: rascunho, revisão, agendado, publicado, arquivado
+- [✅] Workflow de aprovação com notificações
+- [✅] Agendamento de publicação com data/hora específica
+- [✅] Despublicação automática (opcional)
+- [✅] Controle de acesso baseado em status
+- [✅] Dashboard com páginas por status
+- [✅] Histórico de mudanças de status
+
+## 5. Permalinks e Redirecionamentos
+- [✅] URLs personalizáveis independentes da hierarquia
+- [✅] Validação de unicidade de URLs
+- [✅] Geração automática de slugs a partir do título
+- [✅] Redirecionamentos 301/302 para URLs antigas
+- [✅] Rastreamento de acessos aos redirecionamentos
+- [✅] Interface para gerenciar redirecionamentos
+- [✅] Importação/exportação de regras de redirecionamento
+
+## 6. Tipos de Campo Personalizáveis
+- [✅] Texto curto (string)
+- [✅] Texto longo (textarea)
+- [✅] Editor rich text (WYSIWYG)
+- [✅] Número (inteiro e decimal)
+- [✅] Booleano (checkbox)
+- [✅] Data e hora
+- [✅] Seleção (dropdown)
+- [✅] Múltipla escolha (checkboxes)
+- [✅] Imagem com recorte e dimensionamento
+- [✅] Galeria de imagens
+- [✅] Arquivo para download
+- [✅] Vídeo (upload e embeds)
+- [✅] Áudio
+- [✅] Mapa com geocodificação
+- [✅] Cor (color picker)
+- [✅] Código (editor com syntax highlighting)
+- [✅] Relação com outros objetos (páginas, usuários, etc.)
+- [✅] JSON para dados estruturados
 
 ### 2. Sistema de Templates
 - **Arquitetura**:
