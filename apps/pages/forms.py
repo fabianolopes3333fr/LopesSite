@@ -3,13 +3,23 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.forms import TextInput, Textarea
 from django.contrib.auth.models import User
 from mptt.forms import TreeNodeChoiceField
 from django_ckeditor_5.widgets import CKEditor5Widget
 from .models import (
-    Page, PageCategory, PageTemplate, FieldGroup, FieldDefinition, 
+    Page, PageApproval, PageCategory, PageTemplate, FieldGroup, FieldDefinition, 
     PageFieldValue, PageComment, PageGallery, PageRevisionRequest
 )
+
+
+class PageApprovalForm(forms.ModelForm):
+    class Meta:
+        model = PageApproval
+        fields = ['comment']
+        widgets = {
+            'comment': forms.Textarea(attrs={'rows': 4}),
+        }
 
 
 class PageBaseForm(forms.ModelForm):
@@ -348,6 +358,37 @@ class PageBaseForm(forms.ModelForm):
                 field_value_obj.save()
 
 
+class PageForm(forms.ModelForm):
+    """Formulário personalizado para administração de páginas"""
+    
+    class Meta:
+        model = Page
+        fields = '__all__'
+        widgets = {
+            'meta_title': TextInput(attrs={'placeholder': _('Se vazio, usa o título da página')}),
+            'meta_description': Textarea(attrs={'rows': 3, 'placeholder': _('Descrição para SEO (máx. 300 caracteres)')}),
+            'meta_keywords': TextInput(attrs={'placeholder': _('Palavras-chave separadas por vírgula')}),
+            'og_title': TextInput(attrs={'placeholder': _('Se vazio, usa o título SEO ou o título da página')}),
+            'og_description': Textarea(attrs={'rows': 3, 'placeholder': _('Descrição para redes sociais')}),
+            'schema_data': Textarea(attrs={'rows': 5, 'placeholder': '{\n  "additionalProperty": {\n    "@type": "PropertyValue",\n    "name": "Exemplo",\n    "value": "Valor"\n  }\n}'}),
+        }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['meta_title'].widget.attrs.update({'maxlength': 60, 'data-counter': 'true'})
+        self.fields['meta_description'].widget.attrs.update({'maxlength': 160, 'data-counter': 'true'})
+
+    def clean_meta_title(self):
+        meta_title = self.cleaned_data.get('meta_title')
+        if len(meta_title) > 60:
+            raise forms.ValidationError(_('Meta title must be 60 characters or less.'))
+        return meta_title
+
+    def clean_meta_description(self):
+        meta_description = self.cleaned_data.get('meta_description')
+        if len(meta_description) > 160:
+            raise forms.ValidationError(_('Meta description must be 160 characters or less.'))
+        return meta_description
+    
 class PagePublishForm(forms.Form):
     """
     Formulário para publicação de páginas

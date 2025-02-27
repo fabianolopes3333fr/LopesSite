@@ -10,6 +10,7 @@ urlpatterns = [
     path('', views.PageListView.as_view(), name='page_list'),
     path('page/<slug:slug>/', views.PageDetailView.as_view(), name='page_detail'),
     path('pages/<path:path>/', views.PageDetailView.as_view(), name='page_path'),
+    path('<path:page_path>/', views.PageDetailView, name='page_detail'),
     path('category/<slug:category_slug>/', views.PageListView.as_view(), name='page_category'),
     path('search/', views.PageSearchView.as_view(), name='page_search'),
     

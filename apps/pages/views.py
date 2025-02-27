@@ -24,18 +24,129 @@ from django.db import transaction
 import re
 
 from .models import (
-    Page, PageCategory, PageTemplate, FieldGroup, FieldDefinition, 
+    Page, PageApproval, PageCategory, PageTemplate, FieldGroup, FieldDefinition, 
     PageFieldValue, PageGallery, PageImage, PageComment, PageVersion,
-    PageRedirect, PageRevisionRequest, PageNotification, PageMeta
+    PageRedirect, PageRevisionRequest, PageNotification, PageMeta, 
 )
 from .forms import (
-    PageBaseForm, PagePublishForm, PageReviewRequestForm, 
+    PageApprovalForm, PageBaseForm, PagePublishForm, PageReviewRequestForm, 
     PageCommentForm, PageSearchForm, GalleryForm
 )
 
 import json
 import re
 
+def handle_redirect(request, path):
+    try:
+        redirect_rule = PageRedirect.objects.get(old_path=path)
+        redirect_rule.access_count += 1
+        redirect_rule.last_accessed = timezone.now()
+        redirect_rule.save()
+        return redirect(redirect_rule.new_path, permanent=(redirect_rule.redirect_type == '301'))
+    except PageRedirect.DoesNotExist:
+        # Handle 404 or fallback to default view
+        pass
+
+
+
+@login_required
+def compare_versions(request, page_id, version1_id, version2_id):
+    """
+    View para comparar duas versões de uma página.
+    """
+    page = get_object_or_404(Page, id=page_id)
+    version1 = get_object_or_404(PageVersion, id=version1_id, page=page)
+    version2 = get_object_or_404(PageVersion, id=version2_id, page=page)
+
+    diff = page.get_version_diff(version1, version2)
+
+    return render(request, 'pages/compare_versions.html', {
+        'page': page,
+        'version1': version1,
+        'version2': version2,
+        'diff': diff,
+    })
+
+@login_required
+def restore_version(request, page_id, version_id):
+    """
+    View para restaurar uma versão específica de uma página.
+    """
+    page = get_object_or_404(Page, id=page_id)
+    version = get_object_or_404(PageVersion, id=version_id, page=page)
+
+    if request.method == 'POST':
+        page.restore_version(version)
+        messages.success(request, _("Page restored to version from %s") % version.created_at)
+        return redirect('admin:pages_page_change', page.id)
+
+    return render(request, 'pages/restore_version_confirm.html', {
+        'page': page,
+        'version': version,
+    })
+
+@login_required
+@permission_required('pages.change_page')
+def change_page_status(request, page_id):
+    """
+    View para alterar o status de uma página.
+    """
+    page = get_object_or_404(Page, id=page_id)
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        if new_status in dict(Page.STATUS_CHOICES):
+            old_status = page.status
+            page.status = new_status
+            page.save()
+            page.status_history.create(
+                old_status=old_status,
+                new_status=new_status,
+                changed_by=request.user,
+                comment=request.POST.get('comment', '')
+            )
+            messages.success(request, _('Page status updated successfully.'))
+        else:
+            messages.error(request, _('Invalid status.'))
+    return redirect('admin:pages_page_change', page.id)
+
+@login_required
+@permission_required('pages.add_pageapproval')
+def request_page_approval(request, page_id):
+    """
+    View para solicitar aprovação de uma página.
+    """
+    page = get_object_or_404(Page, id=page_id)
+    if request.method == 'POST':
+        form = PageApprovalForm(request.POST)
+        if form.is_valid():
+            approval = form.save(commit=False)
+            approval.page = page
+            approval.requested_by = request.user
+            approval.save()
+            messages.success(request, _('Approval request sent successfully.'))
+            return redirect('admin:pages_page_change', page.id)
+    else:
+        form = PageApprovalForm()
+    return render(request, 'admin/pages/page/approval_request.html', {'form': form, 'page': page})
+
+@login_required
+@permission_required('pages.change_pageapproval')
+def approve_page(request, approval_id):
+    """
+    View para aprovar uma página.
+    """
+    approval = get_object_or_404(PageApproval, id=approval_id, status='pending')
+    if request.method == 'POST':
+        approval.status = 'approved'
+        approval.approved_by = request.user
+        approval.approved_at = timezone.now()
+        approval.save()
+        approval.page.status = 'published'
+        approval.page.save()
+        messages.success(request, _('Page approved and published successfully.'))
+    return redirect('admin:pages_page_change', approval.page.id)
+
+# classes ---------------------
 
 class PageListView(ListView):
     """

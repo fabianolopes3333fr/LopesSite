@@ -67,6 +67,7 @@ THIRD_APPS = [ # são as Lib/app que instalamos no projeto
     'crispy_bootstrap5',
     'redis',
     'rest_framework',
+    'mapwidgets',
     
     
 

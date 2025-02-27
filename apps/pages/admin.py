@@ -1,5 +1,5 @@
 # your_cms_app/pages/admin.py
-
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
@@ -13,13 +13,27 @@ from django import forms
 from django.contrib.admin.widgets import AdminFileWidget
 from django.db.models import Count
 from mptt.admin import MPTTModelAdmin, DraggableMPTTAdmin
-from django.shortcuts import get_object_or_404
+import csv
+from django.http import HttpResponse
 from django.template.response import TemplateResponse
+from .forms import PageForm
 from .models import (
-    PageCategory, PageTemplate, FieldGroup, FieldDefinition, Page, PageVersion,
+    PageApproval, PageCategory, PageStatusHistory, PageTemplate, FieldGroup, FieldDefinition, Page, PageVersion,
     PageFieldValue, PageRedirect, PageGallery, PageImage, PageComment,
     PageMeta, PageRevisionRequest, PageNotification
 )
+
+class PageStatusHistoryInline(admin.TabularInline):
+    model = PageStatusHistory
+    extra = 0
+    readonly_fields = ('changed_at', 'changed_by', 'old_status', 'new_status')
+    can_delete = False
+
+class PageApprovalInline(admin.TabularInline):
+    model = PageApproval
+    extra = 0
+    readonly_fields = ('requested_by', 'requested_at', 'approved_by', 'approved_at')
+    can_delete = False
 
 
 class FieldGroupInline(admin.TabularInline):
@@ -221,31 +235,18 @@ class PageRevisionRequestInline(admin.TabularInline):
         return False
 
 
-class PageAdminForm(forms.ModelForm):
-    """Formulário personalizado para administração de páginas"""
-    
-    class Meta:
-        model = Page
-        fields = '__all__'
-        widgets = {
-            'meta_title': TextInput(attrs={'placeholder': _('Se vazio, usa o título da página')}),
-            'meta_description': Textarea(attrs={'rows': 3, 'placeholder': _('Descrição para SEO (máx. 300 caracteres)')}),
-            'meta_keywords': TextInput(attrs={'placeholder': _('Palavras-chave separadas por vírgula')}),
-            'og_title': TextInput(attrs={'placeholder': _('Se vazio, usa o título SEO ou o título da página')}),
-            'og_description': Textarea(attrs={'rows': 3, 'placeholder': _('Descrição para redes sociais')}),
-            'schema_data': Textarea(attrs={'rows': 5, 'placeholder': '{\n  "additionalProperty": {\n    "@type": "PropertyValue",\n    "name": "Exemplo",\n    "value": "Valor"\n  }\n}'}),
-        }
+
 
 
 class PageAdmin(DraggableMPTTAdmin):
     """Administração de páginas"""
-    form = PageAdminForm
-    list_display = ('tree_actions', 'indented_title', 'status', 'template', 'created_at', 'updated_at', 'view_on_site')
+    form = PageForm
+    list_display = ('tree_actions', 'indented_title', 'status', 'template', 'created_at', 'updated_at', 'view_on_site', 'is_published')
     list_filter = ('status', 'template', 'visibility', 'is_indexable', 'is_visible_in_menu', 'categories')
     search_fields = ('title', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'content')
     prepopulated_fields = {'slug': ('title',)}
     date_hierarchy = 'created_at'
-    actions = ['publish_selected', 'unpublish_selected', 'archive_selected']
+    actions = ['publish_selected', 'unpublish_selected', 'archive_selected', 'create_new_version']
     save_on_top = True
     mptt_level_indent = 20
     
@@ -291,9 +292,14 @@ class PageAdmin(DraggableMPTTAdmin):
         PageVersionInline,
         PageCommentInline,
         PageRevisionRequestInline,
+        PageStatusHistoryInline,
+        PageApprovalInline,
     ]
     
     readonly_fields = ('created_at', 'updated_at', 'created_by', 'updated_by', 'published_by', 'view_on_site')
+    
+    class Media:
+        js = ('js/seo_preview.js',)  # Arquivo JS para preview em tempo real
     
     def view_on_site(self, obj):
         """Adiciona botão para visualizar a página no site"""
@@ -308,6 +314,12 @@ class PageAdmin(DraggableMPTTAdmin):
     
     def save_model(self, request, obj, form, change):
         """Salva o modelo com informações adicionais"""
+        
+        is_new = obj.pk is None
+        super().save_model(request, obj, form, change)
+        if not is_new:
+            obj.create_version(request.user, _("Automatic version on save"))
+            obj.save()
         # Registra o usuário que criou/atualizou a página
         if not change:
             obj.created_by = request.user
@@ -354,6 +366,26 @@ class PageAdmin(DraggableMPTTAdmin):
                 custom_fields=custom_fields,
                 comment=_('Versão criada automaticamente após alterações')
             )
+    
+    def publish_pages(self, request, queryset):
+        updated = queryset.update(status='published', published_at=timezone.now())
+        self.message_user(request, _(f'{updated} pages were successfully published.'))
+    publish_pages.short_description = _('Publish selected pages')
+
+    def unpublish_pages(self, request, queryset):
+        updated = queryset.update(status='draft', published_at=None)
+        self.message_user(request, _(f'{updated} pages were successfully unpublished.'))
+    unpublish_pages.short_description = _('Unpublish selected pages')
+    
+    def create_new_version(self, request, queryset):
+        """
+        Ação para criar uma nova versão manualmente.
+        """
+        for page in queryset:
+            page.create_version(request.user, _("Manually created version"))
+        self.message_user(request, _("New versions created successfully."))
+    create_new_version.short_description = _("Create new version for selected pages")
+    
     
     def get_urls(self):
         """Adiciona URLs personalizadas para ações administrativas"""
@@ -547,6 +579,25 @@ class PageAdmin(DraggableMPTTAdmin):
     archive_selected.short_description = _('Arquivar páginas selecionadas')
 
 
+@admin.register(PageApproval)
+class PageApprovalAdmin(admin.ModelAdmin):
+    list_display = ('page', 'requested_by', 'requested_at', 'status', 'approved_by', 'approved_at')
+    list_filter = ('status', 'requested_at', 'approved_at')
+    search_fields = ('page__title', 'requested_by__username', 'approved_by__username')
+    actions = ['approve_selected']
+
+    def approve_selected(self, request, queryset):
+        for approval in queryset.filter(status='pending'):
+            approval.status = 'approved'
+            approval.approved_by = request.user
+            approval.approved_at = timezone.now()
+            approval.save()
+            approval.page.status = 'published'
+            approval.page.save()
+        self.message_user(request, _('Selected approvals have been processed.'))
+    approve_selected.short_description = _('Approve selected requests')
+
+
 class PageGalleryAdmin(admin.ModelAdmin):
     """Administração de galerias de imagens"""
     list_display = ('name', 'page', 'created_at', 'image_count')
@@ -563,11 +614,43 @@ class PageGalleryAdmin(admin.ModelAdmin):
 
 class PageRedirectAdmin(admin.ModelAdmin):
     """Administração de redirecionamentos"""
-    list_display = ('old_path', 'page', 'redirect_type', 'is_active', 'access_count', 'last_accessed')
+    list_display = ('old_path', 'page', 'new_path','redirect_type', 'is_active', 'access_count', 'last_accessed')
     list_filter = ('redirect_type', 'is_active', 'created_at')
-    search_fields = ('old_path', 'page__title')
+    search_fields = ('old_path', 'new_path')
     readonly_fields = ('access_count', 'last_accessed')
 
+    
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('import-redirects/', self.import_redirects, name='import_redirects'),
+            path('export-redirects/', self.export_redirects, name='export_redirects'),
+        ]
+        return custom_urls + urls
+
+    def import_redirects(self, request):
+        if request.method == 'POST':
+            csv_file = request.FILES['csv_file']
+            decoded_file = csv_file.read().decode('utf-8').splitlines()
+            reader = csv.DictReader(decoded_file)
+            for row in reader:
+                PageRedirect.objects.create(
+                    old_path=row['old_path'],
+                    new_path=row['new_path'],
+                    redirect_type=row['redirect_type']
+                )
+            messages.success(request, 'Redirects imported successfully.')
+            return redirect('..')
+        return render(request, 'admin/import_redirects.html')
+
+    def export_redirects(self, request):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="redirects.csv"'
+        writer = csv.writer(response)
+        writer.writerow(['old_path', 'new_path', 'redirect_type'])
+        for redirect in PageRedirect.objects.all():
+            writer.writerow([redirect.old_path, redirect.new_path, redirect.redirect_type])
+        return response
 
 class PageCommentAdmin(admin.ModelAdmin):
     """Administração de comentários"""

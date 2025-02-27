@@ -1,0 +1,20 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{% trans "Restore Version" %}</h1>
+<p>{% trans "Are you sure you want to restore this version?" %}</p>
+
+<div class="version-info">
+    <p>{% trans "Page" %}: {{ page.title }}</p>
+    <p>{% trans "Version created at" %}: {{ version.created_at }}</p>
+    <p>{% trans "Created by" %}: {{ version.created_by }}</p>
+    <p>{% trans "Comment" %}: {{ version.comment }}</p>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="submit" value="{% trans 'Restore' %}" class="button">
+    <a href="{% url 'admin:pages_page_change' page.id %}" class="button cancel-link">{% trans "Cancel" %}</a>
+</form>
+{% endblock %}

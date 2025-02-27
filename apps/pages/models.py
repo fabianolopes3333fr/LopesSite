@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
@@ -11,70 +12,19 @@ from django.core.validators import FileExtensionValidator
 from mptt.models import MPTTModel, TreeForeignKey
 from django_ckeditor_5.fields import CKEditor5Field
 from colorfield.fields import ColorField
+from django.contrib.postgres.fields import JSONField
+from mapwidgets.widgets import GooglePointFieldWidget
+from django.contrib.gis.db import models as gis_models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+import jsonpatch
 import json
 import uuid
 import os
 
-# class ContentBlock(models.Model):
-#     name = models.CharField(max_length=100)
-#     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-#     object_id = models.PositiveIntegerField()
-#     content_object = GenericForeignKey('content_type', 'object_id')
-#     order = models.PositiveIntegerField(default=0)
 
-#     class Meta:
-#         ordering = ['order']
+User = get_user_model()
 
-# class TextBlock(models.Model):
-#     content = models.TextField()
-
-# class ImageBlock(models.Model):
-#     image = models.ImageField(upload_to='content_blocks/')
-#     caption = models.CharField(max_length=255, blank=True)
-
-# TEMPLATE_CHOICES = [
-#     ('default', 'Default'),
-#     ('homepage', 'Homepage'),
-#     ('sidebar', 'With Sidebar'),
-# ]
-# class PagePages(models.Model):
-#     title = models.CharField(max_length=200)
-#     slug = models.SlugField(unique=True)
-#     template = models.CharField(max_length=100, choices=TEMPLATE_CHOICES)
-
-# class Region(models.Model):
-#     page = models.ForeignKey(PagePages, on_delete=models.CASCADE, related_name='regions')
-#     name = models.CharField(max_length=100)
-#     content = models.TextField(blank=True)
-
-# class TemplateOverride(models.Model):
-#     name = models.CharField(max_length=100)
-#     content = models.TextField()
-#     is_active = models.BooleanField(default=True)
-
-# class TemplateLoader:
-#     @staticmethod
-#     def get_template(name):
-#         try:
-#             override = TemplateOverride.objects.get(name=name, is_active=True)
-#             return Template(override.content)
-#         except TemplateOverride.DoesNotExist:
-#             return get_template(name)
-
-#     def get_template_sources(self, template_name, template_dirs=None):
-#         try:
-#             page = PagePages.objects.get(slug=template_name)
-#             if page.template_content:
-#                 return [{'name': template_name, 'content': page.template_content}]
-#         except PagePages.DoesNotExist:
-#             pass
-#         return super().get_template_sources(template_name, template_dirs)
-    
-    
-    # Novo modelo apartir deste ponto
-    
     
 def validate_json(value):
     """Validador para campos JSON"""
@@ -309,6 +259,7 @@ class Page(MPTTModel):
     slug = models.SlugField(_('Slug'), max_length=250, unique=True)
     content = CKEditor5Field(_('Conteúdo principal'), blank=True)
     summary = models.TextField(_('Resumo'), blank=True)
+    custom_url = models.CharField(max_length=255, blank=True, unique=True)
     
     # Hierarquia e categorização
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, 
@@ -319,6 +270,8 @@ class Page(MPTTModel):
     # Template e layout
     template = models.ForeignKey(PageTemplate, on_delete=models.CASCADE, 
                                related_name='pages', verbose_name=_('Template'))
+    theme = models.CharField(max_length=50, blank=True, null=True)
+    permissions = models.JSONField(default=dict, blank=True)
     
     # Status e publicação
     status = models.CharField(_('Status'), max_length=20, choices=STATUS_CHOICES, default='draft')
@@ -337,6 +290,8 @@ class Page(MPTTModel):
     updated_at = models.DateTimeField(_('Última atualização'), auto_now=True)
     published_at = models.DateTimeField(_('Data de publicação'), null=True, blank=True)
     scheduled_at = models.DateTimeField(_('Data agendada'), null=True, blank=True)
+    unpublish_at = models.DateTimeField(_('Unpublish At'), null=True, blank=True)
+    last_modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='pages_modified')
     
     # SEO e metadados
     meta_title = models.CharField(_('Título SEO'), max_length=150, blank=True, 
@@ -356,7 +311,7 @@ class Page(MPTTModel):
     og_type = models.CharField(_('Tipo Open Graph'), max_length=50, 
                             choices=(('website', 'Website'), ('article', 'Article'), ('blog', 'Blog'), 
                                     ('product', 'Product')),
-                            default='website')
+                            default='website', help_text=_('Open Graph type'))
     
     # Schema.org
     schema_type = models.CharField(_('Tipo Schema.org'), max_length=50, 
@@ -364,7 +319,7 @@ class Page(MPTTModel):
                                         ('BlogPosting', 'BlogPosting'), ('Product', 'Product'), 
                                         ('Event', 'Event'), ('Organization', 'Organization'), 
                                         ('Person', 'Person'), ('LocalBusiness', 'LocalBusiness')), 
-                                default='WebPage')
+                                default='WebPage',help_text=_('Schema.org type') )
     schema_data = models.TextField(_('Dados Schema.org'), blank=True, 
                                 validators=[validate_json], 
                                 help_text=_('JSON adicional para Schema.org'))
@@ -422,27 +377,86 @@ class Page(MPTTModel):
         # Se a página está sendo publicada pela primeira vez
         if self.status == 'published' and not self.published_at:
             self.published_at = timezone.now()
+            
+        elif self.status != 'published':
+            self.published_at = None
         
         # Se a página está sendo agendada
         if self.status == 'scheduled' and not self.scheduled_at:
             # Define uma data futura padrão (1 dia depois)
             self.scheduled_at = timezone.now() + timezone.timedelta(days=1)
+            raise ValidationError(_('Scheduled date is required for scheduled status.'))
+        
+         # Ensure custom_url is unique if provided
+        if self.custom_url:
+            if Page.objects.filter(custom_url=self.custom_url).exclude(pk=self.pk).exists():
+                raise ValidationError(_("This custom URL is already in use."))
             
         super().save(*args, **kwargs)
     
+    def create_version(self, user, comment=''):
+        """
+        Cria uma nova versão da página.
+        """
+        content = {
+            'title': self.title,
+            'content': self.content,
+            # Adicione outros campos relevantes aqui
+        }
+        return PageVersion.objects.create(
+            page=self,
+            content=content,
+            created_by=user,
+            comment=comment
+        )
+
+    def restore_version(self, version):
+        """
+        Restaura a página para uma versão específica.
+        """
+        if isinstance(version, PageVersion) and version.page == self:
+            self.title = version.content['title']
+            self.content = version.content['content']
+            # Restaure outros campos relevantes aqui
+            self.save()
+        else:
+            raise ValidationError(_("Invalid version for this page."))
+
+    def get_version_diff(self, version1, version2):
+        """
+        Retorna a diferença entre duas versões.
+        """
+        return jsonpatch.make_patch(version1.content, version2.content)
+
+    def clean_old_versions(self):
+        """
+        Remove versões antigas com base nas configurações.
+        """
+        retention_days = getattr(settings, 'PAGE_VERSION_RETENTION_DAYS', 30)
+        cutoff_date = timezone.now() - timezone.timedelta(days=retention_days)
+        old_versions = self.versions.filter(created_at__lt=cutoff_date)
+        old_versions.delete()
+    
     def get_absolute_url(self):
         """Retorna a URL da página"""
+        # Use custom_url if available, otherwise use slug
+        
         if self.permalink:
             return self.permalink
         
         if self.is_root_node():
             return reverse('pages:page', kwargs={'slug': self.slug})
+        
+        if self.custom_url:
+            return f"/{self.custom_url.strip('/')}/"
+    
         else:
             # Constrói a URL com base na hierarquia
             ancestors = self.get_ancestors(include_self=True)
             path = '/'.join([ancestor.slug for ancestor in ancestors])
-            return reverse('pages:page_path', kwargs={'path': path})
+            return reverse('pages:page_path', kwargs={'path': path, 'slug': self.slug})
     
+        
     @property
     def effective_meta_title(self):
         """Retorna o título meta efetivo, usando o título da página se necessário"""
@@ -484,11 +498,17 @@ class Page(MPTTModel):
     
     def is_published(self):
         """Verifica se a página está publicada"""
-        return self.status == 'published' or (
-            self.status == 'scheduled' and 
-            self.scheduled_at and 
-            self.scheduled_at <= timezone.now()
-        )
+        now = timezone.now()
+        return (self.status == 'published' 
+        
+        or 
+            (self.status == 'scheduled' 
+        and 
+            self.scheduled_at 
+        and 
+            self.scheduled_at <= now)
+        and
+            not self.unpublish_at or self.unpublish_at > now)
     
     def needs_password(self):
         """Verifica se a página precisa de senha para acesso"""
@@ -498,6 +518,55 @@ class Page(MPTTModel):
         """Verifica se a senha fornecida é válida"""
         return self.password and self.password == password
 
+    def get_theme(self):
+        if self.theme:
+            return self.theme
+        if self.parent:
+            return self.parent.get_theme()
+        return 'default'  # tema padrão
+
+    def get_permissions(self):
+        if self.permissions:
+            return self.permissions
+        if self.parent:
+            return self.parent.get_permissions()
+        return {}  # permissões padrão
+    
+    def clean(self):
+        if self.parent and self.pk:
+            if self.parent.is_descendant_of(self):
+                raise ValidationError(_("Uma página não pode ser seu próprio descendente."))
+        super().clean()
+
+class PageStatusHistory(models.Model):
+    """
+    Modelo para armazenar o histórico de mudanças de status das páginas.
+    """
+    page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name='status_history')
+    old_status = models.CharField(_('Old Status'), max_length=20, choices=Page.STATUS_CHOICES)
+    new_status = models.CharField(_('New Status'), max_length=20, choices=Page.STATUS_CHOICES)
+    changed_at = models.DateTimeField(_('Changed At'), auto_now_add=True)
+    changed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    comment = models.TextField(_('Comment'), blank=True)
+
+class PageApproval(models.Model):
+    """
+    Modelo para gerenciar o workflow de aprovação de páginas.
+    """
+    page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name='approvals')
+    requested_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='approval_requests')
+    approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='approvals_given')
+    requested_at = models.DateTimeField(_('Requested At'), auto_now_add=True)
+    approved_at = models.DateTimeField(_('Approved At'), null=True, blank=True)
+    status = models.CharField(_('Approval Status'), max_length=20, choices=(
+        ('pending', _('Pending')),
+        ('approved', _('Approved')),
+        ('rejected', _('Rejected')),
+    ), default='pending')
+    comment = models.TextField(_('Comment'), blank=True)
+
+    class Meta:
+        ordering = ['-requested_at']
 
 class PageVersion(models.Model):
     """
@@ -568,6 +637,57 @@ class PageVersion(models.Model):
         
         return page
 
+class CustomField(models.Model):
+    name = models.CharField(max_length=100)
+    field_type = models.CharField(max_length=50, choices=[
+        ('short_text', 'Texto curto'),
+        ('long_text', 'Texto longo'),
+        ('rich_text', 'Editor rich text'),
+        ('integer', 'Número inteiro'),
+        ('decimal', 'Número decimal'),
+        ('boolean', 'Booleano'),
+        ('date_time', 'Data e hora'),
+        ('dropdown', 'Seleção (dropdown)'),
+        ('multiple_choice', 'Múltipla escolha'),
+        ('image', 'Imagem'),
+        ('gallery', 'Galeria de imagens'),
+        ('file', 'Arquivo para download'),
+        ('video', 'Vídeo'),
+        ('audio', 'Áudio'),
+        ('map', 'Mapa'),
+        ('color', 'Cor'),
+        ('code', 'Código'),
+        ('relation', 'Relação com outros objetos'),
+        ('json', 'JSON'),
+    ])
+    
+    # Campos específicos para cada tipo
+    short_text = models.CharField(max_length=255, blank=True, null=True)
+    long_text = models.TextField(blank=True, null=True)
+    rich_text = CKEditor5Field(blank=True, null=True)
+    integer = models.IntegerField(blank=True, null=True)
+    decimal = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    boolean = models.BooleanField(default=False)
+    date_time = models.DateTimeField(blank=True, null=True)
+    dropdown_choices = models.TextField(blank=True, null=True, help_text="Enter choices separated by commas")
+    multiple_choice = models.TextField(blank=True, null=True, help_text="Enter choices separated by commas")
+    image = models.ImageField(upload_to='custom_fields/images/', blank=True, null=True)
+    gallery = models.ManyToManyField('Gallery', blank=True)
+    file = models.FileField(upload_to='custom_fields/files/', blank=True, null=True)
+    video = models.URLField(blank=True, null=True)
+    audio = models.FileField(upload_to='custom_fields/audio/', blank=True, null=True)
+    map = gis_models.PointField(blank=True, null=True)
+    color = ColorField(blank=True, null=True)
+    code = models.TextField(blank=True, null=True)
+    relation = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)
+    json_data = JSONField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.get_field_type_display()})"
+
+    class Meta:
+        verbose_name = "Campo Personalizado"
+        verbose_name_plural = "Campos Personalizados"
 
 class PageFieldValue(models.Model):
     """
@@ -575,6 +695,7 @@ class PageFieldValue(models.Model):
     """
     page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name='field_values', 
                           verbose_name=_('Página'))
+    
     field = models.ForeignKey(FieldDefinition, on_delete=models.CASCADE, related_name='field_values', 
                            verbose_name=_('Campo'))
     value = models.TextField(_('Valor'), blank=True)
@@ -693,6 +814,7 @@ class PageRedirect(models.Model):
                           verbose_name=_('Página de destino'))
     old_path = models.CharField(_('Caminho antigo'), max_length=255, unique=True,
                              help_text=_('Caminho da URL antiga (ex: /antiga-url/)'))
+    new_path = models.CharField(max_length=255)
     redirect_type = models.IntegerField(_('Tipo de redirecionamento'), 
                                      choices=((301, _('Permanente (301)')), (302, _('Temporário (302)'))), 
                                      default=301)
@@ -709,7 +831,7 @@ class PageRedirect(models.Model):
         ordering = ['-created_at']
         
     def __str__(self):
-        return f"{self.old_path} → {self.page.title}"
+        return f"{self.old_path} → {self.new_path}"
     
     def increment_access(self):
         """Incrementa o contador de acessos e atualiza a data do último acesso"""

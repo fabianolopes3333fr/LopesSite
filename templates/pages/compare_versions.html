@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{% trans "Compare Versions" %}</h1>
+<h2>{{ page.title }}</h2>
+
+<div class="version-info">
+    <h3>{% trans "Version 1" %}</h3>
+    <p>{% trans "Created at" %}: {{ version1.created_at }}</p>
+    <p>{% trans "Created by" %}: {{ version1.created_by }}</p>
+    <p>{% trans "Comment" %}: {{ version1.comment }}</p>
+</div>
+
+<div class="version-info">
+    <h3>{% trans "Version 2" %}</h3>
+    <p>{% trans "Created at" %}: {{ version2.created_at }}</p>
+    <p>{% trans "Created by" %}: {{ version2.created_by }}</p>
+    <p>{% trans "Comment" %}: {{ version2.comment }}</p>
+</div>
+
+<h3>{% trans "Differences" %}</h3>
+<pre>{{ diff|json }}</pre>
+
+<a href="{% url 'admin:pages_page_change' page.id %}" class="button">{% trans "Back to Page" %}</a>
+{% endblock %}
