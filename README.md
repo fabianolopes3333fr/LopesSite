@@ -804,3 +804,4 @@ your_cms_project/
 
 Este briefing é um documento vivo e será atualizado conforme o projeto evolui. Todas as partes interessadas devem revisar e fornecer feedback para garantir que o produto final atenda às expectativas e necessidades dos usuários.
 
+# Lopescompleto
